@@ -2,7 +2,8 @@ import os
 import gpxpy
 import matplotlib.pyplot as plt
 
-gpx_rel_path = "../data/trails/fells_loop.gpx"
+trail_name = "fells_loop"
+gpx_rel_path = f"../data/trails/{trail_name}.gpx"
 
 def convert_to_abs_path(path: str):
     return os.path.abspath(os.path.join(os.path.dirname(__file__), path))

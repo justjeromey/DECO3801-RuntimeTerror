@@ -14,6 +14,7 @@ with open(gpx_path, 'r') as gpx_file:
 
 latitudes = []
 longitudes = []
+elevations = []
 
 # Try to get points from tracks (if any)
 for track in gpx.tracks:
@@ -21,6 +22,7 @@ for track in gpx.tracks:
         for point in segment.points:
             latitudes.append(point.latitude)
             longitudes.append(point.longitude)
+            elevations.append(point.elevation)
 
 # If no track points, get points from routes
 if not latitudes and not longitudes:
@@ -28,6 +30,8 @@ if not latitudes and not longitudes:
         for point in route.points:
             latitudes.append(point.latitude)
             longitudes.append(point.longitude)
+            elevations.append(point.elevation)
+
 for waypoint in gpx.waypoints:
     pass  
 
@@ -39,11 +43,7 @@ print(f"GPX file path: {gpx_path}")
 print(f"Tracks: {len(gpx.tracks)}")
 print(f"Routes: {len(gpx.routes)}")
 print(f"Waypoints: {len(gpx.waypoints)}")
-"""
-print(f"Number of points: {len(latitudes)}")
-print(f"First 5 latitudes: {latitudes[:5]}")
-print(f"First 5 longitudes: {longitudes[:5]}")
-"""
+
 plt.figure(figsize=(8, 6))
 plt.plot(longitudes, latitudes, marker='o', linestyle='-', color='blue')
 plt.title('GPX Trail Visualization')
@@ -52,6 +52,15 @@ plt.ylabel('Latitude')
 plt.grid(True)
 plt.gca().set_aspect('equal', adjustable='box') 
 plt.show()
+
+if elevations and any(e is not None for e in elevations):
+    plt.figure(figsize=(10, 4))
+    plt.plot([i for i in range(len(elevations))], elevations, marker='.', color='green')
+    plt.title('Elevation Profile')
+    plt.xlabel('Point Index')
+    plt.ylabel('Elevation (m)')
+    plt.grid(True)
+    plt.show()
 
 """
 print('GPX:', gpx.to_xml())

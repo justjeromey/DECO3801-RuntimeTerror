@@ -18,6 +18,8 @@ lidar_layer = layers[0]
 
 print(f"Loading layer: {lidar_layer}")
 lidar_gdf = gpd.read_file(gdb_path, layer=lidar_layer)
+lidar_gdf.plot()
+plt.show()
 
 #find brisbane from project_name
 brisbane_rows = lidar_gdf[lidar_gdf['project_name'].str.contains('brisbane', case=False, na=False)]

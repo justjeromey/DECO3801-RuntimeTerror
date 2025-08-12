@@ -39,12 +39,17 @@ for waypoint in gpx.waypoints:
 for route in gpx.routes:
     for point in route.points:
         pass 
+
+## Debugging messages
+"""
 print(f"GPX file exists: {os.path.exists(gpx_path)}")
 print(f"GPX file path: {gpx_path}")
 print(f"Tracks: {len(gpx.tracks)}")
 print(f"Routes: {len(gpx.routes)}")
 print(f"Waypoints: {len(gpx.waypoints)}")
+"""
 
+## Plotting the trail topdown view
 plt.figure(figsize=(8, 6))
 plt.plot(longitudes, latitudes, marker='o', linestyle='-', color='blue')
 plt.title('GPX Trail Visualization')
@@ -54,6 +59,7 @@ plt.grid(True)
 plt.gca().set_aspect('equal', adjustable='box') 
 plt.show()
 
+## Plotting the elevation profile
 if elevations and any(e is not None for e in elevations):
     plt.figure(figsize=(10, 4))
     plt.plot([i for i in range(len(elevations))], elevations, marker='.', color='green')
@@ -63,6 +69,7 @@ if elevations and any(e is not None for e in elevations):
     plt.grid(True)
     plt.show()
 
+## Creating a GPX file
 """
 print('GPX:', gpx.to_xml())
 

@@ -21,6 +21,6 @@
 **Updating Requirements**
     When installing new packages with pip, updating the requirements
     ```bash
-    pip freeze requirements.txt
+    pip freeze > requirements.txt
     ```
 

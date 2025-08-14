@@ -1,6 +1,8 @@
 import os
 import gpxpy
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
+from gpxpy.geo import haversine_distance
 
 trail_name = "fells_loop"
 gpx_rel_path = f"../data/trails/{trail_name}.gpx"
@@ -57,17 +59,33 @@ plt.xlabel('Longitude')
 plt.ylabel('Latitude')
 plt.grid(True)
 plt.gca().set_aspect('equal', adjustable='box') 
-plt.show()
+plt.show(block=False)
 
-## Plotting the elevation profile
-if elevations and any(e is not None for e in elevations):
-    plt.figure(figsize=(10, 4))
-    plt.plot([i for i in range(len(elevations))], elevations, marker='.', color='green')
-    plt.title('Elevation Profile')
-    plt.xlabel('Point Index')
-    plt.ylabel('Elevation (m)')
-    plt.grid(True)
-    plt.show()
+## Plotting the elevation profile (Distance vs Elevation)
+if latitudes and longitudes and elevations and any(e is not None for e in elevations):
+    # Compute cumulative distance along the path using haversine distance
+    cum_dist_m = [0.0]
+    total = 0.0
+    for i in range(1, len(latitudes)):
+        d = haversine_distance(latitudes[i-1], longitudes[i-1], latitudes[i], longitudes[i]) or 0.0
+        total += d
+        cum_dist_m.append(total)
+
+    # Keep only points that have elevation values
+    dist_km = [cum_dist_m[i] / 1000.0 for i, e in enumerate(elevations) if e is not None]
+    elev_ok = [e for e in elevations if e is not None]
+
+    if dist_km and elev_ok:
+        fig, ax = plt.subplots(figsize=(10, 4))
+        ax.plot(dist_km, elev_ok, marker='.', color='green')
+        ax.set_title('Elevation Profile')
+        ax.set_xlabel('Distance (km)')
+        ax.set_ylabel('Elevation (m)')
+        ax.grid(True)
+        # Set major ticks on the distance axis every 1 km (change to desired interval)
+        ax.xaxis.set_major_locator(MultipleLocator(1))
+        fig.tight_layout()
+        plt.show()
 
 ## Creating a GPX file
 """

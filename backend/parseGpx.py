@@ -14,7 +14,7 @@ class GPXData:
     -----------
     latitudes: List of latitudes for each point.
     longitudes: List of longitudes for each point.
-    elevations: List of elevations (meters). May contain None if not present in the GPX.
+    elevations: List of elevations (meters). 
     cumulative_distances_m: Cumulative distances between points in meters.
 
     Convenience
@@ -78,6 +78,10 @@ def parse_gpx(gpx_path: str) -> GPXData:
         d = haversine_distance(latitudes[i-1], longitudes[i-1], latitudes[i], longitudes[i]) or 0.0
         total += d
         cum_dist_m.append(total)
+
+    #standardize the elevation to 0
+    min_elevation = min(elevations) if elevations else 0
+    elevations = [e - min_elevation for e in elevations]
 
     return GPXData(
         latitudes=latitudes,

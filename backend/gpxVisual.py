@@ -20,7 +20,7 @@ plt.show(block=False)
 
 
 fig, ax = plt.subplots(figsize=(10, 4))
-ax.plot(gpx_result.convert_distance_to_km(), gpx_result.elevations, marker='.', color='green')
+ax.plot(gpx_result.convert_distance_to_km, gpx_result.elevations, marker='.', color='green')
 ax.set_title('Elevation Profile')
 ax.set_xlabel('Distance (km)')
 ax.set_ylabel('Elevation (m)')

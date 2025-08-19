@@ -71,6 +71,10 @@ def parse_gpx(gpx_path: str) -> GPXData:
                 longitudes.append(point.longitude)
                 elevations.append(point.elevation)
     
+    print(f"Trail latitude points: {len(latitudes)}")
+    print(f"Total longtitude points: {len(longitudes)}")
+    print(f"Total elevation points: {len(elevations)}")
+
     #calcuate distance
     cum_dist_m = [0.0]
     total = 0.0
@@ -78,6 +82,8 @@ def parse_gpx(gpx_path: str) -> GPXData:
         d = haversine_distance(latitudes[i-1], longitudes[i-1], latitudes[i], longitudes[i]) or 0.0
         total += d
         cum_dist_m.append(total)
+
+    print(f"Total trail length: {total:.2f} meters")
 
     #standardize the elevation to 0
     min_elevation = min(elevations) if elevations else 0

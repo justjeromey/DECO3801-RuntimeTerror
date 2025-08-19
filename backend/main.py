@@ -2,11 +2,11 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from parseGpx import parse_gpx, save_json
+from parseGpx import parse_gpx, convert_gpx_data_to_json
 
 app = FastAPI()
 
-@app.post("/upload-gpx")
+@app.post("/format-gpx")
 async def upload_gpx(file: UploadFile = File(...)):
     #check its gpx
     if not file.filename.endswith(".gpx"):
@@ -14,10 +14,9 @@ async def upload_gpx(file: UploadFile = File(...)):
 
     # Process the GPX file
     gpx_data = parse_gpx(file.file)
-    json_file_path = f"../data/trails/{file.filename}.json"
-    save_json(gpx_data, json_file_path)
+    json = convert_gpx_data_to_json(gpx_data)
 
-    return JSONResponse(status_code=200, content={"message": "GPX file uploaded and processed successfully."})
+    return JSONResponse(status_code=200, content=json)
 
 app.add_middleware(
     CORSMiddleware,

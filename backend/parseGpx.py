@@ -1,4 +1,6 @@
 import os
+import json
+
 from dataclasses import dataclass
 from typing import List, Optional
 
@@ -101,3 +103,19 @@ def parse_gpx(gpx_path: str) -> GPXData:
         elevations=elevations,
         cumulative_distances_m=cum_dist_m,
     )
+
+def convert_gpx_data_to_json(data: GPXData):
+    return {
+        "latitudes": data.latitudes,
+        "longitudes": data.longitudes,
+        "elevations": data.elevations,
+        "cumulative_distances_m": data.cumulative_distances_m,
+        "cumulative_distances_km": data.convert_distance_to_km,
+        "total_distance_m": data.total_distance_m,
+        "total_distance_km": data.total_distance_m / 1000,
+    }
+
+def save_json(data: GPXData, file_path: str):
+    json_data = convert_gpx_data_to_json(data)
+    with open(file_path, 'w') as json_file:
+        json.dump(json_data, json_file, indent=4)

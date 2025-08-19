@@ -3,7 +3,7 @@ from matplotlib.ticker import MultipleLocator
 
 from parseGpx import get_trail_file_path, parse_gpx, GPXData
 
-trail_name = "fells_loop"
+trail_name = "slaughter_falls"
 gpx_path = get_trail_file_path(trail_name)
 
 gpx_result: GPXData = parse_gpx(gpx_path)

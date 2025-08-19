@@ -1,7 +1,8 @@
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
-from parseGpx import parse_gpx, save_json, GPXData
+from parseGpx import parse_gpx, save_json
 
 app = FastAPI()
 
@@ -17,3 +18,11 @@ async def upload_gpx(file: UploadFile = File(...)):
     save_json(gpx_data, json_file_path)
 
     return JSONResponse(status_code=200, content={"message": "GPX file uploaded and processed successfully."})
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)

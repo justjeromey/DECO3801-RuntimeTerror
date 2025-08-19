@@ -11,8 +11,8 @@
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
-    --color-primary: #1b1918;
-    --color-secondary: #1f1d1b;
+    --color-primary: #1b1918; /* Main color */
+    --color-secondary: #1f1d1b; /* Border color */
     --color-accent-1: #69a742;
     --font-poppins: "Poppins", sans-serif;
     --font-inter: "Inter", sans-serif;
@@ -35,13 +35,16 @@ body {
 }
 
 .sections {
-    @apply flex flex-col flex-1;
+    @apply flex flex-col flex-1 font-inter;
 }
-.sections p {
-    @apply font-inter pb-2;
+.sections h1 {
+    @apply text-lg pb-2 font-bold;
 }
 
 .container {
     @apply w-full h-full rounded-lg p-5 bg-primary border border-secondary;
 }
 
+.analysis_container {
+    @apply w-full h-full;
+}

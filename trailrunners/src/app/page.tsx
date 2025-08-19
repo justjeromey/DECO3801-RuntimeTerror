@@ -17,23 +17,23 @@ export default function Home() {
                         </div>
                     </nav>
                 </div>
-                <div className="gap-5 flex flex-grow justify-between">
+                <div className="components">
                     <div className="nested_components">
                         <div className="sections">
-                            <p>Trail Elevation Visualiser</p>
+                            <h1>Trail Elevation Visualiser</h1>
                             <div className="container">
                                 <p>This is where the chart goes</p>
                             </div>
                         </div>
                         <div className="sections">
-                            <p>Trail Analysis</p>
-                            <div className="container">
+                            <h1>Trail Analysis</h1>
+                            <div className="analysis_container">
                                 <p>This is where the analysis goes</p>
                             </div>
                         </div>
                     </div>
                     <div className="sections">
-                        <p>Trail Overview</p>
+                        <h1>Trail Overview</h1>
                         <div className="container">
                             <p>This is where the map goes</p>
                         </div>

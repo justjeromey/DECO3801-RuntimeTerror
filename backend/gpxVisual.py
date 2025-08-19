@@ -4,13 +4,18 @@ from matplotlib.ticker import MultipleLocator
 from parseGpx import get_trail_file_path, parse_gpx, GPXData
 
 trail_name = "fells_loop"
+print(f"Loading {trail_name} GPX data...")
 gpx_path = get_trail_file_path(trail_name)
 
 gpx_result: GPXData = parse_gpx(gpx_path)
 
+num_points = len(gpx_result.latitudes)
+
+trail_markersize = max(0.5, 20 / num_points)  # Adjust 20 to tune overall size
+print("Trail marker size: ", trail_markersize)
 ## Plotting the trail topdown view
 plt.figure(figsize=(8, 6))
-plt.plot(gpx_result.longitudes, gpx_result.latitudes, marker='o', linestyle='-', color='blue')
+plt.plot(gpx_result.longitudes, gpx_result.latitudes, marker='o', linestyle='-', color='blue', markersize=trail_markersize)
 plt.title('GPX Trail Visualization')
 plt.xlabel('Longitude')
 plt.ylabel('Latitude')

@@ -54,23 +54,33 @@ def parse_gpx(gpx_path: str) -> GPXData:
     with open(gpx_path, 'r') as gpx_file:
         gpx = gpxpy.parse(gpx_file)
 
+    def add_points(points):
+        #check elevation points exist
+        first_point = points[0]
+        if first_point.elevation is None:
+            raise ValueError("Elevation data is missing for the first point.")
 
-    # Try to get points from tracks (if any)
-    # for track in gpx.tracks:
-    #     for segment in track.segments:
-    #         for point in segment.points:
-    #             latitudes.append(point.latitude)
-    #             longitudes.append(point.longitude)
-    #             elevations.append(point.elevation)
+        for point in points:
+            latitudes.append(point.latitude)
+            longitudes.append(point.longitude)
+            elevations.append(point.elevation)
+
+    for track in gpx.tracks:
+        for segment in track.segments:
+            add_points(segment.points)
 
     # If no track points, get points from routes
     if not latitudes and not longitudes:
         for route in gpx.routes:
-            for point in route.points:
-                latitudes.append(point.latitude)
-                longitudes.append(point.longitude)
-                elevations.append(point.elevation)
-    
+            add_points(route.points)
+
+    if len(latitudes) == 0 or len(longitudes) == 0:
+        raise ValueError("No valid GPS points found.")
+
+    print(f"Trail latitude points: {len(latitudes)}")
+    print(f"Total longitude points: {len(longitudes)}")
+    print(f"Total elevation points: {len(elevations)}")
+
     #calcuate distance
     cum_dist_m = [0.0]
     total = 0.0
@@ -78,6 +88,8 @@ def parse_gpx(gpx_path: str) -> GPXData:
         d = haversine_distance(latitudes[i-1], longitudes[i-1], latitudes[i], longitudes[i]) or 0.0
         total += d
         cum_dist_m.append(total)
+
+    print(f"Total trail length: {total:.2f} meters")
 
     #standardize the elevation to 0
     min_elevation = min(elevations) if elevations else 0

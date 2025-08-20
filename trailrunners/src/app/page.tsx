@@ -10,7 +10,7 @@ export default function Home() {
                             src="/logo.svg"
                             width={303}
                             height={83}
-                            alt="TrailRunners"
+                            alt="Trail Runners"
                         />
                         <div className="border border-secondary px-6 py-2 rounded-xl bg-primary">
                             Select trail

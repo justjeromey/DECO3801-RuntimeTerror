@@ -12,8 +12,9 @@
     --color-background: var(--background);
     --color-foreground: var(--foreground);
     --color-primary: #1b1918; /* Main color */
-    --color-secondary: #1f1d1b; /* Border color */
+    --color-secondary: #23211E; /* Border color */
     --color-accent-1: #69a742;
+    --color-accent-2: #22201F;
     --font-poppins: "Poppins", sans-serif;
     --font-inter: "Inter", sans-serif;
 }
@@ -47,4 +48,8 @@ body {
 
 .analysis_container {
     @apply w-full h-full;
+}
+
+.fileSelector {
+    @apply w-full border border-secondary px-6 py-2 bg-primary cursor-pointer;
 }

@@ -1,9 +1,10 @@
 import Image from "next/image";
+import FileSelector from "@/components/fileSelector";
 
 export default function Home() {
     return (
         <div className="flex flex-col justify-between h-screen">
-            <main className="flex flex-col p-5 h-full">
+            <main className="flex flex-col p-10 h-full">
                 <div className="w-full">
                     <nav className="flex mb-5 justify-between items-center">
                         <Image
@@ -12,9 +13,7 @@ export default function Home() {
                             height={83}
                             alt="Trail Runners"
                         />
-                        <div className="border border-secondary px-6 py-2 rounded-xl bg-primary">
-                            Select trail
-                        </div>
+                        <FileSelector />
                     </nav>
                 </div>
                 <div className="components">
@@ -40,7 +39,7 @@ export default function Home() {
                     </div>
                 </div>
             </main>
-            <footer className="p-2 flex flex-wrap items-center justify-center">
+            <footer className="p-2 py-3 flex flex-wrap items-center justify-center">
                 <p>Made with ❤️ by Runtime Terrors</p>
             </footer>
         </div>

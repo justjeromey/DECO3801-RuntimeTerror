@@ -1,21 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function FileSelector() {
-    // Trail array
-    let dummy: string[] = [];
-    for (let i = 0; i < 20; i++) {
-        dummy.push("trail " + i);
-    }
-    const [trails, setTrails] = useState<Array<string>>(dummy);
+    // Todo
+    // - Add trail loading logic
+    // - Add loading status
+    // - Add file uploads
+
+    const [trails, setTrails] = useState<Array<string>>([]);
     const [toggled, setToggle] = useState<boolean>(false);
     const [selected, setSelected] = useState<string>("");
 
-    // This would fetch server dir for GPX files
-    function handleClick() {
+    useEffect(() => {
+        // Grab default trails on load
+        async function fetchTrails() {
+            try {
+                const res = await fetch("/api/fileReader");
+                const files = await res.json();
+                if (files) {
+                    setTrails(files);
+                }
+            } catch (error) {
+                console.log("File fetching failed.");
+            }
+        };
+
+        fetchTrails();
+    }, []);
+
+    function handleDropdown() {
         setToggle(!toggled);
-        console.log("hello");
     }
 
     // Handles trail selection, sends request to render charts
@@ -29,14 +44,14 @@ export default function FileSelector() {
             <button
                 type="button"
                 className={`fileSelector ${toggled ? `rounded-t-lg` : `rounded-lg`} hover:brightness-125`}
-                onClick={handleClick}
+                onClick={handleDropdown}
             >
                 {selected === "" ? "Select a trail" : selected}
             </button>
             <div
                 className={`border w-full max-h-[50vh] p-1 gap-2 flex flex-col bg-accent-2 border-secondary rounded-b-lg overflow-scroll ${toggled ? `absolute` : `hidden`}`}
             >
-                {trails.map((trail:string, key:number) => (
+                {trails.map((trail: string, key: number) => (
                     <button
                         key={key}
                         type="button"

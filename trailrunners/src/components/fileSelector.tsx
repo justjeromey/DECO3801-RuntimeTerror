@@ -3,10 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 
-export default function FileSelector() {
-    // Todo
-    // - Add trail loading logic
-
+export default function FileSelector({ setTrailData }) {
     const acceptedFileTypes = ".gpx";
     const [trails, setTrails] = useState<Array<string>>([]);
     const [toggled, setToggle] = useState<boolean>(false);
@@ -61,8 +58,12 @@ export default function FileSelector() {
                     error: "Failed to upload selected file",
                 },
             );
+            // Get json data and pass to parent
+            const result = await res.json();
+            console.log(result);
+            setTrailData(result);
         } catch (error) {
-            return; // Things hit the fan when uploading
+            console.error(`File upload failed ${error}`);
         }
     };
 
@@ -78,17 +79,21 @@ export default function FileSelector() {
                 fetch("/api/parser", {
                     method: "POST",
                     body: formData,
-                }), {
+                }),
+                {
                     pending: "Parsing selected trail...",
                     success: "Trail parsed.",
                     error: "Failed to parse selected trail",
-                }
+                },
             );
-
+            // Get json data and pass to parent
+            const result = await res.json();
+            console.log(result);
+            setTrailData(result);
         } catch (error) {
-            return; // Something went wrong when parsing chosen trail
+            console.error(error);
         }
-    }
+    };
 
     return (
         <div className="min-w-50 relative">

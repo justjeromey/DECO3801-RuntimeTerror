@@ -1,7 +1,11 @@
+'use client'
+
 import Image from "next/image";
 import FileSelector from "@/components/fileSelector";
+import { useState } from "react";
 
 export default function Home() {
+    const [trailData, setTrailData] = useState();
     return (
         <div className="flex flex-col justify-between h-screen">
             <main className="flex flex-col p-10 h-full">
@@ -13,7 +17,7 @@ export default function Home() {
                             height={83}
                             alt="Trail Runners"
                         />
-                        <FileSelector />
+                        <FileSelector setTrailData={setTrailData}/>
                     </nav>
                 </div>
                 <div className="components">

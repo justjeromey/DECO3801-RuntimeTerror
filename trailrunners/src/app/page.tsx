@@ -3,6 +3,7 @@
 import Image from "next/image";
 import FileSelector from "@/components/fileSelector";
 import { useState } from "react";
+import ChartViewer from "@/components/chart";
 
 export default function Home() {
     const [trailData, setTrailData] = useState();
@@ -24,9 +25,7 @@ export default function Home() {
                     <div className="nested_components">
                         <div className="sections">
                             <h1>Trail Elevation Visualiser</h1>
-                            <div className="container">
-                                <p>This is where the chart goes</p>
-                            </div>
+                            <ChartViewer trailData={trailData}/>
                         </div>
                         <div className="sections">
                             <h1>Trail Analysis</h1>

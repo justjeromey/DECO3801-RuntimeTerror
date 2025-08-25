@@ -60,7 +60,6 @@ export default function FileSelector({ setTrailData }) {
             );
             // Get json data and pass to parent
             const result = await res.json();
-            console.log(result);
             setTrailData(result);
         } catch (error) {
             console.error(`File upload failed ${error}`);
@@ -88,10 +87,9 @@ export default function FileSelector({ setTrailData }) {
             );
             // Get json data and pass to parent
             const result = await res.json();
-            console.log(result);
             setTrailData(result);
         } catch (error) {
-            console.error(error);
+            console.error(`Selected file parsing failed ${error}`);
         }
     };
 

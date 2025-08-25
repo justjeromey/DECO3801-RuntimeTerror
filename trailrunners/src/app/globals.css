@@ -61,3 +61,7 @@ body {
 .burnt_toast {
     @apply bg-primary border border-secondary;
 }
+
+.chart {
+    color: --var(color-foreground);
+}

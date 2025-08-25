@@ -53,3 +53,11 @@ body {
 .fileSelector {
     @apply w-full border border-secondary px-6 py-2 bg-primary cursor-pointer;
 }
+
+.file_select_button {
+    @apply py-2 cursor-pointer bg-accent-2 rounded-sm hover:brightness-125;
+}
+
+.burnt_toast {
+    @apply bg-primary border border-secondary;
+}

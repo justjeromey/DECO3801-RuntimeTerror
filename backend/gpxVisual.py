@@ -7,7 +7,8 @@ trail_name = "fells_loop"
 print(f"Loading {trail_name} GPX data...")
 gpx_path = get_trail_file_path(trail_name)
 
-gpx_result: GPXData = parse_gpx(gpx_path)
+with open(gpx_path, 'r') as gpx_file:
+    gpx_result: GPXData = parse_gpx(gpx_file)
 
 num_points = len(gpx_result.latitudes)
 

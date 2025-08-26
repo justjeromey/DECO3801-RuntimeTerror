@@ -24,3 +24,13 @@
     pip freeze > requirements.txt
     ```
 
+    ## Running the FastAPI Server
+
+    To start the FastAPI server, run:
+
+    ```bash
+    cd backend
+    uvicorn main:app --reload
+    ```
+
+    - The server will be available at [http://127.0.0.1:8000](http://127.0.0.1:8000).

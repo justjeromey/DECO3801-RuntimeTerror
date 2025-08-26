@@ -46,7 +46,7 @@ print(index_list)
 turning_x = []
 turning_y = []
 for index in index_list:
-    turning_x.append(gpx_result.cumulative_distances_m[index])
+    turning_x.append(gpx_result.cumulative_distances_m[index] / 1000)
     turning_y.append(gpx_result.elevations[index])
 
 

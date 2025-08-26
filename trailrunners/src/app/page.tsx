@@ -9,15 +9,20 @@ export default function Home() {
     const [trailData, setTrailData] = useState();
     return (
         <div className="flex flex-col justify-between h-screen">
-            <main className="flex flex-col p-10 h-full">
+            <header className="header flex flex-col px-10 py-4">
+                <Image
+                        src="/logo.svg"
+                        width={290}
+                        height={70}
+                        alt="Trail Runners"
+                    />
+            </header>
+
+            <main className="flex flex-col px-10 py-5 h-full">
+                
                 <div className="w-full">
-                    <nav className="flex mb-5 justify-between items-center">
-                        <Image
-                            src="/logo.svg"
-                            width={303}
-                            height={83}
-                            alt="Trail Runners"
-                        />
+                    <nav className="nav_container">
+                        <h1>Trail Summary</h1>
                         <FileSelector setTrailData={setTrailData}/>
                     </nav>
                 </div>

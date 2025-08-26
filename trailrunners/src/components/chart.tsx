@@ -149,7 +149,9 @@ export default function ChartViewer({ trailData }) {
                             data: trailData.elevations,
                             borderColor: "#69a742",
                             borderWidth: 1,
-                            pointRadius: 1,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            pointHitRadius: 10,
                         },
                     ],
                 });
@@ -170,7 +172,9 @@ export default function ChartViewer({ trailData }) {
             {chartData !== null ? (
                 <Line data={chartData} options={options} ref={chartRef} />
             ) : (
-                <div className="text-center pt-20">Loading...</div>
+                <div className="py-10 flex justify-center items-center">
+                    <p>Select a trail to start...</p>
+                </div>
             )}
             <button
                 type="button"

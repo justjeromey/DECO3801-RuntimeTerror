@@ -1,9 +1,13 @@
-'use client'
+"use client";
 
 import Image from "next/image";
 import FileSelector from "@/components/fileSelector";
 import { useState } from "react";
-import ChartViewer from "@/components/chart";
+import dynamic from "next/dynamic";
+
+const ChartViewer = dynamic(() => import('@/components/chart'), {
+  ssr: false,
+});
 
 export default function Home() {
     const [trailData, setTrailData] = useState();
@@ -30,26 +34,27 @@ export default function Home() {
                     <div className="nested_components">
                         <div className="sections">
                             <h1>Trail Elevation Visualiser</h1>
-                            <ChartViewer trailData={trailData}/>
+                            <ChartViewer trailData={trailData} />
                         </div>
                         <div className="sections">
-                            <h1>Trail Analysis</h1>
-                            <div className="analysis_container">
-                                <p>This is where the analysis goes</p>
-                            </div>
+                        <h1>Trail Overview</h1>
+                        <div className="map_container">
+                        <p>This is where the map goes</p>
+                        </div>
                         </div>
                     </div>
                     <div className="sections">
-                        <h1>Trail Overview</h1>
-                        <div className="container">
-                            <p>This is where the map goes</p>
-                        </div>
+                    <h1>Trail Analysis</h1>
+                    <div className="analysis_container">
+                    <p>This is where the analysis goes</p>
+                    <p className="outline min-h-100">Testing out the vertical spacing</p>
+                    </div>
                     </div>
                 </div>
-            </main>
-            <footer className="p-2 py-3 flex flex-wrap items-center justify-center">
+                <footer className="p-2 py-3 flex flex-wrap items-center justify-center">
                 <p>Made with ❤️ by Runtime Terrors</p>
-            </footer>
+                </footer>
+            </main>
         </div>
     );
 }

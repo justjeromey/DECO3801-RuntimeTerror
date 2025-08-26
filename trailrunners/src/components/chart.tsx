@@ -1,15 +1,29 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-    CartesianGrid,
-    Label,
-    Legend,
-    Line,
-    LineChart,
-    ResponsiveContainer,
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
     Tooltip,
-    XAxis,
-    YAxis,
-} from "recharts";
+    Legend,
+    Filler,
+} from "chart.js";
+import zoomPlugin from "chartjs-plugin-zoom";
+import { Line } from "react-chartjs-2";
+
+ChartJS.register(
+    CategoryScale,
+    LineElement,
+    LinearScale,
+    PointElement,
+    Title,
+    Tooltip,
+    Legend,
+    Filler,
+    zoomPlugin,
+);
 
 interface Trail {
     cumulative_distances_km: Array<number>;
@@ -26,82 +40,150 @@ interface DataPoint {
     elevation: number;
 }
 
-// A custom tool tip display
-const CustomTooltip = ({ active, payload, label }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="brightness-110 p-5 bg-primary border border-secondary rounded-lg shadow-xl">
-        <p>{`Distance: ${label.toFixed(2)} m`}</p> 
-        <p>{`Elevation: ${payload[0].value.toFixed(2)} m`}</p>
-      </div>
-    );
-  }
-
-  return null;
+interface ChartData {
+    labels: string;
+    datasets: [
+        {
+            label: string;
+            data: Array<number>;
+            boarderColor: string;
+        },
+    ];
+}
+export const options = {
+    responsive: true,
+    interactions: {
+        mode: "nearest",
+        intersect: false,
+        axis: "x",
+    },
+    plugins: {
+        legend: {
+            display: false,
+        },
+        title: {
+            display: false,
+        },
+        tooltip: {
+            callbacks: {
+                // Custom tooltip options
+                title: (context) => {
+                    return ""; // Hide title
+                },
+                beforeBody: (context) => {
+                    const dataPoint = context[0].parsed;
+                    return [
+                        `Distance: ${dataPoint.x.toFixed(2)} m`,
+                        `Elevation: ${dataPoint.y.toFixed(2)} m`,
+                    ];
+                },
+                label: (context) => {
+                    return ""; // Hide label
+                },
+            },
+        },
+        zoom: {
+            pan: {
+                enabled: true,
+                mode: "xy",
+            },
+            zoom: {
+                wheel: {
+                    enabled: true,
+                },
+                pinch: {
+                    enabled: true,
+                },
+                mode: "xy",
+            },
+        },
+    },
+    scales: {
+        x: {
+            grid: {
+                color: "rgba(255, 255, 255, 0.05)", // Sets the x-axis grid color
+            },
+            title: {
+                display: true,
+                text: "Distance (m)",
+            },
+            ticks: {
+                // Tick settings to reduce amount of clutter
+                autoSkip: true,
+                maxRotation: 0,
+                minRotation: 0,
+                // Show label only if it's a whole number
+                callback: function(value, index, values) {
+                    if (Math.floor(value) === value) {
+                        return value;
+                    }
+                },
+            },
+        },
+        y: {
+            beginAtZero: true, // Start the y-axis at 0
+            grid: {
+                color: "rgba(255, 255, 255, 0.05)", // Sets the x-axis grid color
+            },
+            title: {
+                display: true,
+                text: "Elevation (m)",
+            },
+        },
+    },
 };
 
-export default function ChartViewer({trailData}) {
-    const [chartData, setChartData] = useState<Array<DataPoint>>([]);
+export default function ChartViewer({ trailData }) {
+    const [chartData, setChartData] = useState<ChartData | null>(null);
+    const chartRef = useRef(null);
 
     // Check if trail data has changed
     useEffect(() => {
         if (trailData) {
             try {
-                setChartData(
-                    trailData.cumulative_distances_m.map(
-                        (distance: number, index: number) => ({
-                            distance: distance,
-                            elevation: trailData.elevations[index],
-                        }),
-                    ),
-                );
-                if (!chartData) {
-                    throw new Error("Chart is empty");
-                }
+                setChartData({
+                    labels: trailData.cumulative_distances_m,
+                    datasets: [
+                        {
+                            label: "Elevation (m)",
+                            data: trailData.elevations,
+                            borderColor: "#69a742",
+                            borderWidth: 1,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            pointHitRadius: 10,
+                        },
+                    ],
+                });
             } catch (error) {
                 console.error(`Chart creation failed: ${error}`);
             }
         }
     }, [trailData]);
 
+    const handleZoomReset = () => {
+        if (chartRef.current) {
+            chartRef.current.resetZoom();
+        }
+    };
+
     return (
-        <div className="container">
-            <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                    width={500}
-                    height={400}
-                    data={chartData}
-                    className="p-2"
-                    margin={{ top: 0, right: 0, bottom: 20, left: 0 }}
-                >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis type="number" dataKey="distance">
-                        <Label
-                            value="Distance (m)"
-                            position="bottom"
-                            style={{ textAnchor: "middle" }}
-                        />
-                    </XAxis>
-                    <YAxis type="number">
-                        <Label
-                            value="Elevation (m)"
-                            position="left"
-                            angle={-90}
-                            style={{ textAnchor: "middle" }}
-                        />
-                    </YAxis>
-                    <Tooltip content={CustomTooltip}/>
-                    <Legend />
-                    <Line
-                        type="monotone"
-                        dataKey="elevation"
-                        stroke="#69a742"
-                        activeDot={{ r: 3 }}
-                        dot={false}
-                        legendType="none"
-                    />
-                </LineChart>
-            </ResponsiveContainer>
+        <div className="chart_container flex flex-col justify-between">
+            {chartData !== null ? (
+                <Line data={chartData} options={options} ref={chartRef} />
+            ) : (
+                <div className="py-10 flex justify-center items-center">
+                    <p>Select a trail to start...</p>
+                </div>
+            )}
+            <button
+                type="button"
+                id="reset_zoom"
+                onClick={handleZoomReset}
+                className="mt-3 cursor-pointer max-w-[10rem] bg-accent-2 border border-secondary p-1 px-3 rounded-lg hover:brightness-110 active:brightness-90"
+            >
+                Reset zoom
+            </button>
         </div>
     );
 }

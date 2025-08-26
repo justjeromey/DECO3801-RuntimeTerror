@@ -22,7 +22,6 @@
 }
 
 body {
-    height: 100vh;
     background: var(--background);
     color: var(--foreground);
     font-family: Inter, sans-serif;
@@ -30,11 +29,11 @@ body {
 }
 
 .components {
-    @apply gap-5 flex flex-grow justify-between;
+    @apply gap-5 flex flex-col;
 }
 
 .nested_components {
-    @apply gap-3 flex flex-col flex-grow;
+    @apply gap-3 flex flex-row max-w-full;
 }
 
 .sections {
@@ -46,7 +45,7 @@ body {
 
 }
 
-.container {
+.chart_container {
     @apply w-full h-full rounded-lg p-5 bg-primary border border-secondary;
 }
 
@@ -61,6 +60,9 @@ body {
 
 .analysis_container {
     @apply w-full h-full;
+}
+.map_container {
+    @apply w-full h-full rounded-lg p-5 bg-primary border border-secondary;
 }
 
 .header {

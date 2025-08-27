@@ -4,6 +4,12 @@ import Image from "next/image";
 import FileSelector from "@/components/fileSelector";
 import { useState } from "react";
 import ChartViewer from "@/components/chart";
+import dynamic from "next/dynamic";
+
+const MapViewer = dynamic(() => import('@/components/map'), {
+    ssr: false,
+}) 
+
 
 export default function Home() {
     const [trailData, setTrailData] = useState();
@@ -36,9 +42,7 @@ export default function Home() {
                     </div>
                     <div className="sections">
                         <h1>Trail Overview</h1>
-                        <div className="container">
-                            <p>This is where the map goes</p>
-                        </div>
+                            <MapViewer trailData={trailData}/>
                     </div>
                 </div>
             </main>

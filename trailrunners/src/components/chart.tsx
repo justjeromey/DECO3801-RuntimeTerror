@@ -35,11 +35,6 @@ interface Trail {
     total_distance_m: number;
 }
 
-interface DataPoint {
-    distance: number;
-    elevation: number;
-}
-
 interface ChartData {
     labels: string;
     datasets: [
@@ -85,7 +80,7 @@ export const options = {
         zoom: {
             pan: {
                 enabled: true,
-                mode: "xy",
+                mode: "x",
             },
             zoom: {
                 wheel: {
@@ -94,7 +89,7 @@ export const options = {
                 pinch: {
                     enabled: true,
                 },
-                mode: "xy",
+                mode: "x",
             },
         },
     },

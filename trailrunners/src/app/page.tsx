@@ -3,14 +3,11 @@
 import Image from "next/image";
 import FileSelector from "@/components/fileSelector";
 import { useState } from "react";
-import ChartViewer from "@/components/chart";
 import dynamic from "next/dynamic";
 
 const MapViewer = dynamic(() => import('@/components/map'), {
     ssr: false,
 }) 
-
-import dynamic from "next/dynamic";
 
 const ChartViewer = dynamic(() => import('@/components/chart'), {
   ssr: false,

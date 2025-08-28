@@ -74,6 +74,7 @@ export default function MapViewer({ trailData }) {
                 zoom={1} 
                 scrollWheelZoom={true}
                 style={{ height: '100%', width: '100%' }}
+                className="rounded-md"
             >
                 <SetMapCenter center={center} initial={initial}/>
                 <TileLayer

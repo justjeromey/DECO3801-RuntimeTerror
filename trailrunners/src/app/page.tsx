@@ -9,8 +9,8 @@ const MapViewer = dynamic(() => import("@/components/map"), {
     ssr: false,
 });
 
-const ChartViewer = dynamic(() => import("@/components/chart"), {
-    ssr: false,
+const ChartViewer = dynamic(() => import('@/components/chart'), {
+  ssr: false,
 });
 
 export default function Home() {

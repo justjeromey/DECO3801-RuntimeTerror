@@ -5,9 +5,9 @@ import FileSelector from "@/components/fileSelector";
 import { useState } from "react";
 import dynamic from "next/dynamic";
 
-const MapViewer = dynamic(() => import('@/components/map'), {
+const MapViewer = dynamic(() => import("@/components/map"), {
     ssr: false,
-}) 
+});
 
 const ChartViewer = dynamic(() => import('@/components/chart'), {
   ssr: false,
@@ -36,27 +36,22 @@ export default function Home() {
                             <ChartViewer trailData={trailData} />
                         </div>
                         <div className="sections">
-                        <h1>Trail Overview</h1>
-                        <div className="map_container">
-                        <p>This is where the map goes</p>
-                        </div>
+                            <h1>Trail Overview</h1>
+                            <MapViewer trailData={trailData} />
                         </div>
                     </div>
                     <div className="sections">
-
-                        <h1>Trail Overview</h1>
-                            <MapViewer trailData={trailData}/>
-
-                    <h1>Trail Analysis</h1>
-                    <div className="analysis_container">
-                    <p>This is where the analysis goes</p>
-                    <p className="outline min-h-100">Testing out the vertical spacing</p>
-                    </div>
-
+                        <h1>Trail Analysis</h1>
+                        <div className="analysis_container">
+                            <p>This is where the analysis goes</p>
+                            <p className="outline min-h-100">
+                                Testing out the vertical spacing
+                            </p>
+                        </div>
                     </div>
                 </div>
                 <footer className="p-2 py-3 flex flex-wrap items-center justify-center">
-                <p>Made with ❤️ by Runtime Terrors</p>
+                    <p>Made with ❤️ by Runtime Terrors</p>
                 </footer>
             </main>
         </div>

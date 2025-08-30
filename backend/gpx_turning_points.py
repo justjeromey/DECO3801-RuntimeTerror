@@ -41,7 +41,6 @@ for index in index_list:
     turning_y.append(gpx_result.elevations[index-1])
 
 #calculate hypotenuse 
-
 threshold = 200
 rolling_x = []
 rolling_y = []
@@ -51,10 +50,8 @@ for x in range(len(turning_x)-1):
     y_diff = abs(turning_y[x+1] - turning_y[x])
     hypotenuse = (x_diff**2 + y_diff**2)**0.5
     if hypotenuse < threshold:
-        rolling_x.append(turning_x[x])
-        rolling_x.append(turning_x[x+1])
-        rolling_y.append(turning_y[x])
-        rolling_y.append(turning_y[x+1])
+        rolling_x.extend([turning_x[x],turning_x[x+1]])
+        rolling_y.extend([turning_y[x], turning_y[x+1]])
         print(hypotenuse)
 
 num_points = len(gpx_result.latitudes)

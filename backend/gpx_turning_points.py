@@ -11,6 +11,8 @@ gpx_path = get_trail_file_path(trail_name)
 
 gpx_result: GPXData = parse_gpx(gpx_path)
 
+
+#find turning points 
 first = 0
 second = 0
 grad = "neutral"
@@ -38,11 +40,27 @@ for index in index_list:
     turning_x.append(gpx_result.cumulative_distances_m[index-1] / 1000)
     turning_y.append(gpx_result.elevations[index-1])
 
+#calculate hypotenuse 
+
+threshold = 5
+rolling_x = []
+rolling_y = []
+
+for x in range(len(turning_x)-1):
+    x_diff = (turning_x[x+1] - turning_x[x])
+    y_diff = abs(turning_y[x+1] - turning_y[x])
+    hypotenuse = (x_diff**2 + y_diff**2)**0.5
+    if hypotenuse < threshold:
+        rolling_x.append(turning_x[x])
+        rolling_y.append(turning_y[x])
+        print(hypotenuse)
+
 num_points = len(gpx_result.latitudes)
 
 fig, ax = plt.subplots(figsize=(10, 4))
 ax.plot(gpx_result.convert_distance_to_km, gpx_result.elevations, marker='.', color='green')
 ax.scatter(turning_x, turning_y, c="blue", marker="o", s=100, alpha=0.7, edgecolors="black")
+ax.scatter(rolling_x, rolling_y, c="red", marker="o", s=100, alpha=0.7, edgecolors="black")
 ax.set_title('Elevation Profile')
 ax.set_xlabel('Distance (km)')
 ax.set_ylabel('Elevation (m)')

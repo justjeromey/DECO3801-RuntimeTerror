@@ -42,12 +42,12 @@ for index in index_list:
 
 #calculate hypotenuse 
 
-threshold = 5
+threshold = 200
 rolling_x = []
 rolling_y = []
 
 for x in range(len(turning_x)-1):
-    x_diff = (turning_x[x+1] - turning_x[x])
+    x_diff = (turning_x[x+1] - turning_x[x])*1000
     y_diff = abs(turning_y[x+1] - turning_y[x])
     hypotenuse = (x_diff**2 + y_diff**2)**0.5
     if hypotenuse < threshold:

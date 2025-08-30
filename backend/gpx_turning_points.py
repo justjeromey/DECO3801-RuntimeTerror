@@ -52,7 +52,9 @@ for x in range(len(turning_x)-1):
     hypotenuse = (x_diff**2 + y_diff**2)**0.5
     if hypotenuse < threshold:
         rolling_x.append(turning_x[x])
+        rolling_x.append(turning_x[x+1])
         rolling_y.append(turning_y[x])
+        rolling_y.append(turning_y[x+1])
         print(hypotenuse)
 
 num_points = len(gpx_result.latitudes)

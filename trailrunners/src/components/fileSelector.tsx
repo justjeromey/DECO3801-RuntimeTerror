@@ -94,7 +94,7 @@ export default function FileSelector({ setTrailData }) {
     };
 
     return (
-        <div className="min-w-50 relative">
+        <div className="min-w-50 relative z-1000">
             <button
                 type="button"
                 className={`fileSelector ${toggled ? `rounded-t-lg` : `rounded-lg`} hover:brightness-125`}

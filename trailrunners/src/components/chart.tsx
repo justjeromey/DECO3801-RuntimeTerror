@@ -35,11 +35,6 @@ interface Trail {
     total_distance_m: number;
 }
 
-interface DataPoint {
-    distance: number;
-    elevation: number;
-}
-
 interface ChartData {
     labels: string;
     datasets: [
@@ -73,6 +68,7 @@ export const options = {
                 beforeBody: (context) => {
                     const dataPoint = context[0].parsed;
                     return [
+                        `Distance: ${(dataPoint.x / 1000).toFixed(2)} km`,
                         `Distance: ${dataPoint.x.toFixed(2)} m`,
                         `Elevation: ${dataPoint.y.toFixed(2)} m`,
                     ];
@@ -85,7 +81,7 @@ export const options = {
         zoom: {
             pan: {
                 enabled: true,
-                mode: "xy",
+                mode: "x",
             },
             zoom: {
                 wheel: {
@@ -94,12 +90,14 @@ export const options = {
                 pinch: {
                     enabled: true,
                 },
-                mode: "xy",
+                mode: "x",
             },
         },
     },
     scales: {
         x: {
+            type: "linear", // Use the x axis as numbers
+            bounds: "data",
             grid: {
                 color: "rgba(255, 255, 255, 0.05)", // Sets the x-axis grid color
             },
@@ -112,18 +110,16 @@ export const options = {
                 autoSkip: true,
                 maxRotation: 0,
                 minRotation: 0,
-                // Show label only if it's a whole number
+                // Round x labels to whole number
                 callback: function(value, index, values) {
-                    if (Math.floor(value) === value) {
-                        return value;
-                    }
+                    return Math.round(value);
                 },
             },
         },
         y: {
-            beginAtZero: true, // Start the y-axis at 0
+            beginAtZero: true,
             grid: {
-                color: "rgba(255, 255, 255, 0.05)", // Sets the x-axis grid color
+                color: "rgba(255, 255, 255, 0.05)", // Sets the y-axis grid color
             },
             title: {
                 display: true,
@@ -141,12 +137,15 @@ export default function ChartViewer({ trailData }) {
     useEffect(() => {
         if (trailData) {
             try {
+                // Parse new trail data
                 setChartData({
+                    // X axis data
                     labels: trailData.cumulative_distances_m,
                     datasets: [
                         {
-                            label: "Elevation (m)",
+                            // Y axis data
                             data: trailData.elevations,
+                            // Styling choices
                             borderColor: "#69a742",
                             borderWidth: 1,
                             pointRadius: 0,
@@ -161,6 +160,7 @@ export default function ChartViewer({ trailData }) {
         }
     }, [trailData]);
 
+    // Resets the zoom via ref to the chart
     const handleZoomReset = () => {
         if (chartRef.current) {
             chartRef.current.resetZoom();

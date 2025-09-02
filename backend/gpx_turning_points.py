@@ -6,7 +6,7 @@ from parseGpx import get_trail_file_path, parse_gpx, GPXData
 ROLLING_SEGMENT_THRESHOLD = 200  # Meters
 
 
-trail_name = "iphone"
+trail_name = "device_measurement_2"
 print(f"Loading {trail_name} GPX data...")
 gpx_path = get_trail_file_path(trail_name)
 

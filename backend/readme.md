@@ -1,18 +1,17 @@
 # Rolling Hills Backend
 
-
 ## Installation
-1. **Create the Environment**  
+1. **Create the Environment (In Root Directory)**  
     ```bash
     python -m venv .venv
     ```
 
-2. **Activate the Environment**  
+2. **Activate the Environment (In Root Directory)**  
     ```bash
     .venv\Scripts\activate
     ```
 
-3. **Install the Requirements**  
+3. **Install the Requirements (In backend Directory)**  
     ```bash
     pip install -r requirements.txt
     ```
@@ -24,7 +23,7 @@
     pip freeze > requirements.txt
     ```
 
-    ## Running the FastAPI Server
+    ## Running the FastAPI Server (From backend Directory)
 
     To start the FastAPI server, run:
 

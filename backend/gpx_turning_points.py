@@ -48,6 +48,12 @@ for index in index_list:
     turning_x.append(gpx_result.cumulative_distances_m[index-1] / 1000)
     turning_y.append(gpx_result.elevations[index-1])
 
+totalGain = 0.0
+for x in range(len(turning_y)):
+    if turning_y[x] > turning_y[x-1]:
+        totalGain += turning_y[x] - turning_y[x-1]
+
+
 # Calculate hypotenuse
 rolling_x = []
 rolling_y = []
@@ -64,6 +70,8 @@ for x in range(len(turning_x) - 1):
         print(hypotenuse)
 
 num_points = len(gpx_result.latitudes)
+
+print("elevation gain is:" , totalGain)
 
 fig, ax = plt.subplots(figsize=(10, 4))
 ax.plot(gpx_result.convert_distance_to_km, gpx_result.elevations, marker='.', color='green')

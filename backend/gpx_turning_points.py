@@ -6,12 +6,12 @@ from parseGpx import get_trail_file_path, parse_gpx, GPXData
 ROLLING_SEGMENT_THRESHOLD = 200  # Meters
 
 
-trail_name = "device_measurement_2"
+trail_name = "device_measurement_1"
 print(f"Loading {trail_name} GPX data...")
 gpx_path = get_trail_file_path(trail_name)
 
-gpx_result: GPXData = parse_gpx(gpx_path)
-
+with open(gpx_path, 'r') as gpx_file:
+    gpx_result: GPXData = parse_gpx(gpx_file)
 
 # Find turning points 
 first = 0

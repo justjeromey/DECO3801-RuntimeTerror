@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 import { Polyline, Circle, Marker, CircleMarker } from "react-leaflet";
@@ -20,22 +20,23 @@ interface Trail {
     total_distance_m: number;
 }
 
+type Point = [latitude: number, longitude: number];
+
 // Dynamic imports for react-leaflet components
 const MapContainer = dynamic(
     () => import("react-leaflet").then((mod) => mod.MapContainer),
     { ssr: false },
 );
-
 const TileLayer = dynamic(
     () => import("react-leaflet").then((mod) => mod.TileLayer),
     { ssr: false },
 );
 
-// Add the line style options
+// SVG component style options
 const trailOptions = { color: "#3888fb", weight: 4 };
+const markerOptions = { color: "#e2ecf2", opacity: 1, fillColor: "#3888fb", fill: true, fillOpacity: 1};
 
-const markerOptions = { color: "#e2ecf2", fillColor: "#3888fb", fill: true, fillOpacity: 1};
-
+// Custom centering function
 const SetMapCenter: React.FC<SetMapCenterProps> = ({ center, initial }) => {
     const map = useMap();
     useEffect(() => {
@@ -52,9 +53,10 @@ const SetMapCenter: React.FC<SetMapCenterProps> = ({ center, initial }) => {
 export default function MapViewer({ trailData, pointIndex }) {
     const [initial, setInitial] = useState(true);
     const [data, setData] = useState([]);
-    const [center, setCenter] = useState([0, 0]);
-    const [markerPoint, setMarkerPoint] = useState([0, 0]);
+    const [center, setCenter] = useState<Point>([0, 0]);
+    const [markerPoint, setMarkerPoint] = useState<Point | null>(null);
 
+    // Rendering trail component
     useEffect(() => {
         try {
             if (trailData) {
@@ -81,8 +83,10 @@ export default function MapViewer({ trailData, pointIndex }) {
         }
     }, [trailData]);
 
+    // Changes marker position when chart point updates
     useEffect(() => {
         try {
+            // Make sure updated point isn't null
             if (pointIndex !== null) {
                 if (!trailData) return;
                 setMarkerPoint([
@@ -115,9 +119,9 @@ export default function MapViewer({ trailData, pointIndex }) {
                 />
                 <Polyline pathOptions={trailOptions} positions={data} />
                 <CircleMarker
-                    center={markerPoint}
+                    center={!markerPoint ? [0, 0] : markerPoint}
                     radius={5}
-                    pathOptions={markerOptions}
+                    pathOptions={!markerPoint ? {opacity: 0, fillOpacity: 0} : markerOptions}
                 />
             </MapContainer>
         </div>

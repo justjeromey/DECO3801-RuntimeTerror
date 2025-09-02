@@ -81,14 +81,16 @@ export default function ChartViewer({ trailData, setPointIndex }) {
 
     // useMemo to preserve options unless trailData changes
     const options = useMemo(() => ({
+        // A on hover function that updates a parent value
         onHover: (e, active) => {
-            if (active.length > 0) {
-                if (active[0]) {
-                    const pointIndex = active[0].index;
-                    if (prevPoint != pointIndex) {
-                        setPointIndex(pointIndex);
-                    }
-                }
+            // Making sure the active array isn't empty
+            if (active.length <= 0) return;
+            if (!active[0]) return;
+
+            // If an valid coordinate is returned, set the value to the index
+            const pointIndex = active[0].index;
+            if (prevPoint != pointIndex) {
+                setPointIndex(pointIndex);
             }
         },
         responsive: true,
@@ -109,11 +111,11 @@ export default function ChartViewer({ trailData, setPointIndex }) {
                 intersect: false,
                 position: "average",
                 callbacks: {
-                    // Custom tooltip options
                     title: (context) => {
                         return ""; // Hide title
                     },
                     beforeBody: (context) => {
+                        // Custom tooltip options
                         const dataPoint = context[0].parsed;
                         return [
                             `Distance: ${(dataPoint.x / 1000).toFixed(2)} km`,

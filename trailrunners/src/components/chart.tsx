@@ -191,7 +191,7 @@ export default function ChartViewer({ trailData, setPointIndex }) {
     };
 
     return (
-        <div className="chart_container flex flex-col justify-between">
+        <div className="chart_container">
             {chartData !== null ? (
                 <Line data={chartData} options={options} ref={chartRef}/>
             ) : (
@@ -203,7 +203,7 @@ export default function ChartViewer({ trailData, setPointIndex }) {
                 type="button"
                 id="reset_zoom"
                 onClick={handleZoomReset}
-                className="mt-3 cursor-pointer max-w-[10rem] bg-accent-2 border border-secondary p-1 px-3 rounded-lg hover:brightness-110 active:brightness-90"
+                className="button_1"
             >
                 Reset zoom
             </button>

@@ -3,6 +3,10 @@
 
 @import "tailwindcss";
 
+.leaflet-container {
+    z-index: 1;
+}
+
 :root {
     --background: #171513;
     --foreground: #ebebeb;
@@ -42,7 +46,11 @@ body {
 }
 
 .chart_container {
-    @apply w-full h-full rounded-lg p-5 bg-primary border border-secondary;
+    @apply w-full h-full rounded-lg p-5 bg-primary border border-secondary flex flex-col justify-between;
+}
+
+.button_1 {
+    @apply mt-3 cursor-pointer max-w-[10rem] bg-accent-2 border border-secondary p-1 px-3 rounded-lg hover:brightness-110 active:brightness-90;
 }
 
 .analysis_container {

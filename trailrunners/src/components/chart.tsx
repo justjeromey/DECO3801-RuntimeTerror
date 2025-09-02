@@ -12,6 +12,7 @@ import {
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 import { Line } from "react-chartjs-2";
+import { useDebouncedCallback } from "use-debounce";
 
 ChartJS.register(
     CategoryScale,
@@ -45,93 +46,10 @@ interface ChartData {
         },
     ];
 }
-export const options = {
-    responsive: true,
-    interactions: {
-        mode: "nearest",
-        intersect: false,
-        axis: "x",
-    },
-    plugins: {
-        legend: {
-            display: false,
-        },
-        title: {
-            display: false,
-        },
-        tooltip: {
-            callbacks: {
-                // Custom tooltip options
-                title: (context) => {
-                    return ""; // Hide title
-                },
-                beforeBody: (context) => {
-                    const dataPoint = context[0].parsed;
-                    return [
-                        `Distance: ${(dataPoint.x / 1000).toFixed(2)} km`,
-                        `Distance: ${dataPoint.x.toFixed(2)} m`,
-                        `Elevation: ${dataPoint.y.toFixed(2)} m`,
-                    ];
-                },
-                label: (context) => {
-                    return ""; // Hide label
-                },
-            },
-        },
-        zoom: {
-            pan: {
-                enabled: true,
-                mode: "x",
-            },
-            zoom: {
-                wheel: {
-                    enabled: true,
-                },
-                pinch: {
-                    enabled: true,
-                },
-                mode: "x",
-            },
-        },
-    },
-    scales: {
-        x: {
-            type: "linear", // Use the x axis as numbers
-            bounds: "data",
-            grid: {
-                color: "rgba(255, 255, 255, 0.05)", // Sets the x-axis grid color
-            },
-            title: {
-                display: true,
-                text: "Distance (m)",
-            },
-            ticks: {
-                // Tick settings to reduce amount of clutter
-                autoSkip: true,
-                maxRotation: 0,
-                minRotation: 0,
-                // Round x labels to whole number
-                callback: function(value, index, values) {
-                    return Math.round(value);
-                },
-            },
-        },
-        y: {
-            beginAtZero: true,
-            grid: {
-                color: "rgba(255, 255, 255, 0.05)", // Sets the y-axis grid color
-            },
-            title: {
-                display: true,
-                text: "Elevation (m)",
-            },
-        },
-    },
-};
 
-export default function ChartViewer({ trailData }) {
+export default function ChartViewer({ trailData, setPointData }) {
     const [chartData, setChartData] = useState<ChartData | null>(null);
-    const chartRef = useRef(null);
+    const [prevPoint, setPrevPoint] = useState(0);
 
     // Check if trail data has changed
     useEffect(() => {
@@ -160,6 +78,104 @@ export default function ChartViewer({ trailData }) {
         }
     }, [trailData]);
 
+    const options = {
+        // Debounce to rate limit the function
+        onHover: useDebouncedCallback((event, active) => {
+            if (active.length > 0) {
+                if (active[0]) {
+                    const pointIndex = active[0].index;
+                    if (prevPoint != pointIndex) {
+                        setPrevPoint(pointIndex);
+                        setPointData(pointIndex);
+                    }
+                };
+            } else {
+                setPointData(0);
+            }
+        }, 10),
+        responsive: true,
+        interactions: {
+            mode: "nearest",
+            intersect: false,
+            axis: "x",
+        },
+        plugins: {
+            legend: {
+                display: false,
+            },
+            title: {
+                display: false,
+            },
+            tooltip: {
+                callbacks: {
+                    // Custom tooltip options
+                    title: (context) => {
+                        return ""; // Hide title
+                    },
+                    beforeBody: (context) => {
+                        const dataPoint = context[0].parsed;
+                        return [
+                            `Distance: ${(dataPoint.x / 1000).toFixed(2)} km`,
+                            `Distance: ${dataPoint.x.toFixed(2)} m`,
+                            `Elevation: ${dataPoint.y.toFixed(2)} m`,
+                        ];
+                    },
+                    label: (context) => {
+                        return ""; // Hide label
+                    },
+                },
+            },
+            zoom: {
+                pan: {
+                    enabled: true,
+                    mode: "x",
+                },
+                zoom: {
+                    wheel: {
+                        enabled: true,
+                    },
+                    pinch: {
+                        enabled: true,
+                    },
+                    mode: "x",
+                },
+            },
+        },
+        scales: {
+            x: {
+                type: "linear", // Use the x axis as numbers
+                bounds: "data",
+                grid: {
+                    color: "rgba(255, 255, 255, 0.05)", // Sets the x-axis grid color
+                },
+                title: {
+                    display: true,
+                    text: "Distance (m)",
+                },
+                ticks: {
+                    // Tick settings to reduce amount of clutter
+                    autoSkip: true,
+                    maxRotation: 0,
+                    minRotation: 0,
+                    // Round x labels to whole number
+                    callback: function(value, index, values) {
+                        return Math.round(value);
+                    },
+                },
+            },
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: "rgba(255, 255, 255, 0.05)", // Sets the y-axis grid color
+                },
+                title: {
+                    display: true,
+                    text: "Elevation (m)",
+                },
+            },
+        },
+    };
+
     // Resets the zoom via ref to the chart
     const handleZoomReset = () => {
         if (chartRef.current) {
@@ -170,7 +186,7 @@ export default function ChartViewer({ trailData }) {
     return (
         <div className="chart_container flex flex-col justify-between">
             {chartData !== null ? (
-                <Line data={chartData} options={options} ref={chartRef} />
+                <Line data={chartData} options={options}/>
             ) : (
                 <div className="py-10 flex justify-center items-center">
                     <p>Select a trail to start...</p>

@@ -5,6 +5,11 @@ import FileSelector from "@/components/fileSelector";
 import { useState } from "react";
 import dynamic from "next/dynamic";
 
+interface PointData {
+    longitude: number;
+    latitude: number;
+};
+
 const MapViewer = dynamic(() => import("@/components/map"), {
     ssr: false,
 });
@@ -15,6 +20,8 @@ const ChartViewer = dynamic(() => import('@/components/chart'), {
 
 export default function Home() {
     const [trailData, setTrailData] = useState();
+    const [pointData, setPointData] = useState(0);
+
     return (
         <div className="flex flex-col justify-between h-screen">
             <main className="flex flex-col p-10 h-full">
@@ -33,11 +40,11 @@ export default function Home() {
                     <div className="nested_components">
                         <div className="sections">
                             <h1>Trail Elevation Visualiser</h1>
-                            <ChartViewer trailData={trailData} />
+                            <ChartViewer trailData={trailData} setPointData={setPointData}/>
                         </div>
                         <div className="sections">
                             <h1>Trail Overview</h1>
-                            <MapViewer trailData={trailData} />
+                            <MapViewer trailData={trailData} pointData={pointData}/>
                         </div>
                     </div>
                     <div className="sections">

@@ -1,14 +1,23 @@
 import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Polyline } from 'react-leaflet';
+import { Polyline, Circle, Marker } from 'react-leaflet';
 import { useState } from 'react';
 import { useMap } from 'react-leaflet/hooks';
 
 interface SetMapCenterProps {
     center: [number, number];
     initial: boolean;
+}
+
+interface Trail {
+    cumulative_distances_km: Array<number>;
+    cumulative_distances_m: Array<number>;
+    elevations: Array<number>;
+    latitudes: Array<number>;
+    longitudes: Array<number>;
+    total_distance_km: number;
+    total_distance_m: number;
 }
 
 // Dynamic imports for react-leaflet components
@@ -25,6 +34,8 @@ const TileLayer = dynamic(
 // Add the line style options
 const limeOptions = { color: '#0044ffff', weight: 3 };
 
+const fillBlueOptions = { fillColor: 'blue' }
+
 const SetMapCenter: React.FC<SetMapCenterProps> = ({center, initial}) => {
     const map = useMap();
     useEffect(() => {
@@ -39,10 +50,11 @@ const SetMapCenter: React.FC<SetMapCenterProps> = ({center, initial}) => {
     return null;
 }
 
-export default function MapViewer({ trailData }) {
+export default function MapViewer({ trailData, pointData}) {
     const [initial, setInitial] = useState(true);
     const [data, setData] = useState([]);
     const [center, setCenter] = useState([0,0]);
+    const [markerPoint, setMarkerPoint] = useState([0,0]);
 
     useEffect(() => {
         try {
@@ -66,7 +78,18 @@ export default function MapViewer({ trailData }) {
         }
     }, [trailData]);
 
-    // Simply return the JSX directly - no render() needed
+    useEffect(() => {
+        try {
+            if (pointData !== null) {
+                if (!trailData) return;
+                setMarkerPoint([trailData.latitudes[pointData], trailData.longitudes[pointData]]);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }, [pointData]);
+
+    // Simply return the TSX directly - no render() needed
     return (
         <div className="map_container" style={{ height: '500px', width: '100%' }}>
             <MapContainer 
@@ -77,6 +100,7 @@ export default function MapViewer({ trailData }) {
                 className="rounded-md"
             >
                 <SetMapCenter center={center} initial={initial}/>
+                <Circle center={markerPoint}/>
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

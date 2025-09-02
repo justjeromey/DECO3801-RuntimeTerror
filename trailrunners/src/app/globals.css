@@ -59,8 +59,9 @@ body {
 }
 
 .analysis_container {
-    @apply w-full h-full;
+    @apply w-full h-full rounded-lg p-5 bg-primary border border-secondary;
 }
+
 .map_container {
     @apply w-full h-full rounded-lg p-5 bg-primary border border-secondary;
 }
@@ -68,7 +69,16 @@ body {
 .header {
     @apply w-full;
     background-color:#2a3024;
+}
 
+.headerLink {
+    @apply text-gray-400 text-lg font-medium uppercase transition-colors transition-transform duration-300 hover:text-white hover:scale-105 cursor-pointer;
+}
+
+.headerLink.activeLink {
+    @apply text-white;
+    border-bottom: 2px solid #69a742;
+    padding-bottom: 4px;
 }
 
 .fileSelector {

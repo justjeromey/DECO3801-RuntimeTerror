@@ -4,6 +4,7 @@ import Image from "next/image";
 import FileSelector from "@/components/fileSelector";
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 
 const MapViewer = dynamic(() => import("@/components/map"), {
     ssr: false,
@@ -17,13 +18,19 @@ export default function Home() {
     const [trailData, setTrailData] = useState();
     return (
         <div className="flex flex-col justify-between h-screen">
-            <header className="header flex flex-col px-10 py-4">
+            <header className="header flex flex-row justify-between items-center px-10 py-4">
                 <Image
                         src="/logo.svg"
                         width={290}
                         height={70}
                         alt="Trail Runners"
                     />
+
+                <div className="nav_links flex flex-row gap-10 text-lg font-medium uppercase">
+                    <Link href="/" className="headerLink activeLink">Trail Summary</Link>
+                    <Link href="/info" className="headerLink">Info</Link>
+
+                </div>
             </header>
 
             <main className="flex flex-col px-10 py-5 h-full">
@@ -48,8 +55,7 @@ export default function Home() {
                     <div className="sections">
                         <h1>Trail Analysis</h1>
                         <div className="analysis_container">
-                            <p>This is where the analysis goes</p>
-                            <p className="outline min-h-100">
+                            <p className="min-h-100">
                                 Testing out the vertical spacing
                             </p>
                         </div>
@@ -62,3 +68,4 @@ export default function Home() {
         </div>
     );
 }
+

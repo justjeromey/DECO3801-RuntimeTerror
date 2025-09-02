@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "all": "concurrently \"cd ..\\backend && ..\\.venv\\Scripts\\activate && uvicorn main:app --reload\" \"cd ..\\trailrunners && next dev\"",
+    "install-all": "concurrently  \"cd ..\\ && python -m venv .venv && .venv\\Scripts\\activate && cd .\\backend && pip install -r requirements.txt\" \"cd ..\\trailrunners && npm install\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -30,6 +32,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.2.1",
     "eslint": "^9",
     "eslint-config-next": "15.4.7",
     "tailwindcss": "^4",

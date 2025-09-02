@@ -27,7 +27,7 @@ export default function Home() {
         <div className="flex flex-col justify-between h-screen">
             <main className="flex flex-col p-10 h-full">
                 <div className="w-full">
-                    <nav className="flex mb-5 justify-between items-center">
+                    <nav className="nav_bar">
                         <Image
                             src="/logo.svg"
                             width={303}

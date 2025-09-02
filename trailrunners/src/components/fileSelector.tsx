@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 
@@ -94,7 +95,7 @@ export default function FileSelector({ setTrailData }) {
     };
 
     return (
-        <div className="min-w-50 relative z-10">
+        <div className="md:min-w-50 relative z-10">
             <button
                 type="button"
                 className={`fileSelector ${toggled ? `rounded-t-lg` : `rounded-lg`} hover:brightness-125`}
@@ -102,6 +103,20 @@ export default function FileSelector({ setTrailData }) {
             >
                 {selected === "" ? "Select a trail" : selected}
             </button>
+
+            <button
+                type="button"
+                className="fileSelector_icon"
+                onClick={handleDropdown}
+            >
+                <Image
+                    src="/menu.svg"
+                    width={50}
+                    height={50}
+                    alt="Burger Menu"
+                />
+            </button>
+
             <div
                 className={`border w-full max-h-[50vh] p-1 gap-2 flex flex-col bg-accent-2 border-secondary rounded-b-lg overflow-scroll ${toggled ? `absolute` : `hidden`}`}
             >

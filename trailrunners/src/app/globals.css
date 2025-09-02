@@ -34,8 +34,12 @@ body {
     @apply gap-5 flex flex-col;
 }
 
+.nav_bar {
+    @apply flex mb-5 justify-between items-center;
+}
+
 .nested_components {
-    @apply gap-3 flex flex-row max-w-full;
+    @apply gap-3 flex lg:flex-row max-w-full flex-col;
 }
 
 .sections {
@@ -61,7 +65,11 @@ body {
 }
 
 .fileSelector {
-    @apply w-full border border-secondary px-6 py-2 bg-primary cursor-pointer;
+    @apply hidden md:inline w-full border border-secondary px-6 py-2 bg-primary cursor-pointer;
+}
+
+.fileSelector_icon {
+    @apply md:hidden inline;
 }
 
 .file_select_button {

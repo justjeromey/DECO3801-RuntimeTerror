@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -47,7 +47,7 @@ interface ChartData {
     ];
 }
 
-export default function ChartViewer({ trailData, setPointData }) {
+export default function ChartViewer({ trailData, setPointIndex }) {
     const [chartData, setChartData] = useState<ChartData | null>(null);
     const [prevPoint, setPrevPoint] = useState(0);
 
@@ -68,7 +68,7 @@ export default function ChartViewer({ trailData, setPointData }) {
                             borderWidth: 1,
                             pointRadius: 0,
                             pointHoverRadius: 6,
-                            pointHitRadius: 10,
+                            pointHitRadius: 30,
                         },
                     ],
                 });
@@ -78,21 +78,18 @@ export default function ChartViewer({ trailData, setPointData }) {
         }
     }, [trailData]);
 
-    const options = {
-        // Debounce to rate limit the function
-        onHover: useDebouncedCallback((event, active) => {
+    // useMemo to preserve options unless trailData changes
+    const options = useMemo(() => ({
+        onHover: (e, active) => {
             if (active.length > 0) {
                 if (active[0]) {
                     const pointIndex = active[0].index;
                     if (prevPoint != pointIndex) {
-                        setPrevPoint(pointIndex);
-                        setPointData(pointIndex);
+                        setPointIndex(pointIndex);
                     }
-                };
-            } else {
-                setPointData(0);
+                }
             }
-        }, 10),
+        },
         responsive: true,
         interactions: {
             mode: "nearest",
@@ -158,7 +155,7 @@ export default function ChartViewer({ trailData, setPointData }) {
                     maxRotation: 0,
                     minRotation: 0,
                     // Round x labels to whole number
-                    callback: function(value, index, values) {
+                    callback: function (value, index, values) {
                         return Math.round(value);
                     },
                 },
@@ -174,7 +171,7 @@ export default function ChartViewer({ trailData, setPointData }) {
                 },
             },
         },
-    };
+    }), [trailData]);
 
     // Resets the zoom via ref to the chart
     const handleZoomReset = () => {
@@ -186,7 +183,7 @@ export default function ChartViewer({ trailData, setPointData }) {
     return (
         <div className="chart_container flex flex-col justify-between">
             {chartData !== null ? (
-                <Line data={chartData} options={options}/>
+                <Line data={chartData} options={options} />
             ) : (
                 <div className="py-10 flex justify-center items-center">
                     <p>Select a trail to start...</p>

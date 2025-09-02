@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import FileSelector from "@/components/fileSelector";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 
 interface PointData {
@@ -20,7 +20,8 @@ const ChartViewer = dynamic(() => import('@/components/chart'), {
 
 export default function Home() {
     const [trailData, setTrailData] = useState();
-    const [pointData, setPointData] = useState(0);
+    const [pointIndex, setPointIndex] = useState(0);
+    const mapRef = useRef(null);
 
     return (
         <div className="flex flex-col justify-between h-screen">
@@ -40,11 +41,11 @@ export default function Home() {
                     <div className="nested_components">
                         <div className="sections">
                             <h1>Trail Elevation Visualiser</h1>
-                            <ChartViewer trailData={trailData} setPointData={setPointData}/>
+                            <ChartViewer trailData={trailData} setPointIndex={setPointIndex}/>
                         </div>
                         <div className="sections">
                             <h1>Trail Overview</h1>
-                            <MapViewer trailData={trailData} pointData={pointData}/>
+                            <MapViewer trailData={trailData} pointIndex={pointIndex} ref={mapRef}/>
                         </div>
                     </div>
                     <div className="sections">

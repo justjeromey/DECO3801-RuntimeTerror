@@ -50,6 +50,7 @@ interface ChartData {
 export default function ChartViewer({ trailData, setPointIndex }) {
     const [chartData, setChartData] = useState<ChartData | null>(null);
     const [prevPoint, setPrevPoint] = useState(0);
+    const chartRef = useRef(null);
 
     // Check if trail data has changed
     useEffect(() => {
@@ -104,6 +105,9 @@ export default function ChartViewer({ trailData, setPointIndex }) {
                 display: false,
             },
             tooltip: {
+                mode: "index",
+                intersect: false,
+                position: "average",
                 callbacks: {
                     // Custom tooltip options
                     title: (context) => {
@@ -137,6 +141,10 @@ export default function ChartViewer({ trailData, setPointIndex }) {
                     mode: "x",
                 },
             },
+        },
+        hover: {
+            mode: "index",
+            intersect: false
         },
         scales: {
             x: {
@@ -183,7 +191,7 @@ export default function ChartViewer({ trailData, setPointIndex }) {
     return (
         <div className="chart_container flex flex-col justify-between">
             {chartData !== null ? (
-                <Line data={chartData} options={options} />
+                <Line data={chartData} options={options} ref={chartRef}/>
             ) : (
                 <div className="py-10 flex justify-center items-center">
                     <p>Select a trail to start...</p>

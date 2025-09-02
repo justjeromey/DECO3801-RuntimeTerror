@@ -32,9 +32,9 @@ const TileLayer = dynamic(
 );
 
 // Add the line style options
-const trailOptions = { color: "#0077b6", weight: 4 };
+const trailOptions = { color: "#3888fb", weight: 4 };
 
-const markerOptions = { color: "#e2ecf2", fillColor: "#0077b6", fill: true, fillOpacity: 1};
+const markerOptions = { color: "#e2ecf2", fillColor: "#3888fb", fill: true, fillOpacity: 1};
 
 const SetMapCenter: React.FC<SetMapCenterProps> = ({ center, initial }) => {
     const map = useMap();

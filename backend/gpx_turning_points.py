@@ -71,7 +71,12 @@ for x in range(len(turning_x) - 1):
 
 num_points = len(gpx_result.latitudes)
 
+lastPoint = len(gpx_result.elevations) - 1
+grade = gpx_result.elevations[lastPoint] / gpx_result.cumulative_distances_m[lastPoint]
+
+
 print("elevation gain is:" , totalGain)
+print("grade is:", grade)
 
 fig, ax = plt.subplots(figsize=(10, 4))
 ax.plot(gpx_result.convert_distance_to_km, gpx_result.elevations, marker='.', color='green')

@@ -3,7 +3,46 @@ from matplotlib.ticker import MultipleLocator
 
 from parseGpx import get_trail_file_path, parse_gpx, GPXData
 
-ROLLING_SEGMENT_THRESHOLD = 200  # Meters
+ROLLING_SEGMENT_THRESHOLD = 10  # Meters
+
+
+def calculateSegmentStats(x_list: list[int], y_list: list[int], start: int, end: int):
+    #calculate elevation gain for the segment 
+    totalGain = 0.0
+    for x in range(start, end - 1):
+        if y_list[x + 1] > y_list[x]:
+            totalGain += y_list[x + 1] - y_list[x]
+
+    # Calculate hypotenuse
+    rolling_x = []
+    rolling_y = []
+    numhills = 0
+
+    for x in range(start, end - 1):
+        x_diff = (x_list[x+1] - x_list[x]) * 1000
+        y_diff = abs(y_list[x+1] - y_list[x])
+        hypotenuse = (x_diff**2 + y_diff**2)**0.5
+
+        # If section is short then it is rolling hill
+        if hypotenuse < ROLLING_SEGMENT_THRESHOLD:
+            rolling_x.extend([x_list[x],x_list[x+1]])
+            rolling_y.extend([y_list[x], y_list[x+1]])
+            numhills += 1
+
+    # calculate grade for the segment 
+    print("\n\n\n",y_list[end - 1], y_list[start], x_list[end - 1], x_list[start], "\n\n\n")
+    grade = (y_list[end - 1] - y_list[start]) / ((x_list[end - 1] - x_list[start])*1000)
+
+    # organise the stats nicely
+    stats = {
+        "gain": totalGain,
+        "hillcount": numhills,
+        "rolling_x": rolling_x,
+        "rolling_y": rolling_y,
+        "grade": grade
+    }
+
+    return stats
 
 
 trail_name = "device_measurement_2"
@@ -38,15 +77,15 @@ for y in gpx_result.elevations:
 
     i += 1
 
-print(index_list)
 
 # Collect x and y of turning points
 turning_x = []
 turning_y = []
 for index in index_list:
     # Converting m to km
-    turning_x.append(gpx_result.cumulative_distances_m[index-1] / 1000)
-    turning_y.append(gpx_result.elevations[index-1])
+    if index > 0:
+        turning_x.append(gpx_result.cumulative_distances_m[index-1] / 1000)
+        turning_y.append(gpx_result.elevations[index-1])
 
 totalGain = 0.0
 for x in range(len(turning_y)):
@@ -67,16 +106,17 @@ for x in range(len(turning_x) - 1):
     if hypotenuse < ROLLING_SEGMENT_THRESHOLD:
         rolling_x.extend([turning_x[x],turning_x[x+1]])
         rolling_y.extend([turning_y[x], turning_y[x+1]])
-        print(hypotenuse)
 
-num_points = len(gpx_result.latitudes)
 
 lastPoint = len(gpx_result.elevations) - 1
 grade = gpx_result.elevations[lastPoint] / gpx_result.cumulative_distances_m[lastPoint]
 
-
+results = calculateSegmentStats(turning_x, turning_y, 0, (len(turning_y)))
+print(turning_y[0],turning_x[0])
 print("elevation gain is:" , totalGain)
+print(results["gain"])
 print("grade is:", grade)
+print(results["grade"])
 
 fig, ax = plt.subplots(figsize=(10, 4))
 ax.plot(gpx_result.convert_distance_to_km, gpx_result.elevations, marker='.', color='green')

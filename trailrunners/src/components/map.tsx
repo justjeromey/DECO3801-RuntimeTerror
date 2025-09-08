@@ -50,7 +50,7 @@ const SetMapCenter: React.FC<SetMapCenterProps> = ({ center, initial }) => {
     return null;
 };
 
-export default function MapViewer({ trailData, pointIndex }) {
+export default function MapViewer({ trailData, pointIndex, ref }) {
     const [initial, setInitial] = useState(true);
     const [data, setData] = useState([]);
     const [center, setCenter] = useState<Point>([0, 0]);

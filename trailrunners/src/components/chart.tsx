@@ -97,7 +97,7 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
     // useMemo to preserve options unless trailData changes
     const options = useMemo(() => ({
         // A on hover function that updates a parent value
-        onHover: ( {e, active} : optionsProps) => {
+        onHover: (e, active) => {
             // Making sure the active array isn't empty
             if (active.length <= 0) return;
             if (!active[0]) return;
@@ -122,9 +122,7 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
                 display: false,
             },
             tooltip: {
-                mode: "index",
                 intersect: false,
-                position: "average",
                 callbacks: {
                     title: (context: import("chart.js").TooltipItem<"line">[]) => {
                         return ""; // Hide title
@@ -146,7 +144,7 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
             zoom: {
                 pan: {
                     enabled: true,
-                    mode: "x",
+                    mode: 'x' as const,
                 },
                 zoom: {
                     wheel: {
@@ -155,18 +153,14 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
                     pinch: {
                         enabled: true,
                     },
-                    mode: "x",
+                    mode: 'x' as const,
                 },
             },
         },
-        hover: {
-            mode: "index",
-            intersect: false
-        },
         scales: {
             x: {
-                type: "linear", // Use the x axis as numbers
-                bounds: "data",
+                type: "linear" as const, // Use the x axis as numbers
+                bounds: "data" as const,
                 grid: {
                     color: "rgba(255, 255, 255, 0.05)", // Sets the x-axis grid color
                 },

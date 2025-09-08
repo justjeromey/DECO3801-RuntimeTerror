@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-const API_URL = "http://127.0.0.1:8001/format-gpx";
+const API_URL = "http://127.0.0.1:8000/format-gpx";
 
 export async function POST(request: NextRequest) {
     try {

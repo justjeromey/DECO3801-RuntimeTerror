@@ -37,17 +37,32 @@ interface Trail {
 }
 
 interface ChartData {
-    labels: string;
+    labels: Array<number>;
     datasets: [
         {
-            label: string;
+            label?: string;
             data: Array<number>;
-            boarderColor: string;
+            borderColor: string;
+            borderWidth?: number;
+            pointRadius?: number;
+            pointHoverRadius?: number;
+            pointHitRadius?: number;
         },
     ];
 }
 
-export default function ChartViewer({ trailData, setPointIndex }) {
+interface ChartViewerProps {
+    trailData: Trail;
+    setPointIndex: (index: number) => void;
+}
+
+interface optionsProps {
+    e: React.MouseEvent<HTMLCanvasElement>
+    active: Array<import("chart.js").ActiveElement>;
+}
+
+
+export default function ChartViewer({ trailData, setPointIndex }: ChartViewerProps) {
     const [chartData, setChartData] = useState<ChartData | null>(null);
     const [prevPoint, setPrevPoint] = useState(0);
     const chartRef = useRef(null);
@@ -82,15 +97,15 @@ export default function ChartViewer({ trailData, setPointIndex }) {
     // useMemo to preserve options unless trailData changes
     const options = useMemo(() => ({
         // A on hover function that updates a parent value
-        onHover: (e, active) => {
+        onHover: ( {e, active} : optionsProps) => {
             // Making sure the active array isn't empty
             if (active.length <= 0) return;
             if (!active[0]) return;
-
-            // If an valid coordinate is returned, set the value to the index
+                
+            // If a valid coordinate is returned, set the value to the index
             const pointIndex = active[0].index;
             if (prevPoint != pointIndex) {
-                setPointIndex(pointIndex);
+            setPointIndex(pointIndex);
             }
         },
         responsive: true,
@@ -111,19 +126,19 @@ export default function ChartViewer({ trailData, setPointIndex }) {
                 intersect: false,
                 position: "average",
                 callbacks: {
-                    title: (context) => {
+                    title: (context: import("chart.js").TooltipItem<"line">[]) => {
                         return ""; // Hide title
                     },
-                    beforeBody: (context) => {
+                    beforeBody: (context: import("chart.js").TooltipItem<"line">[]) => {
                         // Custom tooltip options
-                        const dataPoint = context[0].parsed;
+                        const dataPoint = context[0].parsed as { x: number; y: number };
                         return [
                             `Distance: ${(dataPoint.x / 1000).toFixed(2)} km`,
                             `Distance: ${dataPoint.x.toFixed(2)} m`,
                             `Elevation: ${dataPoint.y.toFixed(2)} m`,
                         ];
                     },
-                    label: (context) => {
+                    label: (context: import("chart.js").TooltipItem<"line">) => {
                         return ""; // Hide label
                     },
                 },

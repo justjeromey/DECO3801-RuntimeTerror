@@ -165,18 +165,46 @@ def link_points_to_route(las: laspy.LasData, gpx_data: GPXData, max_distance: fl
     return elevations
 
 def prune_trees(elevations: List[Optional[float]], max_gap: int = 5) -> List[Optional[float]]:
-    pruned = elevations.copy()
+    """Prune spikes in elevation data likely caused by trees."""
+    if not elevations:
+        return []
+
+    pruned = list(elevations)
     n = len(pruned)
     i = 0
-    while i < n:
-        v = pruned[i]
-        next = pruned[i + 1] if i + 1 < n else None
-        if v is not None and next is not None:
-            if next - v > max_gap:
-                pruned[i + 1] = v
-        i += 1
-    return pruned
+    while i < n - 1:
+        if pruned[i] is None:
+            i += 1
+            continue
 
+        j = i + 1
+        while j < n and pruned[j] is None:
+            j += 1
+
+        if j == n:
+            break
+
+        current_val = pruned[i]
+        next_val = pruned[j]
+
+        # Detect a spike: a sharp increase in elevation
+        if next_val - current_val > max_gap:
+            end_of_spike = j + 1
+            while end_of_spike < n and (pruned[end_of_spike] is None or pruned[end_of_spike] - current_val > max_gap):
+                end_of_spike += 1
+
+            if end_of_spike < n:
+                # Interpolate all points within the spike
+                end_val = pruned[end_of_spike]
+                num_points = end_of_spike - i
+                for k in range(i + 1, end_of_spike):
+                    pruned[k] = current_val + (end_val - current_val) * (k - i) / num_points
+                i = end_of_spike
+            else:
+                i = j
+        else:
+            i = j
+    return pruned
 
 
 if __name__ == "__main__":
@@ -205,7 +233,6 @@ if __name__ == "__main__":
 
     # plotting for visual verification
     import matplotlib.pyplot as plt
-    from matplotlib.ticker import MultipleLocator
     num_points = len(gpx_data.latitudes)
 
     # Plotting the elevation profile against distance
@@ -215,21 +242,17 @@ if __name__ == "__main__":
     ax.set_xlabel('Distance (km)')
     ax.set_ylabel('Elevation (m)')
     ax.grid(True)
-    # Set major ticks on the distance axis every 1 km (change to desired interval)
-    ax.xaxis.set_major_locator(MultipleLocator(1))
     fig.tight_layout()
     plt.show(block = False)
     print("Done")
 
-    pruned = prune_trees(elevations, max_gap=5)
+    pruned = prune_trees(elevations, max_gap=3)
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.plot(gpx_data.convert_distance_to_km, pruned, marker='.', color='green')
-    ax.set_title('Elevation Profile with LiDAR Data')
+    ax.set_title('LiDAR Elevation Profile with Trees removed')
     ax.set_xlabel('Distance (km)')
     ax.set_ylabel('Elevation (m)')
     ax.grid(True)
-    # Set major ticks on the distance axis every 1 km (change to desired interval)
-    ax.xaxis.set_major_locator(MultipleLocator(1))
     fig.tight_layout()
     plt.show()
     print("Done")

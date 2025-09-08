@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "all": "concurrently \"cd ..\\backend && ..\\.venv\\Scripts\\activate && uvicorn main:app --reload\" \"cd ..\\trailrunners && next dev\"",
+    "all": "concurrently \"cd ..\\backend && ..\\.venv\\Scripts\\activate && uvicorn main:app --reload\" \"cd ..\\trailrunners && next start\"",
+    "all-dev": "concurrently \"cd ..\\backend && ..\\.venv\\Scripts\\activate && uvicorn main:app --reload\" \"cd ..\\trailrunners && next dev\"",
     "install-all": "concurrently  \"cd ..\\ && python -m venv .venv && .venv\\Scripts\\activate && cd .\\backend && pip install -r requirements.txt\" \"cd ..\\trailrunners && npm install\"",
     "build": "next build",
     "start": "next start",

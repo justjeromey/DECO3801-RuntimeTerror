@@ -168,7 +168,7 @@ def link_points_to_route(las: laspy.LasData, gpx_data: GPXData, max_distance: fl
 if __name__ == "__main__":
 	# change this relative path to the LAZ file you expect to use
     rel_path = "data/lidar/honeyeater.laz"
-    las = load_lidar_points(rel_path)
+    las = load_lidar_points(get_real_path(rel_path))
 
     gpx_path = "data/gpx/honeyeater.gpx"
     with open(get_real_path(gpx_path), "r") as gpx_file:
@@ -188,3 +188,22 @@ if __name__ == "__main__":
         print(f"Height range: {min(valid):.2f} to {max(valid):.2f} m")
     else:
         print("No matching LiDAR elevations found for GPX points. Check CRS and coverage.")
+
+    # plotting for visual verification
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import MultipleLocator
+    num_points = len(gpx_data.latitudes)
+
+    # Plotting the elevation profile against distance
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.plot(gpx_data.convert_distance_to_km, elevations, marker='.', color='green')
+    ax.set_title('Elevation Profile with LiDAR Data')
+    ax.set_xlabel('Distance (km)')
+    ax.set_ylabel('Elevation (m)')
+    ax.grid(True)
+    # Set major ticks on the distance axis every 1 km (change to desired interval)
+    ax.xaxis.set_major_locator(MultipleLocator(1))
+    fig.tight_layout()
+    plt.show()
+    print("Done")
+    

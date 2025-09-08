@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="GaiaGPS" version="1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
+  <metadata>
+    <name>Alpine Loop Waypoints</name>
+    <time>2023-11-23T22:08:55Z</time>
+  </metadata>
+  <wpt lat="37.917580" lon="-107.617660">
+    <time>2023-11-23T22:24:17Z</time>
+    <name>California Pass</name>
+    <sym>peak</sym>
+  </wpt>
+  <wpt lat="37.906430" lon="-107.661840">
+    <time>2023-11-23T22:22:56Z</time>
+    <name>Corkscrew Pass</name>
+    <sym>peak</sym>
+  </wpt>
+  <wpt lat="37.933690" lon="-107.538070">
+    <time>2023-11-23T22:14:21Z</time>
+    <name>Cinnamon Pass</name>
+    <sym>peak</sym>
+  </wpt>
+  <wpt lat="37.931290" lon="-107.571130">
+    <time>2023-11-23T22:25:22Z</time>
+    <name>Animas Forks Mine</name>
+    <sym>mine</sym>
+  </wpt>
+  <wpt lat="37.919990" lon="-107.627120">
+    <time>2023-11-23T22:23:37Z</time>
+    <name>Hurricane Pass</name>
+    <sym>peak</sym>
+  </wpt>
+  <wpt lat="37.974160" lon="-107.585220">
+    <time>2023-11-23T22:17:04Z</time>
+    <name>Engineer Pass</name>
+    <sym>peak</sym>
+  </wpt>
+</gpx>

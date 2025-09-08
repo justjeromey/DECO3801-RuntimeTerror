@@ -164,6 +164,20 @@ def link_points_to_route(las: laspy.LasData, gpx_data: GPXData, max_distance: fl
 
     return elevations
 
+def prune_trees(elevations: List[Optional[float]], max_gap: int = 5) -> List[Optional[float]]:
+    pruned = elevations.copy()
+    n = len(pruned)
+    i = 0
+    while i < n:
+        v = pruned[i]
+        next = pruned[i + 1] if i + 1 < n else None
+        if v is not None and next is not None:
+            if next - v > max_gap:
+                pruned[i + 1] = v
+        i += 1
+    return pruned
+
+
 
 if __name__ == "__main__":
 	# change this relative path to the LAZ file you expect to use
@@ -197,6 +211,19 @@ if __name__ == "__main__":
     # Plotting the elevation profile against distance
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.plot(gpx_data.convert_distance_to_km, elevations, marker='.', color='green')
+    ax.set_title('Elevation Profile with LiDAR Data')
+    ax.set_xlabel('Distance (km)')
+    ax.set_ylabel('Elevation (m)')
+    ax.grid(True)
+    # Set major ticks on the distance axis every 1 km (change to desired interval)
+    ax.xaxis.set_major_locator(MultipleLocator(1))
+    fig.tight_layout()
+    plt.show(block = False)
+    print("Done")
+
+    pruned = prune_trees(elevations, max_gap=5)
+    fig, ax = plt.subplots(figsize=(10, 4))
+    ax.plot(gpx_data.convert_distance_to_km, pruned, marker='.', color='green')
     ax.set_title('Elevation Profile with LiDAR Data')
     ax.set_xlabel('Distance (km)')
     ax.set_ylabel('Elevation (m)')

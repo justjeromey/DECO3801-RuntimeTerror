@@ -3,6 +3,10 @@
 
 @import "tailwindcss";
 
+.leaflet-container {
+    z-index: 1;
+}
+
 :root {
     --background: #171513;
     --foreground: #ebebeb;
@@ -32,8 +36,12 @@ body {
     @apply gap-5 flex flex-col;
 }
 
+.nav_bar {
+    @apply flex mb-5 justify-between items-center;
+}
+
 .nested_components {
-    @apply gap-3 flex flex-row max-w-full;
+    @apply gap-3 flex lg:flex-row max-w-full flex-col;
 }
 
 .sections {
@@ -46,7 +54,11 @@ body {
 }
 
 .chart_container {
-    @apply w-full h-full rounded-lg p-5 bg-primary border border-secondary;
+    @apply w-full h-full rounded-lg p-5 bg-primary border border-secondary flex flex-col justify-between;
+}
+
+.button_1 {
+    @apply mt-3 cursor-pointer max-w-[10rem] bg-accent-2 border border-secondary p-1 px-3 rounded-lg hover:brightness-110 active:brightness-90;
 }
 
 .nav_container {
@@ -82,7 +94,11 @@ body {
 }
 
 .fileSelector {
-    @apply w-full border border-secondary px-6 py-2 bg-primary cursor-pointer;
+    @apply hidden md:inline w-full border border-secondary px-6 py-2 bg-primary cursor-pointer;
+}
+
+.fileSelector_icon {
+    @apply md:hidden inline;
 }
 
 .file_select_button {

@@ -47,14 +47,14 @@ def get_trail_file_path(trail_name: str) -> str:
     gpx_rel_path = f"../data/trails/{trail_name}.gpx"
     return os.path.abspath(os.path.join(os.path.dirname(__file__), gpx_rel_path))
 
+# [{distance: x2, elevation: y2}, ...]
 
-def parse_gpx(gpx_path: str) -> GPXData:
+def parse_gpx(gpx_file) -> GPXData:
     latitudes: List[float] = []
     longitudes: List[float] = []
     elevations: List[Optional[float]] = []
 
-    with open(gpx_path, 'r') as gpx_file:
-        gpx = gpxpy.parse(gpx_file)
+    gpx = gpxpy.parse(gpx_file)
 
     def add_points(points):
         #check elevation points exist

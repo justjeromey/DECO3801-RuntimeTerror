@@ -46,12 +46,12 @@ def calculateSegmentStats(x_list: list[int], y_list: list[int], start: int, end:
     return stats
 
 
-trail_name = "device_measurement_2"
+trail_name = "device_measurement_1"
 print(f"Loading {trail_name} GPX data...")
 gpx_path = get_trail_file_path(trail_name)
 
-gpx_result: GPXData = parse_gpx(gpx_path)
-
+with open(gpx_path, 'r') as gpx_file:
+    gpx_result: GPXData = parse_gpx(gpx_file)
 
 # Find turning points 
 first = 0

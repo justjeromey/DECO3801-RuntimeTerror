@@ -4,6 +4,7 @@ from matplotlib.ticker import MultipleLocator
 from parseGpx import get_trail_file_path, parse_gpx, GPXData
 
 ROLLING_SEGMENT_THRESHOLD = 10  # Meters
+NUMBER_OF_SPLITS = 5
 
 
 def calculateSegmentStats(x_list: list[int], y_list: list[int], start: int, end: int):
@@ -30,7 +31,7 @@ def calculateSegmentStats(x_list: list[int], y_list: list[int], start: int, end:
             numhills += 1
 
     # calculate grade for the segment 
-    print("\n\n\n",y_list[end - 1], y_list[start], x_list[end - 1], x_list[start], "\n\n\n")
+    #print("\n\n\n",y_list[end - 1], y_list[start], x_list[end - 1], x_list[start], "\n\n\n")
     grade = (y_list[end - 1] - y_list[start]) / ((x_list[end - 1] - x_list[start])*1000)
 
     # organise the stats nicely
@@ -111,17 +112,54 @@ for x in range(len(turning_x) - 1):
 lastPoint = len(gpx_result.elevations) - 1
 grade = gpx_result.elevations[lastPoint] / gpx_result.cumulative_distances_m[lastPoint]
 
+distPerSegment = gpx_result.cumulative_distances_m[lastPoint] / NUMBER_OF_SPLITS
+
+segmentIndeces = []
+
+segmentStats = []
+
+#find indeces of split points 
+for i in range(0,NUMBER_OF_SPLITS):
+    for j in range(0,len(turning_x)):
+        if (turning_x[j] * 1000) > (distPerSegment * i):
+            segmentIndeces.append(j)
+            break
+
+segmentIndeces.append(len(turning_x))
+segmentPoints_x = []
+segmentPoints_y = []
+
+#calculate the segment statistics of each segment 
+for i in range (len(segmentIndeces)):
+    start = segmentIndeces[i-1] if i > 0 else 0
+    end = segmentIndeces[i]
+    print("segment start:",start, "segment end:", end)
+    segmentPoints_x.append(turning_x[start])
+    segmentPoints_y.append(turning_y[start])
+    if end != 0:
+        segmentStats.append(calculateSegmentStats(turning_x,turning_y,start-1,end))
+
+#print segment stats
+tg= 0
+for stat in segmentStats:
+    print("\nsegment grade:",stat["grade"])
+    print("segment gain:",stat["gain"])
+    tg += stat["gain"]
+    print("cumulative gain:", tg)
+
 results = calculateSegmentStats(turning_x, turning_y, 0, (len(turning_y)))
-print(turning_y[0],turning_x[0])
-print("elevation gain is:" , totalGain)
+
+print("\ntotal elevation gain is:" , totalGain)
 print(results["gain"])
-print("grade is:", grade)
+print("total grade is:", grade)
 print(results["grade"])
 
 fig, ax = plt.subplots(figsize=(10, 4))
 ax.plot(gpx_result.convert_distance_to_km, gpx_result.elevations, marker='.', color='green')
 ax.scatter(turning_x, turning_y, c="blue", label="Turning points", marker="o", s=100, alpha=0.7, edgecolors="black")
 ax.scatter(rolling_x, rolling_y, c="red", label="Rolling Hills", marker="o", s=100, alpha=0.7, edgecolors="black")
+ax.scatter(segmentPoints_x, segmentPoints_y, c="yellow", label="Segment Starts", marker="o", s=100, alpha=0.7, edgecolors="black")
+
 ax.legend()
 ax.set_title('Elevation Profile')
 ax.set_xlabel('Distance (km)')

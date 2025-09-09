@@ -1,27 +1,17 @@
-<<<<<<< HEAD
-import React, { useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import 'leaflet/dist/leaflet.css';
-import { Polyline } from 'react-leaflet';
-import { useState } from 'react';
-import { useMap } from 'react-leaflet/hooks';
-=======
 import React, { useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 import { Polyline, Circle, Marker, CircleMarker } from "react-leaflet";
 import { useState } from "react";
 import { useMap } from "react-leaflet/hooks";
->>>>>>> origin/main
 
 interface SetMapCenterProps {
     center: [number, number];
     initial: boolean;
 }
 
-<<<<<<< HEAD
+
 // Dynamic imports for react leaflet components
-=======
 interface Trail {
     cumulative_distances_km: Array<number>;
     cumulative_distances_m: Array<number>;
@@ -35,7 +25,6 @@ interface Trail {
 type Point = [latitude: number, longitude: number];
 
 // Dynamic imports for react-leaflet components
->>>>>>> origin/main
 const MapContainer = dynamic(
     () => import("react-leaflet").then((mod) => mod.MapContainer),
     { ssr: false },
@@ -96,13 +85,6 @@ export default function MapViewer({ trailData, pointIndex, ref }) {
         }
     }, [trailData]);
 
-<<<<<<< HEAD
-    return (
-        <div className="map_container" style={{ height: '500px', width: '100%' }}>
-            <MapContainer 
-                center={center}
-                zoom={1} 
-=======
     // Changes marker position when chart point updates
     useEffect(() => {
         try {
@@ -128,7 +110,6 @@ export default function MapViewer({ trailData, pointIndex, ref }) {
             <MapContainer
                 center={center}
                 zoom={1}
->>>>>>> origin/main
                 scrollWheelZoom={true}
                 style={{ height: "100%", width: "100%" }}
                 className="rounded-md"

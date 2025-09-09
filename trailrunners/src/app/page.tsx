@@ -1,10 +1,17 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import FileSelector from "@/components/fileSelector";
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Dashboard from "@/components/dashboard";
+import { Line } from "react-chartjs-2";
+
+interface PointData {
+    longitude: number;
+    latitude: number;
+};
 
 
 const MapViewer = dynamic(() => import("@/components/map"), {
@@ -17,6 +24,9 @@ const ChartViewer = dynamic(() => import('@/components/chart'), {
 
 export default function Home() {
     const [trailData, setTrailData] = useState();
+    const [pointIndex, setPointIndex] = useState(0);
+    const mapRef = useRef(null);
+
     return (
         <div className="flex flex-col justify-between h-screen">
             <header className="header flex flex-row justify-between items-center px-10 py-4">

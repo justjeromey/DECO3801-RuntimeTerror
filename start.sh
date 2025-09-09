@@ -57,7 +57,7 @@ BACKEND_PID=$!
 cd ..
 
 # Give backend a moment to start
-sleep 7
+sleep 3
 
 # Start frontend server in background
 cd trailrunners
@@ -65,6 +65,8 @@ echo "Starting Next.js development server..."
 npm run dev &
 FRONTEND_PID=$!
 cd ..
+
+sleep 5
 
 # Wait for both processes
 echo ""

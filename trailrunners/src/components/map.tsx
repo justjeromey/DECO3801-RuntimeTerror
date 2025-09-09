@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import dynamic from 'next/dynamic';
-import { Icon } from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Polyline } from 'react-leaflet';
 import { useState } from 'react';
@@ -11,7 +10,7 @@ interface SetMapCenterProps {
     initial: boolean;
 }
 
-// Dynamic imports for react-leaflet components
+// Dynamic imports for react leaflet components
 const MapContainer = dynamic(
   () => import('react-leaflet').then((mod) => mod.MapContainer),
   { ssr: false }
@@ -66,11 +65,10 @@ export default function MapViewer({ trailData }) {
         }
     }, [trailData]);
 
-    // Simply return the JSX directly - no render() needed
     return (
         <div className="map_container" style={{ height: '500px', width: '100%' }}>
             <MapContainer 
-                center={center} 
+                center={center}
                 zoom={1} 
                 scrollWheelZoom={true}
                 style={{ height: '100%', width: '100%' }}

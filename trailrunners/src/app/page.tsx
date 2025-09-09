@@ -4,6 +4,7 @@ import Image from "next/image";
 import FileSelector from "@/components/fileSelector";
 import { useState } from "react";
 import dynamic from "next/dynamic";
+import Dashboard from "@/components/dashboard";
 
 const MapViewer = dynamic(() => import("@/components/map"), {
     ssr: false,
@@ -15,6 +16,18 @@ const ChartViewer = dynamic(() => import('@/components/chart'), {
 
 export default function Home() {
     const [trailData, setTrailData] = useState();
+
+    const loadTrailData = async (fileName: string) => {
+        const formData = new FormData();
+        formData.append('fileName', fileName);
+        const data = await fetch('/api/parser', {
+            method: 'POST',
+            body: formData
+        }).then(res => res.json());
+        
+        setTrailData(data);
+    };
+
     return (
         <div className="flex flex-col justify-between h-screen">
             <main className="flex flex-col p-10 h-full">
@@ -45,7 +58,7 @@ export default function Home() {
                         <div className="analysis_container">
                             <p>This is where the analysis goes</p>
                             <p className="outline min-h-100">
-                                Testing out the vertical spacing
+                                <Dashboard trailData={trailData} />
                             </p>
                         </div>
                     </div>

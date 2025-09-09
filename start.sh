@@ -57,7 +57,7 @@ BACKEND_PID=$!
 cd ..
 
 # Give backend a moment to start
-sleep 3
+sleep 7
 
 # Start frontend server in background
 cd trailrunners

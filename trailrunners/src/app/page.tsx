@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import FileSelector from "@/components/fileSelector";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Dashboard from "@/components/dashboard";
+
 
 const MapViewer = dynamic(() => import("@/components/map"), {
     ssr: false,
@@ -16,41 +17,46 @@ const ChartViewer = dynamic(() => import('@/components/chart'), {
 
 export default function Home() {
     const [trailData, setTrailData] = useState();
-
-    const loadTrailData = async (fileName: string) => {
-        const formData = new FormData();
-        formData.append('fileName', fileName);
-        const data = await fetch('/api/parser', {
-            method: 'POST',
-            body: formData
-        }).then(res => res.json());
-        
-        setTrailData(data);
-    };
-
     return (
         <div className="flex flex-col justify-between h-screen">
-            <main className="flex flex-col p-10 h-full">
+            <header className="header flex flex-row justify-between items-center px-10 py-4">
+                <Image
+                        src="/logo.svg"
+                        width={290}
+                        height={70}
+                        alt="Trail Runners"
+                    />
+
+                <div className="nav_links flex flex-row gap-10 text-lg font-medium uppercase">
+                    <Link href="/" className="headerLink activeLink">Trail Summary</Link>
+                    <Link href="/info" className="headerLink">Info</Link>
+
+                </div>
+            </header>
+
+            <main className="flex flex-col px-10 py-5 h-full">
+                
                 <div className="w-full">
-                    <nav className="flex mb-5 justify-between items-center">
-                        <Image
-                            src="/logo.svg"
-                            width={303}
-                            height={83}
-                            alt="Trail Runners"
-                        />
-                        <FileSelector setTrailData={setTrailData} />
+                    <Image
+                        src="/logo.svg"
+                        width={303}
+                        height={83}
+                        alt="Trail Runners"
+                    />
+                    <nav className="nav_container">
+                        <h1>Trail Summary</h1>
+                        <FileSelector setTrailData={setTrailData}/>
                     </nav>
                 </div>
                 <div className="components">
                     <div className="nested_components">
                         <div className="sections">
                             <h1>Trail Elevation Visualiser</h1>
-                            <ChartViewer trailData={trailData} />
+                            <ChartViewer trailData={trailData} setPointIndex={setPointIndex}/>
                         </div>
                         <div className="sections">
                             <h1>Trail Overview</h1>
-                            <MapViewer trailData={trailData} />
+                            <MapViewer trailData={trailData} pointIndex={pointIndex} ref={mapRef}/>
                         </div>
                     </div>
                     <div className="sections">
@@ -70,3 +76,4 @@ export default function Home() {
         </div>
     );
 }
+

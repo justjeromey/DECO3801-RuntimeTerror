@@ -4,12 +4,8 @@ import Image from "next/image";
 import FileSelector from "@/components/fileSelector";
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
+import Dashboard from "@/components/dashboard";
 
-interface PointData {
-    longitude: number;
-    latitude: number;
-};
 
 const MapViewer = dynamic(() => import("@/components/map"), {
     ssr: false,
@@ -21,9 +17,6 @@ const ChartViewer = dynamic(() => import('@/components/chart'), {
 
 export default function Home() {
     const [trailData, setTrailData] = useState();
-    const [pointIndex, setPointIndex] = useState(0);
-    const mapRef = useRef(null);
-
     return (
         <div className="flex flex-col justify-between h-screen">
             <header className="header flex flex-row justify-between items-center px-10 py-4">
@@ -69,8 +62,9 @@ export default function Home() {
                     <div className="sections">
                         <h1>Trail Analysis</h1>
                         <div className="analysis_container">
-                            <p className="min-h-100">
-                                Testing out the vertical spacing
+                            <p>This is where the analysis goes</p>
+                            <p className="outline min-h-100">
+                                <Dashboard trailData={trailData} />
                             </p>
                         </div>
                     </div>

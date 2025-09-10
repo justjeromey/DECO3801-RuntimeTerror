@@ -47,14 +47,9 @@ export default function Home() {
             <main className="flex flex-col px-10 py-5 h-full">
                 
                 <div className="w-full">
-                    <Image
-                        src="/logo.svg"
-                        width={303}
-                        height={83}
-                        alt="Trail Runners"
-                    />
+    
                     <nav className="nav_container">
-                        <h1>Trail Summary</h1>
+                        <h1>TRAIL SUMMARY</h1>
                         <FileSelector setTrailData={setTrailData}/>
                     </nav>
                 </div>

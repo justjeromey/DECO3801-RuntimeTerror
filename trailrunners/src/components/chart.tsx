@@ -214,7 +214,7 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
                 onClick={handleZoomReset}
                 className="button_1"
             >
-                Reset zoom
+                Reset Zoom
             </button>
         </div>
     );

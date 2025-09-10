@@ -10,6 +10,7 @@ export default function FileSelector({ setTrailData }) {
     const [toggled, setToggle] = useState<boolean>(false);
     const [selected, setSelected] = useState<string>("");
     const [uploadedFile, setUploadedFile] = useState<string>("");
+    const dropdown = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         // Grab default trails on load
@@ -32,10 +33,30 @@ export default function FileSelector({ setTrailData }) {
         fetchTrails();
     }, []);
 
+    
+
     // Toggles the dropdown menu
     function handleDropdown() {
         setToggle(!toggled);
     }
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (dropdown.current && !dropdown.current.contains(event.target as Node)) {
+                setToggle(false);
+            }
+        }
+
+        if (toggled) {
+            document.addEventListener("mousedown", handleClickOutside);
+        } else {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [toggled]);
 
     // Loads the selected file and sends file to parser
     const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,13 +116,13 @@ export default function FileSelector({ setTrailData }) {
     };
 
     return (
-        <div className="md:min-w-50 relative z-10">
+        <div ref={dropdown} className="md:min-w-50 relative z-10">
             <button
                 type="button"
                 className={`fileSelector ${toggled ? `rounded-t-lg` : `rounded-lg`} hover:brightness-125`}
                 onClick={handleDropdown}
             >
-                {selected === "" ? "Select a trail" : selected}
+                {selected === "" ? "Select Trail" : selected}
             </button>
 
             <button

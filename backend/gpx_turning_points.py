@@ -32,7 +32,10 @@ def calculateSegmentStats(x_list: list[int], y_list: list[int], start: int, end:
 
     # calculate grade for the segment 
     #print("\n\n\n",y_list[end - 1], y_list[start], x_list[end - 1], x_list[start], "\n\n\n")
-    grade = (y_list[end - 1] - y_list[start]) / ((x_list[end - 1] - x_list[start])*1000)
+    if ((x_list[end - 1]) - x_list[start] != 0):
+        grade = (y_list[end - 1] - y_list[start]) / ((x_list[end - 1] - x_list[start])*1000)
+    else:
+        grade = 0
 
     # organise the stats nicely
     stats = {
@@ -46,6 +49,21 @@ def calculateSegmentStats(x_list: list[int], y_list: list[int], start: int, end:
     return stats
 
 
+def convertStatsToJSON(segment_stats: dict, total_gain, total_grade, rolling_x, turning_x, segment_x):
+    result = { 
+        "trail_elevation_gain" : total_gain,
+        "trail_grade" : total_grade,
+        "num_segments" : len(segment_stats),
+        "segment_stats" : segment_stats,
+        "rolling_x" : rolling_x,
+        "turning_x" : turning_x,
+        "segment_x" : segment_x
+    }
+    return result 
+
+
+
+#specify trail
 trail_name = "device_measurement_1"
 print(f"Loading {trail_name} GPX data...")
 gpx_path = get_trail_file_path(trail_name)
@@ -108,7 +126,7 @@ for x in range(len(turning_x) - 1):
         rolling_x.extend([turning_x[x],turning_x[x+1]])
         rolling_y.extend([turning_y[x], turning_y[x+1]])
 
-
+#set up segments
 lastPoint = len(gpx_result.elevations) - 1
 grade = gpx_result.elevations[lastPoint] / gpx_result.cumulative_distances_m[lastPoint]
 
@@ -149,10 +167,14 @@ for stat in segmentStats:
 
 results = calculateSegmentStats(turning_x, turning_y, 0, (len(turning_y)))
 
+#print overall stats
 print("\ntotal elevation gain is:" , totalGain)
 print(results["gain"])
 print("total grade is:", grade)
 print(results["grade"])
+
+#assign variable to the JSON data 
+JSON = convertStatsToJSON(segmentStats, totalGain, grade, rolling_x, turning_x, segmentPoints_x)
 
 fig, ax = plt.subplots(figsize=(10, 4))
 ax.plot(gpx_result.convert_distance_to_km, gpx_result.elevations, marker='.', color='green')

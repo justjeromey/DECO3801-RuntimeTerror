@@ -68,18 +68,26 @@ def calculateTrailStats(distances: List[float], elevations: List[float]) -> dict
     distanceDown = 0.0
     distanceFlat = 0.0
 
+    grades = []
+
     for i in range(len(elevations) - 1):
         dy = elevations[i+1] - elevations[i]
         dx = distances[i+1] - distances[i]
 
         if dx <= 0:
             continue 
+
+        grade = (dy / dx) * 100 
+        grades.append(grade)
+
         if dy > 0:
             distanceUp += dx
         elif dy < 0:
             distanceDown += dx
         else:
             distanceFlat += dx
+
+    avgGrade = (altitudeChange / (distances[-1] if distances[-1] > 0 else 1)) * 100
 
     return {
         "altitudeChange" : altitudeChange,
@@ -90,6 +98,9 @@ def calculateTrailStats(distances: List[float], elevations: List[float]) -> dict
         "distanceUp" : distanceUp,
         "distanceDown" : distanceDown,
         "distanceFlat" : distanceFlat,
+        "grade" : avgGrade,
+        "gradeMax" : maxGrade,
+        "gradeMin" : minGrade,
     }
 
 def parse_gpx(gpx_file) -> GPXData:
@@ -156,6 +167,10 @@ def parse_gpx(gpx_file) -> GPXData:
     gpx_data.distanceUp = stats["distanceUp"]
     gpx_data.distanceDown = stats["distanceDown"]
     gpx_data.distanceFlat = stats["distanceFlat"]
+    gpx_data.grade = stats["grade"]
+    gpx_data.gradeMax = stats["gradeMax"]
+    gpx_data.gradeMin = stats["gradeMin"]
+
 
     return gpx_data
 
@@ -180,6 +195,10 @@ def convert_gpx_data_to_json(data: GPXData):
         "distanceUp": data.distanceUp,
         "distanceDown": data.distanceDown,
         "distanceFlat": data.distanceFlat,
+        "grade": data.grade,
+        "gradeMax": data.gradeMax,
+        "gradeMin": data.gradeMin,
+
     }
 
 def save_json(data: GPXData, file_path: str):

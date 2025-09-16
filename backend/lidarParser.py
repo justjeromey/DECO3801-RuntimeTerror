@@ -260,6 +260,11 @@ if __name__ == "__main__":
     last_e = gpx_data.elevations[-1] if gpx_data.elevations else None
     print(f"GPX elevations: start {first_e}, end {last_e}")
 
+    # get the bounds of the route
+    print(f"number of las points: {len(las.points)}")
+    fit_lidar_to_route(las, gpx_data, margin=0.001, las_crs_epsg=28356)
+    print(f"number of las points after: {len(las.points)}")
+
     elevations = link_points_to_route(las, gpx_data)
     print(f"num elevations: {len(elevations)} num points: {len(gpx_data.latitudes)}")
 

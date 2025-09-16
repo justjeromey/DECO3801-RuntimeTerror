@@ -55,7 +55,6 @@ def get_trail_file_path(trail_name: str) -> str:
     gpx_rel_path = f"../data/trails/{trail_name}.gpx"
     return os.path.abspath(os.path.join(os.path.dirname(__file__), gpx_rel_path))
 
-# [{distance: x2, elevation: y2}, ...]
 
 def calculateTrailStats(distances: List[float], elevations: List[float]) -> dict:
 

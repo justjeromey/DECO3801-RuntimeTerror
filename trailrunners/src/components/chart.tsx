@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -12,6 +12,7 @@ import {
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 import { Line } from "react-chartjs-2";
+import { useDebouncedCallback } from "use-debounce";
 
 ChartJS.register(
     CategoryScale,
@@ -36,101 +37,34 @@ interface Trail {
 }
 
 interface ChartData {
-    labels: string;
+    labels: Array<number>;
     datasets: [
         {
-            label: string;
+            label?: string;
             data: Array<number>;
-            boarderColor: string;
+            borderColor: string;
+            borderWidth?: number;
+            pointRadius?: number;
+            pointHoverRadius?: number;
+            pointHitRadius?: number;
         },
     ];
 }
-export const options = {
-    responsive: true,
-    interactions: {
-        mode: "nearest",
-        intersect: false,
-        axis: "x",
-    },
-    plugins: {
-        legend: {
-            display: false,
-        },
-        title: {
-            display: false,
-        },
-        tooltip: {
-            callbacks: {
-                // Custom tooltip options
-                title: (context) => {
-                    return ""; // Hide title
-                },
-                beforeBody: (context) => {
-                    const dataPoint = context[0].parsed;
-                    return [
-                        `Distance: ${(dataPoint.x / 1000).toFixed(2)} km`,
-                        `Distance: ${dataPoint.x.toFixed(2)} m`,
-                        `Elevation: ${dataPoint.y.toFixed(2)} m`,
-                    ];
-                },
-                label: (context) => {
-                    return ""; // Hide label
-                },
-            },
-        },
-        zoom: {
-            pan: {
-                enabled: true,
-                mode: "x",
-            },
-            zoom: {
-                wheel: {
-                    enabled: true,
-                },
-                pinch: {
-                    enabled: true,
-                },
-                mode: "x",
-            },
-        },
-    },
-    scales: {
-        x: {
-            type: "linear", // Use the x axis as numbers
-            bounds: "data",
-            grid: {
-                color: "rgba(255, 255, 255, 0.05)", // Sets the x-axis grid color
-            },
-            title: {
-                display: true,
-                text: "Distance (m)",
-            },
-            ticks: {
-                // Tick settings to reduce amount of clutter
-                autoSkip: true,
-                maxRotation: 0,
-                minRotation: 0,
-                // Round x labels to whole number
-                callback: function(value, index, values) {
-                    return Math.round(value);
-                },
-            },
-        },
-        y: {
-            beginAtZero: true,
-            grid: {
-                color: "rgba(255, 255, 255, 0.05)", // Sets the y-axis grid color
-            },
-            title: {
-                display: true,
-                text: "Elevation (m)",
-            },
-        },
-    },
-};
 
-export default function ChartViewer({ trailData }) {
+interface ChartViewerProps {
+    trailData: Trail;
+    setPointIndex: (index: number) => void;
+}
+
+interface optionsProps {
+    e: React.MouseEvent<HTMLCanvasElement>
+    active: Array<import("chart.js").ActiveElement>;
+}
+
+
+export default function ChartViewer({ trailData, setPointIndex }: ChartViewerProps) {
     const [chartData, setChartData] = useState<ChartData | null>(null);
+    const [prevPoint, setPrevPoint] = useState(0);
     const chartRef = useRef(null);
 
     // Check if trail data has changed
@@ -150,7 +84,7 @@ export default function ChartViewer({ trailData }) {
                             borderWidth: 1,
                             pointRadius: 0,
                             pointHoverRadius: 6,
-                            pointHitRadius: 10,
+                            pointHitRadius: 30,
                         },
                     ],
                 });
@@ -160,6 +94,104 @@ export default function ChartViewer({ trailData }) {
         }
     }, [trailData]);
 
+    // useMemo to preserve options unless trailData changes
+    const options = useMemo(() => ({
+        // A on hover function that updates a parent value
+        onHover: (e, active) => {
+            // Making sure the active array isn't empty
+            if (active.length <= 0) return;
+            if (!active[0]) return;
+                
+            // If a valid coordinate is returned, set the value to the index
+            const pointIndex = active[0].index;
+            if (prevPoint != pointIndex) {
+            setPointIndex(pointIndex);
+            }
+        },
+        responsive: true,
+        interactions: {
+            mode: "nearest",
+            intersect: false,
+            axis: "x",
+        },
+        plugins: {
+            legend: {
+                display: false,
+            },
+            title: {
+                display: false,
+            },
+            tooltip: {
+                intersect: false,
+                callbacks: {
+                    title: (context: import("chart.js").TooltipItem<"line">[]) => {
+                        return ""; // Hide title
+                    },
+                    beforeBody: (context: import("chart.js").TooltipItem<"line">[]) => {
+                        // Custom tooltip options
+                        const dataPoint = context[0].parsed as { x: number; y: number };
+                        return [
+                            `Distance: ${(dataPoint.x / 1000).toFixed(2)} km`,
+                            `Distance: ${dataPoint.x.toFixed(2)} m`,
+                            `Elevation: ${dataPoint.y.toFixed(2)} m`,
+                        ];
+                    },
+                    label: (context: import("chart.js").TooltipItem<"line">) => {
+                        return ""; // Hide label
+                    },
+                },
+            },
+            zoom: {
+                pan: {
+                    enabled: true,
+                    mode: 'x' as const,
+                },
+                zoom: {
+                    wheel: {
+                        enabled: true,
+                    },
+                    pinch: {
+                        enabled: true,
+                    },
+                    mode: 'x' as const,
+                },
+            },
+        },
+        scales: {
+            x: {
+                type: "linear" as const, // Use the x axis as numbers
+                bounds: "data" as const,
+                grid: {
+                    color: "rgba(255, 255, 255, 0.05)", // Sets the x-axis grid color
+                },
+                title: {
+                    display: true,
+                    text: "Distance (m)",
+                },
+                ticks: {
+                    // Tick settings to reduce amount of clutter
+                    autoSkip: true,
+                    maxRotation: 0,
+                    minRotation: 0,
+                    // Round x labels to whole number
+                    callback: function (value, index, values) {
+                        return Math.round(value);
+                    },
+                },
+            },
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: "rgba(255, 255, 255, 0.05)", // Sets the y-axis grid color
+                },
+                title: {
+                    display: true,
+                    text: "Elevation (m)",
+                },
+            },
+        },
+    }), [trailData]);
+
     // Resets the zoom via ref to the chart
     const handleZoomReset = () => {
         if (chartRef.current) {
@@ -168,9 +200,9 @@ export default function ChartViewer({ trailData }) {
     };
 
     return (
-        <div className="chart_container flex flex-col justify-between">
+        <div className="chart_container">
             {chartData !== null ? (
-                <Line data={chartData} options={options} ref={chartRef} />
+                <Line data={chartData} options={options} ref={chartRef}/>
             ) : (
                 <div className="py-10 flex justify-center items-center">
                     <p>Select a trail to start...</p>
@@ -180,9 +212,9 @@ export default function ChartViewer({ trailData }) {
                 type="button"
                 id="reset_zoom"
                 onClick={handleZoomReset}
-                className="mt-3 cursor-pointer max-w-[10rem] bg-accent-2 border border-secondary p-1 px-3 rounded-lg hover:brightness-110 active:brightness-90"
+                className="button_1"
             >
-                Reset zoom
+                Reset Zoom
             </button>
         </div>
     );

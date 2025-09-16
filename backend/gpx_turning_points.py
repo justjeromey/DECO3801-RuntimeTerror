@@ -61,7 +61,70 @@ def convertStatsToJSON(segment_stats: dict, total_gain, total_grade, rolling_x, 
     }
     return result 
 
+def calculateTrailStats(distances: list[int], elevations: list[int]):
+    totalDistance = distances[-1]
 
+    altitudeMin = min(elevations)
+    altitudeMax = max(elevations)
+    altitudeStart = elevations[0]
+    altitudeEnd = elevations[-1]
+    altitudeChange = altitudeEnd - altitudeStart
+
+    totalGain = 0.0
+    totalLoss = 0.0
+    distanceUp = 0.0
+    distanceDown = 0.0
+    distanceFlat = 0.0
+    grades = []
+
+    for i in range(len(elevations) - 1):
+        dy = elevations[i+1] - elevations[i]
+        dx = distances[i+1] - distances[i]
+
+        if dx <= 0:
+            continue 
+
+        grade = dy / dx
+        grades.append(grade)
+
+        if dy > 0:
+            totalGain += dy
+            distanceUp += dx
+        elif dy < 0:
+            totalLoss += abs(dy)
+            distanceDown += dx
+        else:
+            distanceFlat += dx
+
+    # Grade stats
+    if totalDistance > 0:
+        avg_grade = totalGain / totalDistance
+    else:
+        avg_grade = 0.0
+
+    max_grade = max(grades) if grades else 0.0
+    min_grade = min(grades) if grades else 0.0
+
+    stats = {
+        # Potentially add these for difficulty rating
+        # "totalGain": totalGain,
+        # "totalLoss": totalLoss,
+        
+
+        "altitudeChange": altitudeChange,
+        "altitudeMin": altitudeMin,
+        "altitudeMax": altitudeMax,
+        "altitudeStart": altitudeStart,
+        "altitudeEnd": altitudeEnd,
+        "gradeAvg": avg_grade,
+        "gradeMax": max_grade,
+        "gradeMin": min_grade,
+        "distanceUp": distanceUp,
+        "distanceDown": distanceDown,
+        "distanceFlat": distanceFlat,
+    }
+
+    return stats
 
 #specify trail
 trail_name = "device_measurement_1"
@@ -193,6 +256,36 @@ fig.tight_layout()
 
 plt.show()
 
+trail_stats = calculateTrailStats(gpx_result.cumulative_distances_m, gpx_result.elevations)
 
+for key, value in trail_stats.items():
+    print(f"{key}: {value}")
+
+''' 
+Stats to add
+------------
+Altitude change
+    elevation gain (m)
+Altitude min
+    min(elevations)
+Altitude max
+    max(elevations)
+Altitude start
+    elevation[0]
+Altitude end
+    elevation[-1]
+Grade
+    total(uphill sections) / total distance
+Grade max
+    max(incline)
+Grade min
+    min(incline)
+Distance climb
+    total(uphill sections)
+Distance down
+    total(downhill sections)
+Distance flat
+    total(flat sections)
+'''
 
 

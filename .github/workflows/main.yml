@@ -1,4 +1,4 @@
-name: Test SSH
+name: Test SSH with Password
 
 on:
   workflow_dispatch: # run manually
@@ -8,14 +8,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY_MOSS }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan ${{ secrets.SSH_HOST_MOSS }} >> ~/.ssh/known_hosts
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
 
-      - name: Run remote command
+      - name: Test SSH connection
         run: |
-          ssh -i ~/.ssh/id_ed25519 ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_MOSS }} \
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" \
+            ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_MOSS }} \
             "echo 'Hello from GitHub Actions on $(hostname)'"

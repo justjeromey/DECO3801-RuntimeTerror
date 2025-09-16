@@ -29,6 +29,14 @@ class GPXData:
     longitudes: List[float]
     elevations: List[Optional[float]]
     cumulative_distances_m: List[float]
+    altitudeChange: Optional[float] = None
+    altitudeMin: Optional[float] = None
+    altitudeMax: Optional[float] = None
+    altitudeStart: Optional[float] = None
+    altitudeEnd: Optional[float] = None
+    distanceUp: Optional[float] = None
+    distanceDown: Optional[float] = None
+    distanceFlat: Optional[float] = None
 
     @property
     def total_distance_m(self) -> float:
@@ -48,6 +56,42 @@ def get_trail_file_path(trail_name: str) -> str:
     return os.path.abspath(os.path.join(os.path.dirname(__file__), gpx_rel_path))
 
 # [{distance: x2, elevation: y2}, ...]
+
+def calculateTrailStats(distances: List[float], elevations: List[float]) -> dict:
+
+    altitudeMin = min(elevations)
+    altitudeMax = max(elevations)
+    altitudeStart = elevations[0]
+    altitudeEnd = elevations[-1]
+    altitudeChange = altitudeEnd - altitudeStart
+
+    distanceUp = 0.0
+    distanceDown = 0.0
+    distanceFlat = 0.0
+
+    for i in range(len(elevations) - 1):
+        dy = elevations[i+1] - elevations[i]
+        dx = distances[i+1] - distances[i]
+
+        if dx <= 0:
+            continue 
+        if dy > 0:
+            distanceUp += dx
+        elif dy < 0:
+            distanceDown += dx
+        else:
+            distanceFlat += dx
+
+    return {
+        "altitudeChange" : altitudeChange,
+        "altitudeMin" : altitudeMin,
+        "altitudeMax" : altitudeMax,
+        "altitudeStart" : altitudeStart,
+        "altitudeEnd" : altitudeEnd,
+        "distanceUp" : distanceUp,
+        "distanceDown" : distanceDown,
+        "distanceFlat" : distanceFlat,
+    }
 
 def parse_gpx(gpx_file) -> GPXData:
     latitudes: List[float] = []
@@ -97,12 +141,25 @@ def parse_gpx(gpx_file) -> GPXData:
     min_elevation = min(elevations) if elevations else 0
     elevations = [e - min_elevation for e in elevations]
 
-    return GPXData(
+    gpx_data = GPXData(
         latitudes=latitudes,
         longitudes=longitudes,
         elevations=elevations,
         cumulative_distances_m=cum_dist_m,
     )
+
+    stats = calculateTrailStats(gpx_data.cumulative_distances_m, gpx_data.elevations)
+    gpx_data.altitudeChange = stats["altitudeChange"]
+    gpx_data.altitudeMin = stats["altitudeMin"]
+    gpx_data.altitudeMax = stats["altitudeMax"]
+    gpx_data.altitudeStart = stats["altitudeStart"]
+    gpx_data.altitudeEnd = stats["altitudeEnd"]
+    gpx_data.distanceUp = stats["distanceUp"]
+    gpx_data.distanceDown = stats["distanceDown"]
+    gpx_data.distanceFlat = stats["distanceFlat"]
+
+    return gpx_data
+
 
 def convert_gpx_data_to_json(data: GPXData):
     return {
@@ -113,6 +170,17 @@ def convert_gpx_data_to_json(data: GPXData):
         "cumulative_distances_km": data.convert_distance_to_km,
         "total_distance_m": data.total_distance_m,
         "total_distance_km": data.total_distance_m / 1000,
+
+        # ADDITIONAL STATS FOR DIFFICULTY RATING AND ANALYSIS 
+
+        "altitudeChange": data.altitudeChange,
+        "altitudeMin": data.altitudeMin,
+        "altitudeMax": data.altitudeMax,
+        "altitudeStart": data.altitudeStart,
+        "altitudeEnd": data.altitudeEnd,
+        "distanceUp": data.distanceUp,
+        "distanceDown": data.distanceDown,
+        "distanceFlat": data.distanceFlat,
     }
 
 def save_json(data: GPXData, file_path: str):

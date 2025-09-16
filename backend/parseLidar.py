@@ -14,6 +14,11 @@ def get_real_path(path: str) -> str:
 def load_lidar_points(laz_rel_path: str):
     laz_path = get_real_path(laz_rel_path)
 
+    if not os.path.exists(laz_path):
+        raise FileNotFoundError(
+            f"LiDAR file not found at the specified path: {laz_path}"
+        )
+
     return laspy.read(laz_path)
 
 def get_route_bounds(gpx_data: GPXData) -> Tuple[float, float, float, float]:
@@ -25,3 +30,80 @@ def get_route_bounds(gpx_data: GPXData) -> Tuple[float, float, float, float]:
     min_lon = min(gpx_data.longitudes)
     max_lon = max(gpx_data.longitudes)
     return (min_lat, max_lat, min_lon, max_lon)
+
+def fit_lidar_to_route(las, gpx_data: GPXData, margin: float = 0.001, las_crs_epsg: int = 28356):
+    """
+    Filter the LAS points to only those within the bounding box of the GPX route plus a margin.
+    """
+    min_lat, max_lat, min_lon, max_lon = get_route_bounds(gpx_data)
+    min_lat -= margin
+    max_lat += margin
+    min_lon -= margin
+    max_lon += margin
+
+    # Transform GPX WGS84 coordinates to LAS CRS
+    transformer = Transformer.from_crs("EPSG:4326", f"EPSG:{las_crs_epsg}", always_xy=True)
+
+    # Transform the bounding box corners
+    (min_x, min_y) = transformer.transform(min_lon, min_lat)
+    (max_x, max_y) = transformer.transform(max_lon, max_lat)
+
+    # Create a mask for points within the bounding box
+    mask = (las.x >= min_x) & (las.x <= max_x) & (las.y >= min_y) & (las.y <= max_y)
+
+    # Apply the mask to filter points
+    las.points = las.points[mask]
+
+def link_points_to_route(las, gpx_data: GPXData, distance_thresh: float) -> List[Optional[float]]:
+    """
+    Link each GPX point to the nearest LIDAR point and return a list of elevations.
+    If no LIDAR points are available, return a list of None.
+    """
+    if len(las.points) == 0:
+        print("No LIDAR points available after filtering.")
+        return [None] * len(gpx_data.latitudes)
+
+    # Transform GPX WGS84 coordinates to LAS CRS
+    transformer = Transformer.from_crs("EPSG:4326", "EPSG:28356", always_xy=True)
+
+    # create a KDTree for fast nearest-neighbor lookup
+    lidar_coords = np.vstack((las.x, las.y)).T
+    tree = KDTree(lidar_coords)
+    elevations: List[Optional[float]] = []
+    for lat, lon in zip(gpx_data.latitudes, gpx_data.longitudes):
+        x, y = transformer.transform(lon, lat)
+        distance, index = tree.query((x, y))
+        if distance < distance_thresh:  # threshold distance in meters
+            elevations.append(float(las.z[int(index)]))
+        else:
+            elevations.append(None)  # no nearby LIDAR point
+
+    # Normalize elevations to start at 0
+    min_elevation = min(e for e in elevations if e is not None)
+    elevations = [e - min_elevation if e is not None else None for e in elevations]
+
+    return elevations
+
+    
+if __name__ == "__main__":
+    laz_path = "data/lidar/honeyeater.laz"
+
+    gpx_path = "data/gpx/honeyeater.gpx"
+    with open(get_real_path(gpx_path), "r") as gpx_file:
+        gpx_data = parse_gpx(gpx_file)
+
+    las = load_lidar_points(laz_path)
+    print(f"Total LIDAR points before filtering: {len(las.points)}")
+    fit_lidar_to_route(las, gpx_data, margin=0.001, las_crs_epsg=28356)
+    print(f"Total LIDAR points after filtering: {len(las.points)}")
+
+    elevations = link_points_to_route(las, gpx_data, distance_thresh=1.5)
+
+    # get number of points that aren't None
+    last_point = None
+    for i in range(len(elevations) - 1, -1, -1):
+        if elevations[i] is not None:
+            last_point = elevations[i]
+            break
+
+    print(f"Elevation point 1: {elevations[0]}, final: {last_point}")

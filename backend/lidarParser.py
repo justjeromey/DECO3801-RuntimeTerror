@@ -42,6 +42,46 @@ def load_lidar_points(laz_rel_path: str):
 
     return las
 
+def get_route_bounds(gpx_data: GPXData) -> Tuple[float, float, float, float]:
+    """Return (min_lat, max_lat, min_lon, max_lon) for the GPX route."""
+    if not gpx_data.latitudes or not gpx_data.longitudes:
+        raise ValueError("GPX data has no latitude/longitude points.")
+    min_lat = min(gpx_data.latitudes)
+    max_lat = max(gpx_data.latitudes)
+    min_lon = min(gpx_data.longitudes)
+    max_lon = max(gpx_data.longitudes)
+    return (min_lat, max_lat, min_lon, max_lon)
+
+def fit_lidar_to_route(las: laspy.LasData, gpx_data: GPXData, margin: float = 0.01, las_crs_epsg: int = 28356) -> bool:
+    """
+    Fit the las points to the GPX route bounds with an optional margin.
+    
+    """
+    min_lat, max_lat, min_lon, max_lon = get_route_bounds(gpx_data)
+
+    # Apply margin in degrees (optional, or convert to meters after transform)
+    min_lat -= margin
+    max_lat += margin
+    min_lon -= margin
+    max_lon += margin
+
+    # Transform the four corners to LAS CRS
+    transformer = Transformer.from_crs(4326, las_crs_epsg, always_xy=True)
+    xs, ys = transformer.transform(
+        [min_lon, max_lon, min_lon, max_lon],
+        [min_lat, min_lat, max_lat, max_lat]
+    )
+    min_x, max_x = min(xs), max(xs)
+    min_y, max_y = min(ys), max(ys)
+
+    # Now filter using projected coordinates
+    mask = (
+        (las.x >= min_x) & (las.x <= max_x) &
+        (las.y >= min_y) & (las.y <= max_y)
+    )
+    las.points = las.points[mask]
+    return np.any(mask)
+
 def link_points_to_route(las: laspy.LasData, gpx_data: GPXData, max_distance: float = 50.0, default_epsg: int = 28356) -> List[Optional[float]]:
     """Given LiDAR points and GPX data, find nearest LiDAR elevation for each GPX point.
 
@@ -246,7 +286,7 @@ if __name__ == "__main__":
     plt.show(block = False)
     print("Done")
 
-    pruned = prune_trees(elevations, max_gap=3)
+    pruned = prune_trees(elevations, max_gap=2.5)
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.plot(gpx_data.convert_distance_to_km, pruned, marker='.', color='green')
     ax.set_title('LiDAR Elevation Profile with Trees removed')

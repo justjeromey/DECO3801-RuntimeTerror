@@ -83,8 +83,51 @@ def link_points_to_route(las, gpx_data: GPXData, distance_thresh: float) -> List
     elevations = [e - min_elevation if e is not None else None for e in elevations]
 
     return elevations
-
     
+    
+def prune_trees(elevations: List[Optional[float]], max_gap: int = 5) -> List[Optional[float]]:
+    """Prune spikes in elevation data likely caused by trees."""
+    if not elevations:
+        return []
+
+    pruned = list(elevations)
+    n = len(pruned)
+    i = 0
+    while i < n - 1:
+        if pruned[i] is None:
+            i += 1
+            continue
+
+        j = i + 1
+        while j < n and pruned[j] is None:
+            j += 1
+
+        if j == n:
+            break
+
+        current_val = pruned[i]
+        next_val = pruned[j]
+
+        # Detect a spike: a sharp increase in elevation
+        if next_val - current_val > max_gap:
+            end_of_spike = j + 1
+            while end_of_spike < n and (pruned[end_of_spike] is None or pruned[end_of_spike] - current_val > max_gap):
+                end_of_spike += 1
+
+            if end_of_spike < n:
+                # Interpolate all points within the spike
+                end_val = pruned[end_of_spike]
+                num_points = end_of_spike - i
+                for k in range(i + 1, end_of_spike):
+                    pruned[k] = current_val + (end_val - current_val) * (k - i) / num_points
+                i = end_of_spike
+            else:
+                i = j
+        else:
+            i = j
+    return pruned
+    
+
 if __name__ == "__main__":
     laz_path = "data/lidar/honeyeater.laz"
 
@@ -103,6 +146,7 @@ if __name__ == "__main__":
     last_point = None
     for i in range(len(elevations) - 1, -1, -1):
         if elevations[i] is not None:
+            print(i)
             last_point = elevations[i]
             break
 

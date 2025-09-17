@@ -110,6 +110,70 @@ def calculateRollingHills(turning_x: List[float], turning_y: List[float], thresh
             rolling_y.extend([turning_y[x], turning_y[x+1]])
     return rolling_x, rolling_y
 
+def calculateSegmentStats(x_list: list[int], y_list: list[int], start: int, end: int, threshold):
+    #calculate elevation gain for the segment 
+    totalGain = 0.0
+    for x in range(start, end - 1):
+        if y_list[x + 1] > y_list[x]:
+            totalGain += y_list[x + 1] - y_list[x]
+
+    # Calculate hypotenuse
+    rolling_x = []
+    rolling_y = []
+    numhills = 0
+
+    for x in range(start, end - 1):
+        x_diff = (x_list[x+1] - x_list[x]) * 1000
+        y_diff = abs(y_list[x+1] - y_list[x])
+        hypotenuse = (x_diff**2 + y_diff**2)**0.5
+
+        # If section is short then it is rolling hill
+        if hypotenuse < threshold:
+            rolling_x.extend([x_list[x],x_list[x+1]])
+            rolling_y.extend([y_list[x], y_list[x+1]])
+            numhills += 1
+
+    # calculate grade for the segment 
+    #print("\n\n\n",y_list[end - 1], y_list[start], x_list[end - 1], x_list[start], "\n\n\n")
+    if ((x_list[end - 1]) - x_list[start] != 0):
+        grade = (y_list[end - 1] - y_list[start]) / ((x_list[end - 1] - x_list[start])*1000)
+    else:
+        grade = 0
+
+    # organise the stats nicely
+    stats = {
+        "gain": totalGain,
+        "hillcount": numhills,
+        "rolling_x": rolling_x,
+        "rolling_y": rolling_y,
+        "grade": grade
+    }
+    return stats
+
+def calculateSegments(turning_x, turning_y, num_splits, dist_per_segment, threshold):
+    segmentIndeces = []
+    segmentStats = []
+
+    #find indeces of split points 
+    for i in range(0,num_splits):
+        for j in range(0,len(turning_x)):
+            if (turning_x[j] * 1000) > (dist_per_segment * i):
+                segmentIndeces.append(j)
+                break
+
+    segmentIndeces.append(len(turning_x))
+    segmentPoints_x = []
+    segmentPoints_y = []
+
+    for i in range (len(segmentIndeces)):
+        start = segmentIndeces[i-1] if i > 0 else 0
+        end = segmentIndeces[i]
+        print("segment start:",start, "segment end:", end)
+        segmentPoints_x.append(turning_x[start])
+        segmentPoints_y.append(turning_y[start])
+        if end != 0:
+            segmentStats.append(calculateSegmentStats(turning_x,turning_y,start-1,end, threshold))
+    return segmentStats
 
 def calculateTrailStats(distances: List[float], elevations: List[float]) -> dict:
 
@@ -210,10 +274,18 @@ def parse_gpx(gpx_file) -> GPXData:
         elevations=elevations,
         cumulative_distances_m=cum_dist_m,
     )
+    num_splits = 5
+    threshold = 10
 
     stats = calculateTrailStats(gpx_data.cumulative_distances_m, gpx_data.elevations)
     turning_x, turning_y = calculateTurningPoints(gpx_data.cumulative_distances_m, gpx_data.elevations)
-    rolling_x, rolling_y = calculateRollingHills(turning_x, turning_y, 10)
+    rolling_x, rolling_y = calculateRollingHills(turning_x, turning_y, threshold)
+    segment_stats = calculateSegments(turning_x, turning_y, num_splits, (gpx_data.cumulative_distances_m[-1] / num_splits), threshold)
+    tg = 0
+    for i in range (0,num_splits):
+        print(segment_stats[i]["gain"])
+        tg += segment_stats[i]["gain"]
+    print(tg)
     gpx_data.altitudeChange = stats["altitudeChange"]
     gpx_data.altitudeMin = stats["altitudeMin"]
     gpx_data.altitudeMax = stats["altitudeMax"]

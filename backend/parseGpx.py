@@ -37,6 +37,8 @@ class GPXData:
     distanceUp: Optional[float] = None
     distanceDown: Optional[float] = None
     distanceFlat: Optional[float] = None
+    turning_x: Optional[List[float]] = None
+    turning_y: Optional[List[float]] = None
 
     @property
     def total_distance_m(self) -> float:
@@ -52,8 +54,42 @@ class GPXData:
 
 
 def get_trail_file_path(trail_name: str) -> str:
-    gpx_rel_path = f"../data/trails/{trail_name}.gpx"
+    gpx_rel_path = f"../backend/data/gpx/{trail_name}.gpx"
     return os.path.abspath(os.path.join(os.path.dirname(__file__), gpx_rel_path))
+
+def calculateTurningPoints(distances: List[float], elevations: List[float]):
+    # Find turning points 
+    first = 0
+    second = 0
+    grad = "neutral"
+    index_list = []
+    i = 0
+
+    for y in elevations: 
+        second = first
+        first = y
+        diff = first - second 
+        # Uphill
+        if diff > 0 :
+            if grad != "pos":
+                index_list.append(i)
+            grad = "pos"
+        # Downhill
+        elif diff < 0:
+            if grad != "neg":
+                index_list.append(i) 
+            grad = "neg"
+        i += 1
+
+        # Collect x and y of turning points
+    turning_x = []
+    turning_y = []
+    for index in index_list:
+        # Converting m to km
+        if index > 0:
+            turning_x.append(distances[index-1] / 1000)
+            turning_y.append(elevations[index-1])
+    return (turning_x, turning_y)
 
 
 def calculateTrailStats(distances: List[float], elevations: List[float]) -> dict:
@@ -98,9 +134,7 @@ def calculateTrailStats(distances: List[float], elevations: List[float]) -> dict
         "distanceUp" : distanceUp,
         "distanceDown" : distanceDown,
         "distanceFlat" : distanceFlat,
-        "grade" : avgGrade,
-        "gradeMax" : maxGrade,
-        "gradeMin" : minGrade,
+        "grade" : avgGrade
     }
 
 def parse_gpx(gpx_file) -> GPXData:
@@ -159,6 +193,7 @@ def parse_gpx(gpx_file) -> GPXData:
     )
 
     stats = calculateTrailStats(gpx_data.cumulative_distances_m, gpx_data.elevations)
+    turning_x, turning_y = calculateTurningPoints(gpx_data.cumulative_distances_m, gpx_data.elevations)
     gpx_data.altitudeChange = stats["altitudeChange"]
     gpx_data.altitudeMin = stats["altitudeMin"]
     gpx_data.altitudeMax = stats["altitudeMax"]
@@ -168,8 +203,8 @@ def parse_gpx(gpx_file) -> GPXData:
     gpx_data.distanceDown = stats["distanceDown"]
     gpx_data.distanceFlat = stats["distanceFlat"]
     gpx_data.grade = stats["grade"]
-    gpx_data.gradeMax = stats["gradeMax"]
-    gpx_data.gradeMin = stats["gradeMin"]
+    gpx_data.turning_x = turning_x
+    gpx_data.turning_y = turning_y
 
 
     return gpx_data
@@ -195,13 +230,17 @@ def convert_gpx_data_to_json(data: GPXData):
         "distanceUp": data.distanceUp,
         "distanceDown": data.distanceDown,
         "distanceFlat": data.distanceFlat,
-        "grade": data.grade,
-        "gradeMax": data.gradeMax,
-        "gradeMin": data.gradeMin,
-
+        "grade": data.grade
     }
 
 def save_json(data: GPXData, file_path: str):
     json_data = convert_gpx_data_to_json(data)
     with open(file_path, 'w') as json_file:
         json.dump(json_data, json_file, indent=4)
+
+# testing code
+# gpx_path = get_trail_file_path("fells_loop")
+
+# with open(gpx_path, 'r') as gpx_file:
+#     gpx_result: GPXData = parse_gpx(gpx_file)
+#     print(gpx_result.turning_x)

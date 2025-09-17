@@ -39,6 +39,9 @@ class GPXData:
     distanceFlat: Optional[float] = None
     turning_x: Optional[List[float]] = None
     turning_y: Optional[List[float]] = None
+    rolling_x: Optional[List[float]] = None
+    rolling_y: Optional[List[float]] = None
+
 
     @property
     def total_distance_m(self) -> float:
@@ -90,6 +93,22 @@ def calculateTurningPoints(distances: List[float], elevations: List[float]):
             turning_x.append(distances[index-1] / 1000)
             turning_y.append(elevations[index-1])
     return (turning_x, turning_y)
+
+def calculateRollingHills(turning_x: List[float], turning_y: List[float], threshold):
+    # Calculate hypotenuse
+    rolling_x = []
+    rolling_y = []
+
+    for x in range(len(turning_x) - 1):
+        x_diff = (turning_x[x+1] - turning_x[x]) * 1000
+        y_diff = abs(turning_y[x+1] - turning_y[x])
+        hypotenuse = (x_diff**2 + y_diff**2)**0.5
+
+        # If section is short then it is rolling hill
+        if hypotenuse < threshold:
+            rolling_x.extend([turning_x[x],turning_x[x+1]])
+            rolling_y.extend([turning_y[x], turning_y[x+1]])
+    return rolling_x, rolling_y
 
 
 def calculateTrailStats(distances: List[float], elevations: List[float]) -> dict:
@@ -194,6 +213,7 @@ def parse_gpx(gpx_file) -> GPXData:
 
     stats = calculateTrailStats(gpx_data.cumulative_distances_m, gpx_data.elevations)
     turning_x, turning_y = calculateTurningPoints(gpx_data.cumulative_distances_m, gpx_data.elevations)
+    rolling_x, rolling_y = calculateRollingHills(turning_x, turning_y, 10)
     gpx_data.altitudeChange = stats["altitudeChange"]
     gpx_data.altitudeMin = stats["altitudeMin"]
     gpx_data.altitudeMax = stats["altitudeMax"]
@@ -205,6 +225,8 @@ def parse_gpx(gpx_file) -> GPXData:
     gpx_data.grade = stats["grade"]
     gpx_data.turning_x = turning_x
     gpx_data.turning_y = turning_y
+    gpx_data.rolling_x = rolling_x
+    gpx_data.rolling_y = rolling_y
 
 
     return gpx_data
@@ -230,7 +252,11 @@ def convert_gpx_data_to_json(data: GPXData):
         "distanceUp": data.distanceUp,
         "distanceDown": data.distanceDown,
         "distanceFlat": data.distanceFlat,
-        "grade": data.grade
+        "grade": data.grade,
+        "turning_x": data.turning_x,
+        "turning_y": data.turning_y,
+        "rolling_x": data.rolling_x,
+        "rolling_y": data.rolling_y
     }
 
 def save_json(data: GPXData, file_path: str):
@@ -238,9 +264,11 @@ def save_json(data: GPXData, file_path: str):
     with open(file_path, 'w') as json_file:
         json.dump(json_data, json_file, indent=4)
 
-# testing code
-# gpx_path = get_trail_file_path("fells_loop")
+#testing code
+gpx_path = get_trail_file_path("honeyeater")
 
-# with open(gpx_path, 'r') as gpx_file:
-#     gpx_result: GPXData = parse_gpx(gpx_file)
-#     print(gpx_result.turning_x)
+with open(gpx_path, 'r') as gpx_file:
+    gpx_result: GPXData = parse_gpx(gpx_file)
+    print(gpx_result.turning_x)
+    print(gpx_result.turning_y)
+    print(gpx_result.rolling_y)

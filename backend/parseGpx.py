@@ -41,6 +41,9 @@ class GPXData:
     turning_y: Optional[List[float]] = None
     rolling_x: Optional[List[float]] = None
     rolling_y: Optional[List[float]] = None
+    segment_stats: Optional[List[dict]] = None
+    segment_x_positions: Optional[list[float]] = None
+
 
 
     @property
@@ -134,7 +137,6 @@ def calculateSegmentStats(x_list: list[int], y_list: list[int], start: int, end:
             numhills += 1
 
     # calculate grade for the segment 
-    #print("\n\n\n",y_list[end - 1], y_list[start], x_list[end - 1], x_list[start], "\n\n\n")
     if ((x_list[end - 1]) - x_list[start] != 0):
         grade = (y_list[end - 1] - y_list[start]) / ((x_list[end - 1] - x_list[start])*1000)
     else:
@@ -155,7 +157,7 @@ def calculateSegments(turning_x, turning_y, num_splits, dist_per_segment, thresh
     segmentStats = []
 
     #find indeces of split points 
-    for i in range(0,num_splits):
+    for i in range(1,num_splits):
         for j in range(0,len(turning_x)):
             if (turning_x[j] * 1000) > (dist_per_segment * i):
                 segmentIndeces.append(j)
@@ -173,7 +175,7 @@ def calculateSegments(turning_x, turning_y, num_splits, dist_per_segment, thresh
         segmentPoints_y.append(turning_y[start])
         if end != 0:
             segmentStats.append(calculateSegmentStats(turning_x,turning_y,start-1,end, threshold))
-    return segmentStats
+    return segmentStats, segmentPoints_x
 
 def calculateTrailStats(distances: List[float], elevations: List[float]) -> dict:
 
@@ -280,12 +282,14 @@ def parse_gpx(gpx_file) -> GPXData:
     stats = calculateTrailStats(gpx_data.cumulative_distances_m, gpx_data.elevations)
     turning_x, turning_y = calculateTurningPoints(gpx_data.cumulative_distances_m, gpx_data.elevations)
     rolling_x, rolling_y = calculateRollingHills(turning_x, turning_y, threshold)
-    segment_stats = calculateSegments(turning_x, turning_y, num_splits, (gpx_data.cumulative_distances_m[-1] / num_splits), threshold)
-    tg = 0
-    for i in range (0,num_splits):
-        print(segment_stats[i]["gain"])
-        tg += segment_stats[i]["gain"]
-    print(tg)
+    segment_stats, segment_x_positions = calculateSegments(turning_x, turning_y, num_splits, (gpx_data.cumulative_distances_m[-1] / num_splits), threshold)
+    #testing code 
+    # tg = 0
+    # for i in range (0,num_splits):
+    #     print(segment_stats[i]["gain"])
+    #     print(segment_x_positions[i])
+    #     tg += segment_stats[i]["gain"]
+    # print(tg)
     gpx_data.altitudeChange = stats["altitudeChange"]
     gpx_data.altitudeMin = stats["altitudeMin"]
     gpx_data.altitudeMax = stats["altitudeMax"]
@@ -299,6 +303,8 @@ def parse_gpx(gpx_file) -> GPXData:
     gpx_data.turning_y = turning_y
     gpx_data.rolling_x = rolling_x
     gpx_data.rolling_y = rolling_y
+    gpx_data.segment_stats = segment_stats
+    gpx_data.segment_x_positions = segment_x_positions
 
 
     return gpx_data
@@ -337,10 +343,13 @@ def save_json(data: GPXData, file_path: str):
         json.dump(json_data, json_file, indent=4)
 
 #testing code
-gpx_path = get_trail_file_path("honeyeater")
+# gpx_path = get_trail_file_path("honeyeater")
 
-with open(gpx_path, 'r') as gpx_file:
-    gpx_result: GPXData = parse_gpx(gpx_file)
-    print(gpx_result.turning_x)
-    print(gpx_result.turning_y)
-    print(gpx_result.rolling_y)
+# with open(gpx_path, 'r') as gpx_file:
+#     gpx_result: GPXData = parse_gpx(gpx_file)
+#     print(gpx_result.turning_x)
+#     print(gpx_result.turning_y)
+#     print(gpx_result.rolling_y)
+#     for i in range (5):
+#         print(gpx_result.segment_stats[i]["gain"])
+#         print(gpx_result.segment_x_positions[i])

@@ -126,28 +126,53 @@ def prune_trees(elevations: List[Optional[float]], max_gap: int = 5) -> List[Opt
         else:
             i = j
     return pruned
+
+def join_laz_files(p1: str, p2: str):
+    p1 = get_real_path(p1)
+    p2 = get_real_path(p2)
     
+    #open the files
+    las1 = laspy.read(p1)
+    las2 = laspy.read(p2)
+    
+    print(f"File 1 has {len(las1.points)} points.")
+    print(f"File 2 has {len(las2.points)} points.")
+    #join the points together
+    all_points = np.concatenate([las1.points, las2.points])
+    print(f"Combined file has {len(all_points)} points.")
 
+    # Create a new LAS file using header from the first file
+    combined_las = laspy.LasData(las1.header)
+    combined_las.points = all_points
+
+    # Write to a new file
+    combined_las.write("data/lidar/combined.laz")
+    
 if __name__ == "__main__":
-    laz_path = "data/lidar/honeyeater.laz"
+    p1 = "data/lidar/honeyeater-p1.laz"
+    p2 = "data/lidar/honeyeater-p2.laz"
+    join_laz_files(p1,p2)
 
-    gpx_path = "data/gpx/honeyeater.gpx"
-    with open(get_real_path(gpx_path), "r") as gpx_file:
-        gpx_data = parse_gpx(gpx_file)
+# if __name__ == "__main__":
+#     laz_path = "data/lidar/honeyeater-v3.laz"
 
-    las = load_lidar_points(laz_path)
-    print(f"Total LIDAR points before filtering: {len(las.points)}")
-    fit_lidar_to_route(las, gpx_data, margin=0.001, las_crs_epsg=28356)
-    print(f"Total LIDAR points after filtering: {len(las.points)}")
+#     gpx_path = "data/gpx/honeyeater.gpx"
+#     with open(get_real_path(gpx_path), "r") as gpx_file:
+#         gpx_data = parse_gpx(gpx_file)
 
-    elevations = link_points_to_route(las, gpx_data, distance_thresh=1.5)
+#     las = load_lidar_points(laz_path)
+#     print(f"Total LIDAR points before filtering: {len(las.points)}")
+#     fit_lidar_to_route(las, gpx_data, margin=0.001, las_crs_epsg=28356)
+#     print(f"Total LIDAR points after filtering: {len(las.points)}")
 
-    # get number of points that aren't None
-    last_point = None
-    for i in range(len(elevations) - 1, -1, -1):
-        if elevations[i] is not None:
-            print(i)
-            last_point = elevations[i]
-            break
+#     elevations = link_points_to_route(las, gpx_data, distance_thresh=1.5)
 
-    print(f"Elevation point 1: {elevations[0]}, final: {last_point}")
+#     # get number of points that aren't None
+#     last_point = None
+#     for i in range(len(elevations) - 1, -1, -1):
+#         if elevations[i] is not None:
+#             print(i)
+#             last_point = elevations[i]
+#             break
+
+#     print(f"Elevation point 1: {elevations[0]}, final: {last_point}")

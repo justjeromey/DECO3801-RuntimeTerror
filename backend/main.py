@@ -2,7 +2,7 @@ from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from parseGpx import parse_gpx, convert_gpx_data_to_json
+from parseGpx import parse_gpx, convert_gpx_data_to_json, handle_gpx_stats
 
 app = FastAPI()
 
@@ -14,6 +14,7 @@ async def upload_gpx(file: UploadFile = File(...)):
 
     # Process the GPX file
     gpx_data = parse_gpx(file.file)
+    handle_gpx_stats(gpx_data)
     json = convert_gpx_data_to_json(gpx_data)
 
     return JSONResponse(status_code=200, content=json)

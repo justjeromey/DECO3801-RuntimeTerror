@@ -240,6 +240,34 @@ def calculateTrailStats(distances: List[float], elevations: List[float]) -> dict
         "grade" : avgGrade
     }
 
+def handle_gpx_stats(gpx_data: GPXData):
+    num_splits = 5 # This should be done dynamically based on trail length
+    threshold = 10
+
+    stats = calculateTrailStats(gpx_data.cumulative_distances_m, gpx_data.elevations)
+    turning_x, turning_y = calculateTurningPoints(gpx_data.cumulative_distances_m, gpx_data.elevations)
+    rolling_x, rolling_y = calculateRollingHills(turning_x, turning_y, threshold)
+    segment_stats, segment_x_positions = calculateSegments(turning_x, turning_y, num_splits, (gpx_data.cumulative_distances_m[-1] / num_splits), threshold)
+    
+    # assign stats to gpx_data
+    gpx_data.altitudeChange = stats["altitudeChange"]
+    gpx_data.altitudeMin = stats["altitudeMin"]
+    gpx_data.altitudeMax = stats["altitudeMax"]
+    gpx_data.altitudeStart = stats["altitudeStart"]
+    gpx_data.altitudeEnd = stats["altitudeEnd"]
+    gpx_data.distanceUp = stats["distanceUp"]
+    gpx_data.distanceDown = stats["distanceDown"]
+    gpx_data.distanceFlat = stats["distanceFlat"]
+    gpx_data.grade = stats["grade"]
+    gpx_data.turning_x = turning_x
+    gpx_data.turning_y = turning_y
+    gpx_data.rolling_x = rolling_x
+    gpx_data.rolling_y = rolling_y
+    gpx_data.segment_stats = segment_stats
+    gpx_data.segment_x_positions = segment_x_positions
+
+    return gpx_data
+
 def parse_gpx(gpx_file) -> GPXData:
     latitudes: List[float] = []
     longitudes: List[float] = []
@@ -270,10 +298,6 @@ def parse_gpx(gpx_file) -> GPXData:
     if len(latitudes) == 0 or len(longitudes) == 0:
         raise ValueError("No valid GPS points found.")
 
-    print(f"Trail latitude points: {len(latitudes)}")
-    print(f"Total longitude points: {len(longitudes)}")
-    print(f"Total elevation points: {len(elevations)}")
-
     #calcuate distance
     cum_dist_m = [0.0]
     total = 0.0
@@ -281,8 +305,6 @@ def parse_gpx(gpx_file) -> GPXData:
         d = haversine_distance(latitudes[i-1], longitudes[i-1], latitudes[i], longitudes[i]) or 0.0
         total += d
         cum_dist_m.append(total)
-
-    print(f"Total trail length: {total:.2f} meters")
 
     #standardize the elevation to 0
     min_elevation = min(elevations) if elevations else 0
@@ -294,37 +316,7 @@ def parse_gpx(gpx_file) -> GPXData:
         elevations=elevations,
         cumulative_distances_m=cum_dist_m,
     )
-    num_splits = 5
-    threshold = 10
-
-    stats = calculateTrailStats(gpx_data.cumulative_distances_m, gpx_data.elevations)
-    turning_x, turning_y = calculateTurningPoints(gpx_data.cumulative_distances_m, gpx_data.elevations)
-    rolling_x, rolling_y = calculateRollingHills(turning_x, turning_y, threshold)
-    segment_stats, segment_x_positions = calculateSegments(turning_x, turning_y, num_splits, (gpx_data.cumulative_distances_m[-1] / num_splits), threshold)
-    #testing code 
-    # tg = 0
-    # for i in range (0,num_splits):
-    #     print(segment_stats[i]["gain"])
-    #     print(segment_x_positions[i])
-    #     tg += segment_stats[i]["gain"]
-    # print(tg)
-    gpx_data.altitudeChange = stats["altitudeChange"]
-    gpx_data.altitudeMin = stats["altitudeMin"]
-    gpx_data.altitudeMax = stats["altitudeMax"]
-    gpx_data.altitudeStart = stats["altitudeStart"]
-    gpx_data.altitudeEnd = stats["altitudeEnd"]
-    gpx_data.distanceUp = stats["distanceUp"]
-    gpx_data.distanceDown = stats["distanceDown"]
-    gpx_data.distanceFlat = stats["distanceFlat"]
-    gpx_data.grade = stats["grade"]
-    gpx_data.turning_x = turning_x
-    gpx_data.turning_y = turning_y
-    gpx_data.rolling_x = rolling_x
-    gpx_data.rolling_y = rolling_y
-    gpx_data.segment_stats = segment_stats
-    gpx_data.segment_x_positions = segment_x_positions
-
-
+    
     return gpx_data
 
 

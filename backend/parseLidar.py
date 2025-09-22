@@ -4,7 +4,7 @@ from typing import List, Optional
 from parseGpx import parse_gpx, GPXData
 from scipy.spatial import KDTree
 from pyproj import Transformer
-from lidar_util import get_real_path, load_lidar_points, get_route_bounds
+from lidar_util import get_real_path, get_route_bounds
 
 def fit_lidar_to_route(las, gpx_data: GPXData, margin: float = 0.001, las_crs_epsg: int = 28356):
     """
@@ -145,14 +145,15 @@ def fill_missing_values(elevations: List[Optional[float]]) -> List[Optional[floa
 
     return elevations
 
-def parse_lidar(laz_file, gpx_file, distance_thresh: float = 1.5) -> GPXData:
+def parse_lidar(laz_file, gpx_file, distance_thresh: float = 1.5, max_tree_gap: float = 1.5) -> GPXData:
     gpx_data = parse_gpx(gpx_file)
 
     las = laspy.read(laz_file)
     fit_lidar_to_route(las, gpx_data, margin=0.001, las_crs_epsg=28356)
 
     elevations = link_points_to_route(las, gpx_data, distance_thresh=distance_thresh)
-    elevations = prune_trees(elevations, max_gap=5)
+    elevations = prune_trees(elevations, max_gap=max_tree_gap)
+
     elevations = fill_missing_values(elevations)
 
     # replace gpx_data.elevations with elevations
@@ -160,11 +161,15 @@ def parse_lidar(laz_file, gpx_file, distance_thresh: float = 1.5) -> GPXData:
     return gpx_data
 
 if __name__ == "__main__":
-    laz_path = "data/lidar/honeyeater.laz"
+    laz_path = "data/lidar/honeyeater_mini.laz"
     laz_path = get_real_path(laz_path)
 
     with open(get_real_path("data/gpx/honeyeater.gpx"), "r") as gpx_file:
-        result = parse_lidar(laz_path, gpx_file, distance_thresh=1.5)
+        result = parse_lidar(laz_path, gpx_file, max_tree_gap=5.0)
+
+    # save to file
+    from lidar_util import save_gpx_data_to_laz
+    # save_gpx_data_to_laz(result, "data/lidar/honeyeater_mini.laz")
 
     # plot the elevations against distance
     import matplotlib.pyplot as plt

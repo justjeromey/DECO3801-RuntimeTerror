@@ -1,8 +1,11 @@
 import os
+import numpy as np
 from typing import Tuple
 import laspy
+from pyproj import Transformer
 
-from parseGpx import GPXData
+
+from parseGpx import GPXData, parse_gpx
 
 def load_lidar_points(laz_rel_path: str):
     laz_path = get_real_path(laz_rel_path)
@@ -44,3 +47,36 @@ def join_laz_files(p1: str, p2: str, output_name = "combined.laz"):
             with laspy.open(infile) as reader:
                 for points in reader.chunk_iterator(1_000_000):  # read 1M points at a time
                     writer.write_points(points)
+
+def save_gpx_data_to_laz(gpx_data, output_path: str):
+    output_path = get_real_path(output_path)
+
+    # Transformer: WGS84 (EPSG:4326) → GDA94 / MGA Zone 56 (EPSG:28356)
+    transformer = Transformer.from_crs("EPSG:4326", "EPSG:28356", always_xy=True)
+
+    # Transform lon/lat → easting/northing
+    eastings, northings = transformer.transform(
+        gpx_data.longitudes,
+        gpx_data.latitudes
+    )
+
+    elevations = np.array([e if e is not None else -9999 for e in gpx_data.elevations])
+
+    # Setup LAS header (XYZ only, version 1.2)
+    header = laspy.LasHeader(point_format=0, version="1.2")
+
+    # Set scaling/offsets for storage precision
+    header.scales = [0.01, 0.01, 0.01]  # centimeter precision
+    header.offsets = [np.min(eastings), np.min(northings), np.min(elevations)]
+
+    # Create LAS object
+    las = laspy.LasData(header)
+    las.x = eastings
+    las.y = northings
+    las.z = elevations
+
+    # Add CRS metadata (so GIS knows it’s EPSG:28356)
+    header.parse_crs("EPSG:28356")
+
+    # Write file
+    las.write(output_path)

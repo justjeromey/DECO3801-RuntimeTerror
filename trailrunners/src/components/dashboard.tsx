@@ -7,13 +7,9 @@ interface TrailData {
     altitudeStart: number;
     altitudeEnd: number;
     grade: number;
-    gradeMax: number;
-    gradeMin: number;
-    distanceClimb: number;
+    distanceUp: number;
     distanceDown: number;
     distanceFlat: number;
-    avgTime: string;
-    avgReverseTime: string;
     total_distance_km: number;
     total_distance_m: number;
     cumulative_distances_km: number[];
@@ -47,13 +43,9 @@ const Dashboard: React.FC<DashboardProps> = ({ trailData }) => {
         altitudeStart,
         altitudeEnd,
         grade,
-        gradeMax,
-        gradeMin,
-        distanceClimb,
+        distanceUp,
         distanceDown,
         distanceFlat,
-        avgTime,
-        avgReverseTime,
         total_distance_km,
         elevations = [],
         latitudes = [],
@@ -73,13 +65,9 @@ const Dashboard: React.FC<DashboardProps> = ({ trailData }) => {
             <StatCard label="Altitude Start" value={altitudeStart} unit="m" color="blue" />
             <StatCard label="Altitude End" value={altitudeEnd} unit="m" color="blue" />
             <StatCard label="Grade" value={grade} unit="%" color="green" />
-            <StatCard label="Grade Max" value={gradeMax} unit="%" color="green" />
-            <StatCard label="Grade Min" value={gradeMin} unit="%" color="green" />
-            <StatCard label="Distance Climb" value={distanceClimb} unit="km" color="purple" />
+            <StatCard label="Distance Climb" value={distanceUp} unit="m" color="purple" />
             <StatCard label="Distance Down" value={distanceDown} unit="m" color="purple" />
             <StatCard label="Distance Flat" value={distanceFlat} unit="m" color="purple" />
-            <StatCard label="Avg Time" value={avgTime} color="orange" />
-            <StatCard label="Avg Reverse Time" value={avgReverseTime} color="orange" />
             <StatCard label="Total Distance" value={total_distance_km} unit="km" color="purple" />
             <StatCard label="Final Elevation Change" value={lastElevation} unit="m" color="blue" />
             <StatCard label="Center Latitude" value={centerLat} unit="°" color="green" />

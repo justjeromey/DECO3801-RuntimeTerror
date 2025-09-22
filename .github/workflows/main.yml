@@ -1,0 +1,19 @@
+name: Test SSH with Password
+
+on:
+  workflow_dispatch: # run manually
+
+jobs:
+  ssh-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Test SSH connection
+        run: |
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" \
+            ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST_MOSS }} \
+            "echo 'Hello from GitHub Actions on $(hostname)'"

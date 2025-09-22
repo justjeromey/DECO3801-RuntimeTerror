@@ -1,15 +1,18 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import FileSelector from "@/components/fileSelector";
 import { useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
-import Link from "next/link";
+import Dashboard from "@/components/dashboard";
+import { Line } from "react-chartjs-2";
 
 interface PointData {
     longitude: number;
     latitude: number;
 };
+
 
 const MapViewer = dynamic(() => import("@/components/map"), {
     ssr: false,
@@ -44,14 +47,9 @@ export default function Home() {
             <main className="flex flex-col px-10 py-5 h-full">
                 
                 <div className="w-full">
-                    <Image
-                        src="/logo.svg"
-                        width={303}
-                        height={83}
-                        alt="Trail Runners"
-                    />
+    
                     <nav className="nav_container">
-                        <h1>Trail Summary</h1>
+                        <h1>TRAIL SUMMARY</h1>
                         <FileSelector setTrailData={setTrailData}/>
                     </nav>
                 </div>
@@ -69,8 +67,9 @@ export default function Home() {
                     <div className="sections">
                         <h1>Trail Analysis</h1>
                         <div className="analysis_container">
-                            <p className="min-h-100">
-                                Testing out the vertical spacing
+                            <p>This is where the analysis goes</p>
+                            <p className="outline min-h-100">
+                                <Dashboard trailData={trailData} />
                             </p>
                         </div>
                     </div>

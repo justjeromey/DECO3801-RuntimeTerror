@@ -2,7 +2,7 @@ import os
 from typing import Tuple
 import laspy
 
-from backend.parseGpx import GPXData
+from parseGpx import GPXData
 
 def load_lidar_points(laz_rel_path: str):
     laz_path = get_real_path(laz_rel_path)

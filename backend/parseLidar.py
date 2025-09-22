@@ -1,4 +1,5 @@
 import numpy as np
+import laspy
 from typing import List, Optional
 from parseGpx import parse_gpx, GPXData
 from scipy.spatial import KDTree
@@ -101,26 +102,30 @@ def prune_trees(elevations: List[Optional[float]], max_gap: int = 5) -> List[Opt
             i = j
     return pruned
 
-if __name__ == "__main__":
-    laz_path = "data/lidar/combined.laz"
+def parse_lidar(laz_file, gpx_file, distance_thresh: float = 1.5) -> GPXData:
+    gpx_data = parse_gpx(gpx_file)
 
-    gpx_path = "data/gpx/honeyeater.gpx"
-    with open(get_real_path(gpx_path), "r") as gpx_file:
-        gpx_data = parse_gpx(gpx_file)
-
-    las = load_lidar_points(laz_path)
-    print(f"Total LIDAR points before filtering: {len(las.points)}")
+    las = laspy.read(laz_file)
     fit_lidar_to_route(las, gpx_data, margin=0.001, las_crs_epsg=28356)
-    print(f"Total LIDAR points after filtering: {len(las.points)}")
 
-    elevations = link_points_to_route(las, gpx_data, distance_thresh=1.5)
+    elevations = link_points_to_route(las, gpx_data, distance_thresh=distance_thresh)
+    elevations = prune_trees(elevations, max_gap=5)
 
-    # get number of points that aren't None
-    last_point = None
-    for i in range(len(elevations) - 1, -1, -1):
-        if elevations[i] is not None:
-            print(i)
-            last_point = elevations[i]
-            break
+    # replace gpx_data.elevations with elevations
+    gpx_data.elevations = elevations
+    return gpx_data
 
-    print(f"Elevation point 1: {elevations[0]}, final: {last_point}")
+if __name__ == "__main__":
+    laz_path = "data/lidar/honeyeater.laz"
+    laz_path = get_real_path(laz_path)
+
+    with open(get_real_path("data/gpx/honeyeater.gpx"), "r") as gpx_file:
+        result = parse_lidar(laz_path, gpx_file, distance_thresh=1.5)
+
+    # plot the elevations against distance
+    import matplotlib.pyplot as plt
+    plt.plot(result.cumulative_distances_m, result.elevations)
+    plt.xlabel("Distance (m)")
+    plt.ylabel("Elevation (m)")
+    plt.title("Elevation Profile")
+    plt.show()

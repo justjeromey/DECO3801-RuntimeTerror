@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from parseGpx import parse_gpx, convert_gpx_data_to_json, handle_gpx_stats
+from parseLidar import parse_lidar
 
 app = FastAPI()
 
@@ -28,6 +29,11 @@ async def process_lidar(lidar_file: UploadFile = File(...), gpx_file: UploadFile
         return JSONResponse(status_code=400, content={"message": "Invalid GPX file type. Please upload a .gpx file."})
     
     # Load the lidar data
+    gpx_data = parse_lidar(lidar_file.file, gpx_file.file)
+    handle_gpx_stats(gpx_data)
+    json = convert_gpx_data_to_json(gpx_data)
+    
+    return JSONResponse(status_code=200, content=json)
 
 
 app.add_middleware(

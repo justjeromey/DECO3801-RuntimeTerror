@@ -18,6 +18,17 @@ async def upload_gpx(file: UploadFile = File(...)):
 
     return JSONResponse(status_code=200, content=json)
 
+@app.post("/process-lidar")
+async def process_lidar(lidar_file: UploadFile = File(...), gpx_file: UploadFile = File(...)):
+    if not lidar_file.filename.endswith(".laz"):
+        return JSONResponse(status_code=400, content={"message": "Invalid LiDAR file type. Please upload a .laz file."})
+    
+    if not gpx_file.filename.endswith(".gpx"):
+        return JSONResponse(status_code=400, content={"message": "Invalid GPX file type. Please upload a .gpx file."})
+    
+    # Load the lidar data
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allows all origins

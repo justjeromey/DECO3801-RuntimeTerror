@@ -1,35 +1,9 @@
-import laspy
 import numpy as np
-import os
-from typing import Tuple, List, Optional
+from typing import List, Optional
 from parseGpx import parse_gpx, GPXData
 from scipy.spatial import KDTree
-from pyproj import Transformer, CRS
-
-
-def get_real_path(path: str) -> str:
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), path))
-
-
-def load_lidar_points(laz_rel_path: str):
-    laz_path = get_real_path(laz_rel_path)
-
-    if not os.path.exists(laz_path):
-        raise FileNotFoundError(
-            f"LiDAR file not found at the specified path: {laz_path}"
-        )
-
-    return laspy.read(laz_path)
-
-def get_route_bounds(gpx_data: GPXData) -> Tuple[float, float, float, float]:
-    """Return (min_lat, max_lat, min_lon, max_lon) for the GPX route."""
-    if not gpx_data.latitudes or not gpx_data.longitudes:
-        raise ValueError("GPX data has no latitude/longitude points.")
-    min_lat = min(gpx_data.latitudes)
-    max_lat = max(gpx_data.latitudes)
-    min_lon = min(gpx_data.longitudes)
-    max_lon = max(gpx_data.longitudes)
-    return (min_lat, max_lat, min_lon, max_lon)
+from pyproj import Transformer
+from lidar_util import get_real_path, load_lidar_points, get_route_bounds
 
 def fit_lidar_to_route(las, gpx_data: GPXData, margin: float = 0.001, las_crs_epsg: int = 28356):
     """
@@ -126,29 +100,6 @@ def prune_trees(elevations: List[Optional[float]], max_gap: int = 5) -> List[Opt
         else:
             i = j
     return pruned
-
-def join_laz_files(p1: str, p2: str):
-    p1 = get_real_path(p1)
-    p2 = get_real_path(p2)
-    
-    input_files = [p1,p2]
-    output_file = get_real_path("data/lidar/combined.laz")
-
-    # Open the first file to copy the header
-    with laspy.open(input_files[0]) as f:
-        header = f.header
-
-    # Create the output file
-    with laspy.open(output_file, mode="w", header=header) as writer:
-        for infile in input_files:
-            with laspy.open(infile) as reader:
-                for points in reader.chunk_iterator(1_000_000):  # read 1M points at a time
-                    writer.write_points(points)
-    
-# if __name__ == "__main__":
-#     p1 = "data/lidar/honeyeater-p1.laz"
-#     p2 = "data/lidar/honeyeater-p2.laz"
-#     join_laz_files(p1,p2)
 
 if __name__ == "__main__":
     laz_path = "data/lidar/combined.laz"

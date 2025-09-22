@@ -32,7 +32,10 @@ def calculateSegmentStats(x_list: list[int], y_list: list[int], start: int, end:
 
     # calculate grade for the segment 
     #print("\n\n\n",y_list[end - 1], y_list[start], x_list[end - 1], x_list[start], "\n\n\n")
-    grade = (y_list[end - 1] - y_list[start]) / ((x_list[end - 1] - x_list[start])*1000)
+    if ((x_list[end - 1]) - x_list[start] != 0):
+        grade = (y_list[end - 1] - y_list[start]) / ((x_list[end - 1] - x_list[start])*1000)
+    else:
+        grade = 0
 
     # organise the stats nicely
     stats = {
@@ -46,6 +49,84 @@ def calculateSegmentStats(x_list: list[int], y_list: list[int], start: int, end:
     return stats
 
 
+def convertStatsToJSON(segment_stats: dict, total_gain, total_grade, rolling_x, turning_x, segment_x):
+    result = { 
+        "trail_elevation_gain" : total_gain,
+        "trail_grade" : total_grade,
+        "num_segments" : len(segment_stats),
+        "segment_stats" : segment_stats,
+        "rolling_x" : rolling_x,
+        "turning_x" : turning_x,
+        "segment_x" : segment_x
+    }
+    return result 
+
+def calculateTrailStats(distances: list[int], elevations: list[int]):
+    totalDistance = distances[-1]
+
+    altitudeMin = min(elevations)
+    altitudeMax = max(elevations)
+    altitudeStart = elevations[0]
+    altitudeEnd = elevations[-1]
+    altitudeChange = altitudeEnd - altitudeStart
+
+    totalGain = 0.0
+    totalLoss = 0.0
+    distanceUp = 0.0
+    distanceDown = 0.0
+    distanceFlat = 0.0
+    grades = []
+
+    for i in range(len(elevations) - 1):
+        dy = elevations[i+1] - elevations[i]
+        dx = distances[i+1] - distances[i]
+
+        if dx <= 0:
+            continue 
+
+        grade = dy / dx
+        grades.append(grade)
+
+        if dy > 0:
+            totalGain += dy
+            distanceUp += dx
+        elif dy < 0:
+            totalLoss += abs(dy)
+            distanceDown += dx
+        else:
+            distanceFlat += dx
+
+    # Grade stats
+    if totalDistance > 0:
+        avg_grade = totalGain / totalDistance
+    else:
+        avg_grade = 0.0
+
+    max_grade = max(grades) if grades else 0.0
+    min_grade = min(grades) if grades else 0.0
+
+    stats = {
+        # Potentially add these for difficulty rating
+        # "totalGain": totalGain,
+        # "totalLoss": totalLoss,
+        
+
+        "altitudeChange": altitudeChange,
+        "altitudeMin": altitudeMin,
+        "altitudeMax": altitudeMax,
+        "altitudeStart": altitudeStart,
+        "altitudeEnd": altitudeEnd,
+        "gradeAvg": avg_grade,
+        "gradeMax": max_grade,
+        "gradeMin": min_grade,
+        "distanceUp": distanceUp,
+        "distanceDown": distanceDown,
+        "distanceFlat": distanceFlat,
+    }
+
+    return stats
+
+#specify trail
 trail_name = "device_measurement_1"
 print(f"Loading {trail_name} GPX data...")
 gpx_path = get_trail_file_path(trail_name)
@@ -108,7 +189,7 @@ for x in range(len(turning_x) - 1):
         rolling_x.extend([turning_x[x],turning_x[x+1]])
         rolling_y.extend([turning_y[x], turning_y[x+1]])
 
-
+#set up segments
 lastPoint = len(gpx_result.elevations) - 1
 grade = gpx_result.elevations[lastPoint] / gpx_result.cumulative_distances_m[lastPoint]
 
@@ -149,10 +230,14 @@ for stat in segmentStats:
 
 results = calculateSegmentStats(turning_x, turning_y, 0, (len(turning_y)))
 
+#print overall stats
 print("\ntotal elevation gain is:" , totalGain)
 print(results["gain"])
 print("total grade is:", grade)
 print(results["grade"])
+
+#assign variable to the JSON data 
+JSON = convertStatsToJSON(segmentStats, totalGain, grade, rolling_x, turning_x, segmentPoints_x)
 
 fig, ax = plt.subplots(figsize=(10, 4))
 ax.plot(gpx_result.convert_distance_to_km, gpx_result.elevations, marker='.', color='green')
@@ -171,6 +256,36 @@ fig.tight_layout()
 
 plt.show()
 
+trail_stats = calculateTrailStats(gpx_result.cumulative_distances_m, gpx_result.elevations)
 
+for key, value in trail_stats.items():
+    print(f"{key}: {value}")
+
+''' 
+Stats to add
+------------
+Altitude change
+    elevation gain (m)
+Altitude min
+    min(elevations)
+Altitude max
+    max(elevations)
+Altitude start
+    elevation[0]
+Altitude end
+    elevation[-1]
+Grade
+    total(uphill sections) / total distance
+Grade max
+    max(incline)
+Grade min
+    min(incline)
+Distance climb
+    total(uphill sections)
+Distance down
+    total(downhill sections)
+Distance flat
+    total(flat sections)
+'''
 
 

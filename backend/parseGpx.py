@@ -113,6 +113,24 @@ def calculateRollingHills(turning_x: List[float], turning_y: List[float], thresh
             rolling_y.extend([turning_y[x], turning_y[x+1]])
     return rolling_x, rolling_y
 
+def calculateDynamic(turning_x: List[float], turning_y: List[float], threshold: float, stride_length: float, vertical_oscillation: float):
+    rolling_x = []
+    rolling_y = []
+
+    for x in range(len(turning_x) - 1):
+        x_diff = (turning_x[x+1] - turning_x[x]) * 1000
+        y_diff = abs(turning_y[x+1] - turning_y[x])
+        hypotenuse = (x_diff**2 + y_diff**2)**0.5
+        if (x_diff / stride_length < 1):
+            continue
+        elif (y_diff / vertical_oscillation < 1):
+            continue
+        # If section is short then it is rolling hill
+        elif hypotenuse < threshold:
+            rolling_x.extend([turning_x[x],turning_x[x+1]])
+            rolling_y.extend([turning_y[x], turning_y[x+1]])
+    return rolling_x, rolling_y
+
 def calculateSegmentStats(x_list: list[int], y_list: list[int], start: int, end: int, threshold):
     #calculate elevation gain for the segment 
     totalGain = 0.0

@@ -61,12 +61,17 @@ def link_points_to_route(las, gpx_data: GPXData, distance_thresh: float) -> List
     
     
 def prune_trees(elevations: List[Optional[float]], max_gap: int = 5) -> List[Optional[float]]:
-    """Prune spikes in elevation data likely caused by trees."""
+    """
+    Prune spikes in elevation data likely caused by trees and interpolate missing values.
+    Also handles the case where trees might be at the end of the route.
+    """
     if not elevations:
         return []
 
     pruned = list(elevations)
     n = len(pruned)
+    
+    # First pass: detect and handle tree spikes (including at the end)
     i = 0
     while i < n - 1:
         if pruned[i] is None:
@@ -90,17 +95,55 @@ def prune_trees(elevations: List[Optional[float]], max_gap: int = 5) -> List[Opt
                 end_of_spike += 1
 
             if end_of_spike < n:
-                # Interpolate all points within the spike
+                # Normal spike with an endpoint - interpolate
                 end_val = pruned[end_of_spike]
                 num_points = end_of_spike - i
                 for k in range(i + 1, end_of_spike):
                     pruned[k] = current_val + (end_val - current_val) * (k - i) / num_points
                 i = end_of_spike
             else:
-                i = j
+                # Spike extends to the end - likely trees at the end
+                # Interpolate backwards from the last known good point
+                for k in range(j, n):
+                    pruned[k] = current_val
+                break
         else:
             i = j
+
     return pruned
+
+def fill_missing_values(elevations: List[Optional[float]]) -> List[Optional[float]]:
+    for i in range(len(elevations)):
+        if elevations[i] is None:
+            # Find the nearest non-None values before and after
+            before_val = None
+            before_idx = i - 1
+            while before_idx >= 0 and elevations[before_idx] is None:
+                before_idx -= 1
+            if before_idx >= 0:
+                before_val = elevations[before_idx]
+
+            after_val = None
+            after_idx = i + 1
+            while after_idx < len(elevations) and elevations[after_idx] is None:
+                after_idx += 1
+            if after_idx < len(elevations):
+                after_val = elevations[after_idx]
+
+            # Interpolate based on available values
+            if before_val is not None and after_val is not None:
+                # Linear interpolation between before and after
+                distance_ratio = (i - before_idx) / (after_idx - before_idx)
+                elevations[i] = before_val + (after_val - before_val) * distance_ratio
+            elif before_val is not None:
+                # Use the last known value (forward fill)
+                elevations[i] = before_val
+            elif after_val is not None:
+                # Use the next known value (backward fill)
+                elevations[i] = after_val
+            # If both are None, leave as None (shouldn't happen in normal cases)
+
+    return elevations
 
 def parse_lidar(laz_file, gpx_file, distance_thresh: float = 1.5) -> GPXData:
     gpx_data = parse_gpx(gpx_file)
@@ -110,6 +153,7 @@ def parse_lidar(laz_file, gpx_file, distance_thresh: float = 1.5) -> GPXData:
 
     elevations = link_points_to_route(las, gpx_data, distance_thresh=distance_thresh)
     elevations = prune_trees(elevations, max_gap=5)
+    elevations = fill_missing_values(elevations)
 
     # replace gpx_data.elevations with elevations
     gpx_data.elevations = elevations

@@ -58,9 +58,9 @@ def link_points_to_route(las, gpx_data: GPXData, distance_thresh: float) -> List
     elevations = [e - min_elevation if e is not None else None for e in elevations]
 
     return elevations
-    
-    
-def prune_trees(elevations: List[Optional[float]], max_gap: int = 5) -> List[Optional[float]]:
+
+
+def prune_trees(elevations: List[Optional[float]], max_gap: int = 5, gap_increase: float = 0.3) -> List[Optional[float]]:
     """
     Prune spikes in elevation data likely caused by trees and interpolate missing values.
     Also handles the case where trees might be at the end of the route.
@@ -91,7 +91,9 @@ def prune_trees(elevations: List[Optional[float]], max_gap: int = 5) -> List[Opt
         # Detect a spike: a sharp increase in elevation
         if next_val - current_val > max_gap:
             end_of_spike = j + 1
-            while end_of_spike < n and (pruned[end_of_spike] is None or pruned[end_of_spike] - current_val > max_gap):
+            gap = max_gap
+            while end_of_spike < n and (pruned[end_of_spike] is None or pruned[end_of_spike] - current_val > gap):
+                gap += gap_increase
                 end_of_spike += 1
 
             if end_of_spike < n:
@@ -165,7 +167,7 @@ if __name__ == "__main__":
     laz_path = get_real_path(laz_path)
 
     with open(get_real_path("data/gpx/honeyeater.gpx"), "r") as gpx_file:
-        result = parse_lidar(laz_path, gpx_file, max_tree_gap=5.0)
+        result = parse_lidar(laz_path, gpx_file, max_tree_gap=1.5)
 
     # save to file
     from lidar_util import save_gpx_data_to_laz

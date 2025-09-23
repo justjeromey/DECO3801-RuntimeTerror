@@ -67,8 +67,7 @@ export default function Home() {
                     <div className="sections">
                         <h1>Trail Analysis</h1>
                         <div className="analysis_container">
-                            <p>This is where the analysis goes</p>
-                            <p className="outline min-h-100">
+                            <p className="min-h-100">
                                 <Dashboard trailData={trailData} />
                             </p>
                         </div>

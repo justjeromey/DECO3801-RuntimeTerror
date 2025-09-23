@@ -24,7 +24,7 @@ interface DashboardProps {
 }
 
 const StatCard = ({ label, value, unit = '', color = 'blue' }: { label: string; value: number | string; unit?: string; color?: string }) => (
-    <span className="bg-white rounded-xl shadow-lg p-4 inline-block hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+    <span className="bg-background rounded-xl shadow-lg p-4 inline-block hover:shadow-xl transition-shadow duration-300 border border-secondary">
         <span className="text-gray-500 text-sm font-medium block mb-1 uppercase tracking-wider">{label}</span>
         <span className={`text-2xl font-bold block text-${color}-600`}>
             {typeof value === 'number' ? value.toFixed(1) : value}

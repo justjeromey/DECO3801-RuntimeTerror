@@ -58,12 +58,14 @@ interface ChartViewerProps {
 }
 
 interface optionsProps {
-    e: React.MouseEvent<HTMLCanvasElement>
+    e: React.MouseEvent<HTMLCanvasElement>;
     active: Array<import("chart.js").ActiveElement>;
 }
 
-
-export default function ChartViewer({ trailData, setPointIndex }: ChartViewerProps) {
+export default function ChartViewer({
+    trailData,
+    setPointIndex,
+}: ChartViewerProps) {
     const [chartData, setChartData] = useState<ChartData | null>(null);
     const [prevPoint, setPrevPoint] = useState(0);
     const chartRef = useRef(null);
@@ -71,9 +73,12 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
     // Function to determine difficulty level and color based on gradient
     const getGradientDifficulty = (grade: number) => {
         const absGrade = Math.abs(grade);
-        if (absGrade < 0.05) return { level: "Easy", color: "rgba(34, 197, 94, 0.3)" }; // Green
-        if (absGrade < 0.1) return { level: "Moderate", color: "rgba(234, 179, 8, 0.3)" }; // Yellow
-        if (absGrade < 0.15) return { level: "Hard", color: "rgba(249, 115, 22, 0.3)" }; // Orange
+        if (absGrade < 0.05)
+            return { level: "Easy", color: "rgba(34, 197, 94, 0.3)" }; // Green
+        if (absGrade < 0.1)
+            return { level: "Moderate", color: "rgba(234, 179, 8, 0.3)" }; // Yellow
+        if (absGrade < 0.15)
+            return { level: "Hard", color: "rgba(249, 115, 22, 0.3)" }; // Orange
         return { level: "Very Hard", color: "rgba(239, 68, 68, 0.3)" }; // Red
     };
 
@@ -103,9 +108,11 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
             }
 
             // Calculate gradient for this segment
-            const elevationChange = elevations[endIndex] - elevations[startIndex];
+            const elevationChange =
+                elevations[endIndex] - elevations[startIndex];
             const distanceChange = distances[endIndex] - distances[startIndex];
-            const gradient = distanceChange > 0 ? elevationChange / distanceChange : 0;
+            const gradient =
+                distanceChange > 0 ? elevationChange / distanceChange : 0;
 
             const difficulty = getGradientDifficulty(gradient);
 
@@ -121,15 +128,15 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
                 label: `${difficulty.level} (${(gradient * 100).toFixed(1)}%)`,
                 data: segmentData,
                 backgroundColor: difficulty.color,
-                borderColor: difficulty.color.replace('0.3', '0.8'),
+                borderColor: difficulty.color.replace("0.3", "0.8"),
                 borderWidth: 0,
                 pointRadius: 0,
-                fill: 'origin',
+                fill: "origin",
                 order: 2,
                 gradient: gradient,
                 startDistance: startDistance,
                 endDistance: endDistance,
-                elevationGain: Math.max(0, elevationChange)
+                elevationGain: Math.max(0, elevationChange),
             });
         }
 
@@ -137,9 +144,15 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
     };
 
     // Function to get current segment info for tooltip
-    const getCurrentSegmentInfo = (currentDistance: number, gradientSegments: any[]) => {
+    const getCurrentSegmentInfo = (
+        currentDistance: number,
+        gradientSegments: any[],
+    ) => {
         for (const segment of gradientSegments) {
-            if (currentDistance >= segment.startDistance && currentDistance <= segment.endDistance) {
+            if (
+                currentDistance >= segment.startDistance &&
+                currentDistance <= segment.endDistance
+            ) {
                 return segment;
             }
         }
@@ -151,7 +164,7 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
         if (trailData) {
             try {
                 const gradientSegments = calculateGradientSegments(trailData);
-                
+
                 // Parse new trail data
                 setChartData({
                     // X axis data
@@ -181,19 +194,21 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
 
     // useMemo to preserve options unless trailData changes
     const options = useMemo(() => {
-        const gradientSegments = trailData ? calculateGradientSegments(trailData) : [];
-        
+        const gradientSegments = trailData
+            ? calculateGradientSegments(trailData)
+            : [];
+
         return {
             // A on hover function that updates a parent value
             onHover: (e, active) => {
                 // Making sure the active array isn't empty
                 if (active.length <= 0) return;
                 if (!active[0]) return;
-                    
+
                 // If a valid coordinate is returned, set the value to the index
                 const pointIndex = active[0].index;
                 if (prevPoint != pointIndex) {
-                setPointIndex(pointIndex);
+                    setPointIndex(pointIndex);
                 }
             },
             responsive: true,
@@ -212,12 +227,19 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
                 tooltip: {
                     intersect: false,
                     callbacks: {
-                        title: (context: import("chart.js").TooltipItem<"line">[]) => {
+                        title: (
+                            context: import("chart.js").TooltipItem<"line">[],
+                        ) => {
                             return ""; // Hide title
                         },
-                        beforeBody: (context: import("chart.js").TooltipItem<"line">[]) => {
+                        beforeBody: (
+                            context: import("chart.js").TooltipItem<"line">[],
+                        ) => {
                             // Custom tooltip options
-                            const dataPoint = context[0].parsed as { x: number; y: number };
+                            const dataPoint = context[0].parsed as {
+                                x: number;
+                                y: number;
+                            };
                             const lines = [
                                 `Distance: ${(dataPoint.x / 1000).toFixed(2)} km`,
                                 `Distance: ${dataPoint.x.toFixed(2)} m`,
@@ -225,17 +247,28 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
                             ];
 
                             // Add gradient information if available
-                            const currentSegment = getCurrentSegmentInfo(dataPoint.x, gradientSegments);
+                            const currentSegment = getCurrentSegmentInfo(
+                                dataPoint.x,
+                                gradientSegments,
+                            );
                             if (currentSegment) {
-                                const difficulty = getGradientDifficulty(currentSegment.gradient);
-                                lines.push(`Gradient: ${(currentSegment.gradient * 100).toFixed(1)}%`);
+                                const difficulty = getGradientDifficulty(
+                                    currentSegment.gradient,
+                                );
+                                lines.push(
+                                    `Gradient: ${(currentSegment.gradient * 100).toFixed(1)}%`,
+                                );
                                 lines.push(`Difficulty: ${difficulty.level}`);
-                                lines.push(`Elevation Gain: ${currentSegment.elevationGain.toFixed(1)}m`);
+                                lines.push(
+                                    `Elevation Gain: ${currentSegment.elevationGain.toFixed(1)}m`,
+                                );
                             }
 
                             return lines;
                         },
-                        label: (context: import("chart.js").TooltipItem<"line">) => {
+                        label: (
+                            context: import("chart.js").TooltipItem<"line">,
+                        ) => {
                             return ""; // Hide label
                         },
                     },
@@ -243,7 +276,7 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
                 zoom: {
                     pan: {
                         enabled: true,
-                        mode: 'x' as const,
+                        mode: "x" as const,
                     },
                     zoom: {
                         wheel: {
@@ -252,7 +285,7 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
                         pinch: {
                             enabled: true,
                         },
-                        mode: 'x' as const,
+                        mode: "x" as const,
                     },
                 },
             },
@@ -303,30 +336,58 @@ export default function ChartViewer({ trailData, setPointIndex }: ChartViewerPro
         <div className="chart_container">
             {chartData !== null ? (
                 <>
-                    <Line data={chartData} options={options} ref={chartRef}/>
-                    {trailData && trailData.elevations && trailData.elevations.length > 0 && (
-                        <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                            <h4 className="text-sm font-medium mb-2">Gradient Difficulty Legend</h4>
-                            <div className="flex flex-wrap gap-4 text-xs">
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 rounded" style={{backgroundColor: "rgba(34, 197, 94, 0.6)"}}></div>
-                                    <span>Easy (&lt;5%)</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 rounded" style={{backgroundColor: "rgba(234, 179, 8, 0.6)"}}></div>
-                                    <span>Moderate (5-10%)</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 rounded" style={{backgroundColor: "rgba(249, 115, 22, 0.6)"}}></div>
-                                    <span>Hard (10-15%)</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                    <div className="w-4 h-4 rounded" style={{backgroundColor: "rgba(239, 68, 68, 0.6)"}}></div>
-                                    <span>Very Hard (&gt;15%)</span>
+                    <Line data={chartData} options={options} ref={chartRef} />
+                    {trailData &&
+                        trailData.elevations &&
+                        trailData.elevations.length > 0 && (
+                            <div className="mt-4 mb-4 p-3 bg-background rounded-lg">
+                                <h4 className="text-sm font-medium mb-2">
+                                    Gradient Difficulty Legend
+                                </h4>
+                                <div className="flex flex-wrap gap-4 text-xs">
+                                    <div className="flex items-center gap-2">
+                                        <div
+                                            className="w-4 h-4 rounded"
+                                            style={{
+                                                backgroundColor:
+                                                    "rgba(34, 197, 94, 0.6)",
+                                            }}
+                                        ></div>
+                                        <span>Easy (&lt;5%)</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div
+                                            className="w-4 h-4 rounded"
+                                            style={{
+                                                backgroundColor:
+                                                    "rgba(234, 179, 8, 0.6)",
+                                            }}
+                                        ></div>
+                                        <span>Moderate (5-10%)</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div
+                                            className="w-4 h-4 rounded"
+                                            style={{
+                                                backgroundColor:
+                                                    "rgba(249, 115, 22, 0.6)",
+                                            }}
+                                        ></div>
+                                        <span>Hard (10-15%)</span>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <div
+                                            className="w-4 h-4 rounded"
+                                            style={{
+                                                backgroundColor:
+                                                    "rgba(239, 68, 68, 0.6)",
+                                            }}
+                                        ></div>
+                                        <span>Very Hard (&gt;15%)</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
                 </>
             ) : (
                 <div className="py-10 flex justify-center items-center">

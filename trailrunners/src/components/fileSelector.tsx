@@ -9,6 +9,7 @@ export default function FileSelector({ setTrailData }) {
     const [trails, setTrails] = useState<Array<string>>([]);
     const [toggled, setToggle] = useState<boolean>(false);
     const [selected, setSelected] = useState<string>("");
+    const [pending, setPending] = useState<boolean>(false);
     const [uploadedFile, setUploadedFile] = useState<string>("");
     const dropdown = useRef<HTMLDivElement>(null);
 
@@ -67,8 +68,13 @@ export default function FileSelector({ setTrailData }) {
 
         setSelected(file.name);
         setToggle(!toggled);
+
         // Send request to parser
         try {
+            if (pending) {
+                return;
+            }
+            setPending(true);
             const res = await toast.promise(
                 fetch("/api/parser", {
                     method: "POST",
@@ -80,8 +86,13 @@ export default function FileSelector({ setTrailData }) {
                     error: "Failed to upload selected file",
                 },
             );
+
             // Get json data and pass to parent
             const result = await res.json();
+            if (result) {
+                setPending(false);
+            }
+
             setTrailData(result);
         } catch (error) {
             console.error(`File upload failed ${error}`);
@@ -96,6 +107,10 @@ export default function FileSelector({ setTrailData }) {
         setToggle(!toggled);
         // Send request to parser
         try {
+            if (pending) {
+                return;
+            }
+            setPending(true);
             const res = await toast.promise(
                 fetch("/api/parser", {
                     method: "POST",
@@ -109,6 +124,11 @@ export default function FileSelector({ setTrailData }) {
             );
             // Get json data and pass to parent
             const result = await res.json();
+
+            if (result) {
+                setPending(false);
+            }
+
             setTrailData(result);
         } catch (error) {
             console.error(`Selected file parsing failed ${error}`);

@@ -10,52 +10,62 @@ export default function Generate() {
 
             <main className="flex flex-col px-0 h-full flex-1">
 
-                <section className="w-full bg-colour-primary py-45">
-                    <div className="flex flex-col align-center max-w-4xl mx-auto px-6 text-center text-white gap-12">
+                <section className="w-full bg-colour-primary py-20">
+                    <div className="flex flex-col items-center max-w-4xl mx-auto px-6 text-center text-white gap-12">
                         <h2 className="text-4xl font-bold mb-6 text-green-400">
-                            How to Generate GPX Files
+                        How to Generate GPX Files
                         </h2>
-                        
-                        <div className="flex gap-30">
-                            <div className="flex flex-col items-center justify-center gap-6">
-                                <div className="flex items-center justify-center p-1 w-12 h-12 rounded-full bg-green-400 text-black font-bold text-xl shrink-0">
-                                    <Image
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 w-full">
+                            {/* Strava */}
+                            <div className="flex flex-col items-center gap-6">
+                                <div className="flex items-center justify-center w-20 h-20 rounded-full bg-green-400 text-black font-bold text-xl">
+                                <Image
                                     src="/strava_svg.svg"
                                     alt="Strava"
-                                    width={80}
-                                    height={80}
+                                    width={60}
+                                    height={60}
                                     priority
-                                    />
+                                />
                                 </div>
-                                <h3 className="w-full text-xl uppercase font-bold text-center">Strava (Desktop)</h3>
+                                <h3 className="text-xl uppercase font-bold text-center">
+                                Strava (Desktop)
+                                </h3>
                             </div>
 
+                            {/* GNSS */}
                             <div className="flex flex-col items-center gap-6">
-                                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-400 text-black font-bold text-xl shrink-0">
-                                    <Image
+                                <div className="flex items-center justify-center w-20 h-20 rounded-full bg-green-400 text-black font-bold text-xl">
+                                <Image
                                     src="/gnss_svg.svg"
                                     alt="GNSS Logger"
-                                    width={80}
-                                    height={80}
-                                    />
+                                    width={60}
+                                    height={60}
+                                />
                                 </div>
-                                <h3 className="text-xl uppercase font-bold">GNSS Logger (Android)</h3>
+                                <h3 className="text-xl uppercase font-bold text-center">
+                                GNSS Logger (Android)
+                                </h3>
                             </div>
 
+                            {/* Open GPX */}
                             <div className="flex flex-col items-center gap-6">
-                                <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-400 text-black font-bold text-xl shrink-0">
-                                    <Image
+                                <div className="flex items-center justify-center w-20 h-20 rounded-full bg-green-400 text-black font-bold text-xl">
+                                <Image
                                     src="/open_gpx_svg.svg"
                                     alt="Open GPX Tracker"
-                                    width={80}
-                                    height={80}
-                                    />
+                                    width={60}
+                                    height={60}
+                                />
                                 </div>
-                                <h3 className="text-xl uppercase font-bold">Open GPX Tracker (Apple)</h3>
+                                <h3 className="text-xl uppercase font-bold text-center">
+                                Open GPX Tracker (Apple)
+                                </h3>
                             </div>
                         </div>
-                    </div>              
+                    </div>
                 </section>
+
 
                 {/* Strava (Desktop) */}
                 <section className="w-full py-20 bg-white">

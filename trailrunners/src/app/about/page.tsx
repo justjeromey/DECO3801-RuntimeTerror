@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronDownIcon, ChevronRightIcon, ChevronLeftIcon} from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
-
+import Header from "../../components/header";
 
 export default function Info() {
     const features = [
@@ -33,24 +33,12 @@ export default function Info() {
     }, [currentFeature]); 
     
   return (
-        <div className="flex flex-col justify-between h-screen">
-            <header className="header flex flex-row justify-between items-center px-10 py-4">
-                <Image
-                        src="/logo.svg"
-                        width={290}
-                        height={70}
-                        alt="Trail Runners"
-                    />
+        <div className="flex flex-col justify-between">
+            <Header activePath="/about" />
 
-                <div className="nav_links flex flex-row gap-10 text-lg font-medium uppercase">
-                    <Link href="/" className="headerLink">Trail Summary</Link>
-                    <Link href="/gpx_generate" className="headerLink">GPX Generate</Link>
-                    <Link href="/info" className="headerLink activeLink">Info</Link>
-                </div>
-            </header>
+            <main className="flex flex-col px-0 h-full flex-1">
 
-            <main className="flex flex-col px-0 h-full">
-
+                {/* About TrailRunners */}
                 <section className="w-full bg-colour-primary py-55">
                     <div className="max-w-4xl mx-auto px-6 text-center text-white">
                         <h2 className="text-4xl font-bold mb-6">
@@ -61,13 +49,11 @@ export default function Info() {
                             By uploading GPS data, users can analyse elevation profiles and plan their trails more effectively.
                         </p>
                     </div>
-
-                    <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
-                        <ChevronDownIcon className="w-10 h-10 text-green-400 animate-bounce" />
-                    </div>
                 </section>
   
                 <section className="flex flex-row">
+
+                    {/* Key Features of TrailRunners */}
                     <div className="w-2/5 bg-green-400 text-black py-15 px-10 flex flex-col gap-5 justify-center items-center relative">
                         <h3 className="text-2xl font-bold mb-4 text-center">Key Features</h3>
 
@@ -97,6 +83,7 @@ export default function Info() {
                         </div>
                     </div>
                     
+                    {/* Tips for TrailRunners */}
                     <div className="w-4/5 bg-white p-15 text-black flex flex-col">
                         <h3 className="text-2xl font-bold mb-4 text-black text-center">
                             Tips for Best Results
@@ -122,6 +109,7 @@ export default function Info() {
 
                 </section>
 
+                {/* How to Use TrailRunners */}
                 <section className="w-full bg-colour-primary py-20 px-20">
                     <div className="p-6 text-left text-white">
                         <h2 className="text-4xl font-bold mb-6">
@@ -202,7 +190,7 @@ export default function Info() {
                                 <div className="flex flex-col gap-6"> 
                                     <div className="flex items-center gap-6">
                                         <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-400 text-black font-bold text-xl shrink-0">
-                                        2
+                                        3
                                         </div>
                                         <h3 className="text-xl uppercase font-bold">Explore the Elevation Profile</h3>
                                     </div>

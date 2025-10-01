@@ -1,110 +1,14 @@
 "use client";
 import Image from "next/image";
-import Link from "next/link";
-import { useState } from "react";
-import { Upload, XCircle, CheckCircle } from "lucide-react";
+import Header from "../../components/header";
+import GNSSButton from "../../components/gnssButton";
 
-async function onFileSelect(file: File) {
-    const formData = new FormData();
-    formData.append("file", file);
-
-    const res = await fetch("/api/gnssConverter", {
-        method: "POST",
-        body: formData,
-    });
-
-    const blob = await res.blob();
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = file.name.replace(/\.txt$/i, ".gpx");
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    window.URL.revokeObjectURL(url);
-
-}
-
-function UploadButton() {
-    const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
-
-    const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        try {
-        setStatus("idle");
-        await onFileSelect(file);
-        setStatus("success");
-        } catch (err) {
-        setStatus("error");
-        }
-    };
-
-    return (
-        <div className="flex justify-center">
-        <label
-            htmlFor="file-upload"
-            className={`flex flex-col items-center justify-center w-50 h-50 rounded-lg cursor-pointer 
-            transition-all duration-200
-            ${status === "idle" ? "bg-gray-200 hover:bg-gray-300 text-gray-700" : ""}
-            ${status === "success" ? "bg-green-500 hover:bg-green-600 text-white" : ""}
-            ${status === "error" ? "bg-red-500 hover:bg-red-600 text-white" : ""}
-            `}
-        >
-            {status === "idle" && (
-            <div className="flex flex-col items-center p-4 gap-3">
-                <Upload />
-                <span className="text-sm font-semibold text-center">Upload .txt File</span>
-            </div>
-            )}
-
-            {status === "success" && (
-            <div className="flex flex-col items-center p-4 gap-3">
-                <CheckCircle />
-                <span className="text-sm font-semibold text-center">Success! <br/> Click again to convert another file.</span>
-            </div>
-            )}
-            
-            {status === "error" && (
-            <div className="flex flex-col items-center p-4 gap-3">
-                <XCircle/>
-                <span className="text-sm font-semibold text-center">Failed. <br/> Try again and upload a valid .txt file.</span>
-            </div>
-            )}
-        </label>
-
-        <input
-            id="file-upload"
-            type="file"
-            accept=".txt"
-            className="hidden"
-            onChange={handleChange}
-        />
-        </div>
-    );
-}
-
-export default function Info() {
+export default function Generate() {
   return (
-        <div className="flex flex-col justify-between h-screen">
-            <header className="header flex flex-row justify-between items-center px-10 py-4">
-                <Image
-                        src="/logo.svg"
-                        width={290}
-                        height={70}
-                        alt="Trail Runners"
-                        priority={true}
-                    />
+        <div className="flex flex-col justify-between">
+            <Header activePath="/gpx_generate" />
 
-                <div className="nav_links flex flex-row gap-10 text-lg font-medium uppercase">
-                    <Link href="/" className="headerLink">Trail Summary</Link>
-                    <Link href="/gpx_generate" className="headerLink activeLink">GPX Generate</Link>
-                    <Link href="/info" className="headerLink">Info</Link>
-                </div>
-            </header>
-
-            <main className="flex flex-col px-0 h-full">
+            <main className="flex flex-col px-0 h-full flex-1">
 
                 <section className="w-full bg-colour-primary py-45">
                     <div className="flex flex-col align-center max-w-4xl mx-auto px-6 text-center text-white gap-12">
@@ -259,7 +163,7 @@ export default function Info() {
                                     processing.
                                 </li>
 
-                                <UploadButton />
+                                <GNSSButton />
                             </div>
                             
                         </ol>

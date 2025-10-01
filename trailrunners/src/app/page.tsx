@@ -1,12 +1,9 @@
 "use client";
-
-import Image from "next/image";
-import Link from "next/link";
 import FileSelector from "@/components/fileSelector";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Dashboard from "@/components/dashboard";
-import { Line } from "react-chartjs-2";
+import Header from "../components/header";
 
 interface PointData {
     longitude: number;
@@ -28,23 +25,10 @@ export default function Home() {
     const mapRef = useRef(null);
 
     return (
-        <div className="flex flex-col justify-between h-screen">
-            <header className="header flex flex-row justify-between items-center px-10 py-4">
-                <Image
-                        src="/logo.svg"
-                        width={290}
-                        height={70}
-                        alt="Trail Runners"
-                    />
-
-                <div className="nav_links flex flex-row gap-10 text-lg font-medium uppercase">
-                    <Link href="/" className="headerLink activeLink">Trail Summary</Link>
-                    <Link href="/gpx_generate" className="headerLink">GPX Generate</Link>
-                    <Link href="/info" className="headerLink">Info</Link>
-                </div>
-            </header>
-
-            <main className="flex flex-col px-10 py-5 h-full">
+        <div className="flex flex-col justify-between">
+            <Header activePath="/" />
+            
+            <main className="flex flex-col px-10 py-5 h-full flex-1">
                 
                 <div className="w-full">
     

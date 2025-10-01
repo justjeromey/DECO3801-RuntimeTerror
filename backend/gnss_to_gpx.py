@@ -40,15 +40,3 @@ def convert_to_gpx(input_file, output_filename="output.gpx"):
     # Write GPX
     tree = ET.ElementTree(gpx)
     tree.write(output_file, encoding="utf-8", xml_declaration=True)
-
-    print(f"GPX file saved at: {output_file}")
-
-# Example usage:
-# convert_to_gpx("gnss_log_2025_08_21_16_01_42.25o", "output.gpx")
-
-
-
-print("... Converting GNSS log to GPX ...")
-input_path = "backend/data/other log/gnss_log_2025_08_25_11_02_50.txt"
-output_path = "output.gpx"
-convert_to_gpx(input_path, output_path)

@@ -111,4 +111,9 @@ body {
 
 .chart {
     color: --var(color-foreground);
+
+}
+
+.gifStyle {
+    @apply mx-auto my-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700;
 }

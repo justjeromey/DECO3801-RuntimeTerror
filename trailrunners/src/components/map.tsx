@@ -101,6 +101,14 @@ export default function MapViewer({ trailData, pointIndex, ref }) {
         }
     }, [pointIndex]);
 
+    const MapResizeFix = () => {
+        const map = useMap();
+        useEffect(() => {
+            map.invalidateSize();
+        }, [map]);
+        return null;
+    };
+
     // Simply return the TSX directly - no render() needed
     return (
         <div
@@ -115,6 +123,8 @@ export default function MapViewer({ trailData, pointIndex, ref }) {
                 className="rounded-md"
             >
                 <SetMapCenter center={center} initial={initial} />
+                <MapResizeFix /> 
+
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

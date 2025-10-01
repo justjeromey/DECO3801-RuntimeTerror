@@ -134,6 +134,10 @@ export default function Generate() {
 
                             <li>Open the &quot;Log&quot; Section and click &quot;Start Log&quot;
 
+                                <br />
+                                <br />  
+                                <br />
+                                
                                 <Image
                                 src="/GNSSStartLog.gif"
                                 width={250}

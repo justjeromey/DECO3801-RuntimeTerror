@@ -1,9 +1,11 @@
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from parseGpx import parse_gpx, convert_gpx_data_to_json, handle_gpx_stats
 from parseLidar import parse_lidar
+from gnss_to_gpx import convert_to_gpx
+import tempfile
 
 app = FastAPI()
 
@@ -35,6 +37,26 @@ async def process_lidar(lidar_file: UploadFile = File(...), gpx_file: UploadFile
     
     return JSONResponse(status_code=200, content=json)
 
+@app.post("/convert")
+async def convert_file(file: UploadFile = File(...)):
+    # Save uploaded file temporarily
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".txt") as tmp:
+        contents = await file.read()
+        tmp.write(contents)
+        tmp_path = tmp.name
+
+    # Output file
+    output_file = tmp_path.replace(".txt", ".gpx")
+
+    # Run your converter
+    convert_to_gpx(tmp_path, output_file)
+
+    # Return file to frontend
+    return FileResponse(
+        path=output_file,
+        filename="converted_output.gpx",
+        media_type="application/gpx+xml"
+    )
 
 app.add_middleware(
     CORSMiddleware,

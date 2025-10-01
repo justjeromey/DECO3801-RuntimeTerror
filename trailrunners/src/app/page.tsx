@@ -39,8 +39,8 @@ export default function Home() {
 
                 <div className="nav_links flex flex-row gap-10 text-lg font-medium uppercase">
                     <Link href="/" className="headerLink activeLink">Trail Summary</Link>
+                    <Link href="/gpx_generate" className="headerLink">GPX Generate</Link>
                     <Link href="/info" className="headerLink">Info</Link>
-
                 </div>
             </header>
 

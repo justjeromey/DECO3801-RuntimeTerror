@@ -1,7 +1,37 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronDownIcon, ChevronRightIcon, ChevronLeftIcon} from "@heroicons/react/24/outline";
+import { useEffect, useState } from "react";
+
 
 export default function Info() {
+    const features = [
+        { id: 1, title: 'Interactive Elevation Profile', icon: '⛰️', text: 'Visualize your trail’s elevation changes in a detailed, interactive graph.' },
+        { id: 2, title: 'Real-time Distance Tracking', icon: '⏱️', text: 'Monitor your progress and remaining distance as you move along the route.' },
+        { id: 3, title: 'Dynamic Map Integration', icon: '🗺️', text: 'View your route on an integrated map that highlights key points and terrain.' },
+        { id: 4, title: 'Elevation Gain/Loss Analysis', icon: '📈', text: 'Get detailed data on your total elevation gain and loss for better training.' },
+    ];
+
+    const [currentFeature, setCurrentFeature] = useState(0);
+
+    const nextFeature = () => {
+        setCurrentFeature((prev) => (prev + 1) % features.length);
+    };
+
+    const prevFeature = () => {
+        setCurrentFeature((prev) => (prev - 1 + features.length) % features.length);
+    };
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            nextFeature();
+        }, 7500); 
+
+        return () => clearInterval(interval);
+    }, [currentFeature]); 
+    
   return (
         <div className="flex flex-col justify-between h-screen">
             <header className="header flex flex-row justify-between items-center px-10 py-4">
@@ -14,66 +44,186 @@ export default function Info() {
 
                 <div className="nav_links flex flex-row gap-10 text-lg font-medium uppercase">
                     <Link href="/" className="headerLink">Trail Summary</Link>
+                    <Link href="/gpx_generate" className="headerLink">GPX Generate</Link>
                     <Link href="/info" className="headerLink activeLink">Info</Link>
                 </div>
             </header>
 
-            <main className="flex flex-col px-10 py-5 h-full">
-                {/* About Section */}
-                <div className="max-w-4xl mx-auto w-full">
-                    <h2 className="text-3xl font-bold mb-8">About Rolling Hills</h2>
-                    
-                    <div className="space-y-8">
-                        <section className="bg-white p-6 rounded-lg shadow-sm">
-                            <h3 className="text-xl font-semibold mb-4">What is Rolling Hills?</h3>
-                            <p className="text-gray-700">
-                                Rolling Hills is an interactive trail visualisation tool designed to help 
-                                runners and hikers better understand their routes. By uploading GPS data, 
-                                users can analyse elevation profiles and plan their trails more effectively.
-                            </p>
-                        </section>
+            <main className="flex flex-col px-0 h-full">
 
-                        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="bg-white p-6 rounded-lg shadow-sm">
-                                <h3 className="text-xl font-semibold mb-4">Key Features</h3>
-                                <ul className="list-disc pl-6 space-y-2 text-gray-700">
-                                    <li>Interactive elevation profile visualisation</li>
-                                    <li>Real-time distance tracking</li>
-                                    <li>Dynamic map integration</li>
-                                    <li>Elevation gain/loss analysis</li>
-                                </ul>
-                            </div>
-
-                            <div className="bg-white p-6 rounded-lg shadow-sm">
-                                <h3 className="text-xl font-semibold mb-4">How to Use</h3>
-                                <ol className="list-decimal pl-6 space-y-2 text-gray-700">
-                                    <li>Upload your GPS track file</li>
-                                    <li>View your trail on the interactive map</li>
-                                    <li>Explore the elevation profile</li>
-                                    <li>Click points to see detailed information</li>
-                                </ol>
-                            </div>
-                        </section>
-
-                        <section className="bg-white p-6 rounded-lg shadow-sm">
-                            <h3 className="text-xl font-semibold mb-4">Tips for Best Results</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-gray-700">
-                                <div>
-                                    <h4 className="font-medium mb-2">📁 File Format</h4>
-                                    <p>Upload GPX files for best compatibility</p>
-                                </div>
-                                <div>
-                                    <h4 className="font-medium mb-2">🎯 Accuracy</h4>
-                                    <p>Ensure your GPS data is clean and continuous</p>
-                                </div>
-                                <div>
-                                    <h4 className="font-medium mb-2">📱 Device</h4>
-                                    <p>Works best on desktop for detailed analysis</p>
-                                </div>
-                            </div>
-                        </section>
+                <section className="w-full bg-colour-primary py-55">
+                    <div className="max-w-4xl mx-auto px-6 text-center text-white">
+                        <h2 className="text-4xl font-bold mb-6">
+                            What is <span className="italic text-green-400">TrailRunners</span>?
+                        </h2>
+                        <p className="text-lg text-gray-300 ">
+                            TrailRunners is an interactive trail visualisation tool designed to help runners and hikers better understand their routes. 
+                            By uploading GPS data, users can analyse elevation profiles and plan their trails more effectively.
+                        </p>
                     </div>
-                </div>
+
+                    <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
+                        <ChevronDownIcon className="w-10 h-10 text-green-400 animate-bounce" />
+                    </div>
+                </section>
+  
+                <section className="flex flex-row">
+                    <div className="w-2/5 bg-green-400 text-black py-15 px-10 flex flex-col gap-5 justify-center items-center relative">
+                        <h3 className="text-2xl font-bold mb-4 text-center">Key Features</h3>
+
+                        <div className="flex gap-5 items-center justify-center w-full">
+                            <button onClick={prevFeature} className="p-2 mr-4 rounded-full bg-black/10 hover:bg-black/20 transition-colors">
+                                <ChevronLeftIcon className="w-6 h-6 text-black" />
+                            </button>
+
+                            <div className="text-center">
+                                <div className="text-5xl mb-4">{features[currentFeature].icon}</div>
+                                <h4 className="font-semibold text-l mb-2">{features[currentFeature].title}</h4>
+                                <p className="px-4">{features[currentFeature].text}</p>
+                            </div>
+
+                            <button onClick={nextFeature} className="p-2 ml-4 rounded-full bg-black/10 hover:bg-black/20 transition-colors">
+                                <ChevronRightIcon className="w-6 h-6 text-black" />
+                            </button>
+                        </div>
+
+                        <div className="flex mt-4 space-x-2">
+                            {features.map((_, index) => (
+                                <div
+                                    key={index}
+                                    className={`h-2 w-2 rounded-full ${index === currentFeature ? 'bg-black' : 'bg-black/30'}`}
+                                ></div>
+                            ))}
+                        </div>
+                    </div>
+                    
+                    <div className="w-4/5 bg-white p-15 text-black flex flex-col">
+                        <h3 className="text-2xl font-bold mb-4 text-black text-center">
+                            Tips for Best Results
+                        </h3>
+
+                        <div className="flex flex-col md:flex-row gap-6 flex-1">
+                            <div className="flex-1 rounded-lg shadow-md p-6 bg-gray-100 text-center flex flex-col justify-center">
+                                <h4 className="font-bold mb-2">📁 File Format</h4>
+                                <p>Upload GPX files for best compatibility</p>
+                            </div>
+
+                            <div className="flex-1 rounded-lg shadow-md p-6 bg-gray-100 text-center flex flex-col justify-center">
+                                <h4 className="font-bold mb-2">🎯 Accuracy</h4>
+                                <p>Ensure your GPS data is clean and continuous</p>
+                            </div>
+
+                            <div className="flex-1 rounded-lg shadow-md p-6 bg-gray-100 text-center flex flex-col justify-center">
+                                <h4 className="font-bold mb-2">📱 Device</h4>
+                                <p>Works best on desktop for detailed analysis</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+
+                <section className="w-full bg-colour-primary py-20 px-20">
+                    <div className="p-6 text-left text-white">
+                        <h2 className="text-4xl font-bold mb-6">
+                            How to Use <span className="italic text-green-400">TrailRunners</span>
+                        </h2>
+                        
+                        <div className="p-6 text-left text-white max-w-3xl">
+
+                            <div className="space-y-8">
+                                {/* Step 1 */}
+                                <div className="flex flex-col gap-6"> 
+                                    <div className="flex items-center gap-6">
+                                        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-400 text-black font-bold text-xl shrink-0">
+                                        1
+                                        </div>
+                                        <h3 className="text-xl uppercase font-bold">Prepare your .GPX File</h3>
+                                    </div>
+
+                                    <div className="px-18">
+                                        <p>
+                                            Find or record a GPX file of an existing trail, using your preferred GPS device or app. 
+                                            Ensure the file is clean and contains accurate elevation data for the best results.
+                                        </p>
+
+                                        <br />
+
+                                        <p>
+                                            TrailRunners has recommended apps for recording GPX files, for more information and 
+                                            tips please visit the link below:
+                                        </p>
+    
+                                        <br />
+                                        
+                                        <Link 
+                                            href="/gpx_generate" 
+                                            className="bg-green-400 text-black font-semibold py-2 px-6 rounded-lg transition-colors hover:bg-green-500"
+                                        >
+                                            GPX Generation
+                                        </Link>                                        
+                                    </div>
+                                </div>
+
+                                {/* Step 2 */}
+                                <div className="flex flex-col gap-6"> 
+                                    <div className="flex items-center gap-6">
+                                        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-400 text-black font-bold text-xl shrink-0">
+                                        2
+                                        </div>
+                                        <h3 className="text-xl uppercase font-bold">Upload your .GPX File for Analysis</h3>
+                                    </div>
+
+                                    <div className="px-18">
+                                        <p>
+                                            Access the Trail Summary page and use the upload feature to select your GPX file. 
+                                            Once uploaded, the tool will process the data and generate an interactive elevation 
+                                            profile along with a map of your trail.
+                                        </p>
+
+                                        <br />
+
+                                        <p>
+                                            You can access the summary page by clicking the link below:
+                                        </p>
+    
+                                        <br />
+                                        
+                                        <Link 
+                                            href="/" 
+                                            className="bg-green-400 text-black font-semibold py-2 px-6 rounded-lg transition-colors hover:bg-green-500"
+                                        >
+                                            Trail Summary
+                                        </Link>                                        
+                                    </div>
+                                </div>
+                               
+
+                                {/* Step 3 */}
+                                <div className="flex flex-col gap-6"> 
+                                    <div className="flex items-center gap-6">
+                                        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-400 text-black font-bold text-xl shrink-0">
+                                        2
+                                        </div>
+                                        <h3 className="text-xl uppercase font-bold">Explore the Elevation Profile</h3>
+                                    </div>
+
+                                    <div className="px-18">
+                                        <p>
+                                            Interact with the elevation profile to see detailed information about different segments of your trail. 
+                                            Click on points along the profile to view elevation, distance, and other relevant data.
+                                        </p>
+
+                                        <br />          
+
+                                        <p>
+                                            And done! You can now use TrailRunners to analyze and visualize your trails effectively.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
                 <footer className="p-2 py-3 flex flex-wrap items-center justify-center">
                     <p>Made with ❤️ by Runtime Terrors</p>

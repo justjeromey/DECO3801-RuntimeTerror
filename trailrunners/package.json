@@ -8,7 +8,7 @@
     "all-dev": "concurrently \"cd ..\\backend && ..\\.venv\\Scripts\\activate && uvicorn main:app --reload\" \"cd ..\\trailrunners && next dev\"",
     "install-all": "concurrently  \"cd ..\\ && python -m venv .venv && .venv\\Scripts\\activate && cd .\\backend && pip install -r requirements.txt\" \"cd ..\\trailrunners && npm install\"",
     "build": "next build",
-    "start": "PORT=8081 next start",
+    "start": "next start -p 8081",
     "lint": "next lint"
   },
   "dependencies": {

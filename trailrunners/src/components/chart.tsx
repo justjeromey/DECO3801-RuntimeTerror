@@ -1,4 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -12,7 +14,6 @@ import {
 } from "chart.js";
 import zoomPlugin from "chartjs-plugin-zoom";
 import { Line } from "react-chartjs-2";
-import { useDebouncedCallback } from "use-debounce";
 
 ChartJS.register(
     CategoryScale,
@@ -83,7 +84,7 @@ export default function ChartViewer({
     };
 
     // Function to calculate gradient segments from existing elevation data
-    const calculateGradientSegments = (trailData: Trail) => {
+    const calculateGradientSegments = useCallback((trailData: Trail) => {
         const segments = [];
         const distances = trailData.cumulative_distances_m;
         const elevations = trailData.elevations;
@@ -141,7 +142,7 @@ export default function ChartViewer({
         }
 
         return segments;
-    };
+    }, []);
 
     // Function to get current segment info for tooltip
     const getCurrentSegmentInfo = (
@@ -190,7 +191,7 @@ export default function ChartViewer({
                 console.error(`Chart creation failed: ${error}`);
             }
         }
-    }, [trailData]);
+    }, [trailData, calculateGradientSegments]);
 
     // useMemo to preserve options unless trailData changes
     const options = useMemo(() => {
@@ -323,7 +324,7 @@ export default function ChartViewer({
                 },
             },
         };
-    }, [trailData]);
+    }, [calculateGradientSegments, prevPoint, setPointIndex, trailData]);
 
     // Resets the zoom via ref to the chart
     const handleZoomReset = () => {

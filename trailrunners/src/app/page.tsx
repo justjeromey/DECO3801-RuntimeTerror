@@ -6,10 +6,10 @@ import dynamic from "next/dynamic";
 import Dashboard from "@/components/dashboard";
 import Header from "../components/header";
 
-interface PointData {
-    longitude: number;
-    latitude: number;
-};
+// interface PointData {
+//     longitude: number;
+//     latitude: number;
+// };
 
 
 const MapViewer = dynamic(() => import("@/components/map"), {

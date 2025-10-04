@@ -93,11 +93,12 @@ export default function Generate() {
                             </li>
 
                             <Image
-                                src="/Strava-gif.gif"
+                                src="/Strava-Gif.gif"
                                 width={1000}
                                 height={500}
                                 alt="Strava Download GPX"
                                 className="gifStyle max-w-full h-auto"
+                                unoptimized
                             />
 
                             <li>Your GPX file will be downloaded automatically and will be ready for use</li>
@@ -154,6 +155,7 @@ export default function Generate() {
                                 height={250}
                                 alt="GNSS Start Log Action"
                                 className="gifStyle max-w-full h-auto"
+                                unoptimized
                                 />
                             </li>
                             
@@ -167,6 +169,7 @@ export default function Generate() {
                                     height={250}
                                     alt="GNSS Stop Log Action"
                                     className="gifStyle max-w-full h-auto"
+                                    unoptimized
                                 />
                             </li>
 

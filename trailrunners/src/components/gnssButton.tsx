@@ -31,14 +31,17 @@ export default function GNSSButton() {
 
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
-        if (!file) return;
+        if (!file) {
+            return;
+        }
 
         try {
-        setStatus("uploading");
+            setStatus("uploading");
         await onFileSelect(file);
-        setStatus("success");
+            setStatus("success");
         } catch (err) {
-        setStatus("error");
+            setStatus("error");
+            console.error("File conversion failed", err);
         }
     };
 
@@ -74,7 +77,7 @@ export default function GNSSButton() {
             <div className="flex flex-col items-center p-4 gap-3">
                 <Upload />
                 <span className="text-sm font-semibold text-center">
-                Upload .txt File
+                    Upload .txt File
                 </span>
             </div>
             )}
@@ -83,7 +86,7 @@ export default function GNSSButton() {
             <div className="flex flex-col items-center p-4 gap-3">
                 <Loader2 className="animate-spin" />
                 <span className="text-sm font-semibold text-center">
-                Converting...
+                    Converting...
                 </span>
             </div>
             )}
@@ -92,7 +95,7 @@ export default function GNSSButton() {
             <div className="flex flex-col items-center p-4 gap-3">
                 <CheckCircle />
                 <span className="text-sm font-semibold text-center">
-                Success! <br /> Click again to convert another file.
+                    Success! <br /> Click again to convert another file.
                 </span>
             </div>
             )}
@@ -101,7 +104,7 @@ export default function GNSSButton() {
             <div className="flex flex-col items-center p-4 gap-3">
                 <XCircle />
                 <span className="text-sm font-semibold text-center">
-                Failed. <br /> Try again and upload a valid .txt file.
+                    Failed. <br /> Try again and upload a valid .txt file.
                 </span>
             </div>
             )}

@@ -1,9 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { ChevronDownIcon, ChevronRightIcon, ChevronLeftIcon} from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
+import { ChevronRightIcon, ChevronLeftIcon} from "@heroicons/react/24/outline";
+import { useEffect, useState, useCallback } from "react";
 import Header from "../../components/header";
 
 export default function Info() {
@@ -14,11 +13,11 @@ export default function Info() {
         { id: 4, title: 'Elevation Gain/Loss Analysis', icon: '📈', text: 'Get detailed data on your total elevation gain and loss for better training.' },
     ];
 
-    const [currentFeature, setCurrentFeature] = useState(0);
+     const [currentFeature, setCurrentFeature] = useState(0);
 
-    const nextFeature = () => {
+    const nextFeature = useCallback(() => {
         setCurrentFeature((prev) => (prev + 1) % features.length);
-    };
+    }, [features.length]);
 
     const prevFeature = () => {
         setCurrentFeature((prev) => (prev - 1 + features.length) % features.length);
@@ -30,7 +29,8 @@ export default function Info() {
         }, 7500); 
 
         return () => clearInterval(interval);
-    }, [currentFeature]); 
+    }, [nextFeature]);
+    
     
   return (
         <div className="flex flex-col justify-between">

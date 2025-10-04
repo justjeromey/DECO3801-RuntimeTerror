@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import { Upload } from "lucide-react"; 
@@ -17,7 +16,6 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
     const [trails, setTrails] = useState<Array<string>>([]);
     const [toggled, setToggle] = useState<boolean>(false);
     const [pending, setPending] = useState<boolean>(false);
-    const [uploadedFile, setUploadedFile] = useState<string>("");
     const dropdown = useRef<HTMLDivElement>(null);
 
     // Fetch default trails on component load

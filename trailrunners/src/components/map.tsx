@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo } from "react";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useEffect, } from "react";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
-import { Polyline, Circle, Marker, CircleMarker } from "react-leaflet";
+import { Polyline, CircleMarker } from "react-leaflet";
 import { useState } from "react";
 import { useMap } from "react-leaflet/hooks";
 
@@ -47,7 +48,7 @@ const SetMapCenter: React.FC<SetMapCenterProps> = ({ center, initial }) => {
         } else {
             map.setView(center);
         }
-    }, [center, initial]);
+    }, [center, initial, map]);
 
     return null;
 };
@@ -99,7 +100,15 @@ export default function MapViewer({ trailData, pointIndex, ref }) {
         } catch (error) {
             console.log(error);
         }
-    }, [pointIndex]);
+    }, [pointIndex, trailData]);
+
+    const MapResizeFix = () => {
+        const map = useMap();
+        useEffect(() => {
+            map.invalidateSize();
+        }, [map]);
+        return null;
+    };
 
     // Simply return the TSX directly - no render() needed
     return (
@@ -115,6 +124,8 @@ export default function MapViewer({ trailData, pointIndex, ref }) {
                 className="rounded-md"
             >
                 <SetMapCenter center={center} initial={initial} />
+                <MapResizeFix /> 
+
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

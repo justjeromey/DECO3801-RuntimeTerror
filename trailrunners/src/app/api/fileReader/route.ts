@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     const folderPath = path.join(process.cwd(), "trails");
     const filenames = fs.readdirSync(folderPath);
 

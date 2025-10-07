@@ -61,11 +61,7 @@ body {
     @apply mt-3 cursor-pointer max-w-[10rem] bg-accent-2 border border-secondary p-1 px-3 rounded-lg hover:brightness-110 active:brightness-90;
 }
 
-.nav_container {
-    @apply flex mb-5 justify-between items-center;
-}
-
-.nav_container h1 {
+.trailSummary {
     @apply text-lg pb-2 font-bold;
     color: #69a742;
 }
@@ -76,6 +72,7 @@ body {
 
 .map_container {
     @apply w-full h-full rounded-lg p-5 bg-primary border border-secondary;
+    flex-grow: 1;
 }
 
 .header {
@@ -111,4 +108,9 @@ body {
 
 .chart {
     color: --var(color-foreground);
+
+}
+
+.gifStyle {
+    @apply mx-auto my-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700;
 }

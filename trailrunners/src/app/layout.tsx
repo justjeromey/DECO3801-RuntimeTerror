@@ -2,7 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    title: "Trail Runners",
+    title: "TrailRunners",
     description: "Created by the Runtime Terror team.",
 };
 

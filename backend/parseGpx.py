@@ -344,7 +344,9 @@ def convert_gpx_data_to_json(data: GPXData):
         "turning_x": data.turning_x,
         "turning_y": data.turning_y,
         "rolling_x": data.rolling_x,
-        "rolling_y": data.rolling_y
+        "rolling_y": data.rolling_y,
+        "segment_stats": data.segment_stats,
+        "segment_x_positions": data.segment_x_positions
     }
 
 def save_json(data: GPXData, file_path: str):

@@ -38,6 +38,7 @@ export default function LidarFileSelector({firstUse = false, setTrailData, selec
                 fetchEndpoint: "/api/lidarFiles",
                 selectItemText: "Upload Lidar Data",
             }}
+            formDataHelper={addGpxToFormData}
         />
     );
 }

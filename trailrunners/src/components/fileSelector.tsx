@@ -36,6 +36,7 @@ interface FileSelectorProps {
     className?: string;
     defaultItems?: string[];
     setFileItem?: Dispatch<SetStateAction<FileItem | null>>;
+    formDataHelper?: (formData: FormData) => void;
 }
 
 export interface FileItem {
@@ -73,6 +74,7 @@ export default function FileSelector({
     className = "",
     defaultItems = [],
     setFileItem,
+    formDataHelper,
 }: FileSelectorProps) {
     const mergedConfig = { ...defaultConfig, ...config };
     const [items, setItems] = useState<Array<string>>(defaultItems);
@@ -139,6 +141,10 @@ export default function FileSelector({
         const formData = new FormData();
         formData.append("file", file);
 
+        if (formDataHelper) {
+            formDataHelper(formData);
+        }
+
         onSelectionChange(file.name);
         setToggle(false);
         setFileItem && setFileItem({fileType: config.acceptedFileTypes, fileName: file.name, file: file});
@@ -187,6 +193,10 @@ export default function FileSelector({
 
             const formData = new FormData();
             formData.append("fileName", item);
+
+            if (formDataHelper) {
+                formDataHelper(formData);
+            }
 
             const promise = fetch(config.uploadEndpoint, {
                 method: "POST",

@@ -1,6 +1,6 @@
 "use client";
 
-import FileSelector from "@/components/fileSelector";
+import GPXFileSelector from "@/components/gpxFileSelector";
 import { useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Dashboard from "@/components/dashboard";
@@ -34,7 +34,7 @@ export default function Home() {
                             To get started, upload a trail <strong>.gpx</strong> file for trail analysis and summary.
                         </p>
 
-                        <FileSelector
+                        <GPXFileSelector
                             setTrailData={setTrailData}
                             selected={selectedTrail}
                             setSelected={setSelectedTrail}
@@ -47,7 +47,7 @@ export default function Home() {
                             
                             <h1 className="trailSummary">TRAIL SUMMARY</h1>
 
-                            <FileSelector
+                            <GPXFileSelector
                                 setTrailData={setTrailData}
                                 selected={selectedTrail}
                                 setSelected={setSelectedTrail}

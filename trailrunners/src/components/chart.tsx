@@ -269,7 +269,6 @@ export default function ChartViewer({
     const calculateGradientSegments = useCallback((trailData: Trail) => {
         // Always use efficient calculation for many segments
         if (FRONTEND_SEGMENT_COUNT > MAX_DATASETS || FORCE_FRONTEND_SEGMENTS) {
-            console.log('hitting this')
             const allSegments = calculateAllSegments(trailData);
             
             // Store segments for tooltip use

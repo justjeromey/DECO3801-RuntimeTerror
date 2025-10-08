@@ -26,6 +26,7 @@ export default function LidarFileSelector({firstUse = false, setTrailData, selec
             config={{
                 acceptedFileTypes: ".laz",
                 uploadEndpoint: "/api/parser",
+                fetchEndpoint: "/api/lidarFiles",
                 selectItemText: "Upload Lidar Data",
             }}
         />

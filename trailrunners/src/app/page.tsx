@@ -106,7 +106,7 @@ export default function Home() {
               <div className="sections">
                 <h1>Trail Analysis</h1>
                 <div className="analysis_container">
-                  {displayData && mapRef.current && (
+                  {displayData && (
                     <Dashboard trailData={displayData} />
                   )}
                 </div>

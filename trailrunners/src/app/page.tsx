@@ -80,18 +80,18 @@ export default function Home() {
                             <div className="nested_components flex flex-col md:flex-row gap-6">
                                 <div className="sections flex-1">
                                     <h1>Trail Elevation Visualiser</h1>
-                                    <ChartViewer trailData={trailData} setPointIndex={setPointIndex}/>
+                                    <ChartViewer trailData={lidarData ? lidarData : trailData} setPointIndex={setPointIndex}/>
                                 </div>
                                 <div className="sections flex-1">
                                     <h1>Trail Overview</h1>
-                                    <MapViewer trailData={trailData} pointIndex={pointIndex} ref={mapRef} />
+                                    <MapViewer trailData={lidarData ? lidarData : trailData} pointIndex={pointIndex} ref={mapRef} />
                                 </div>
                             </div>
 
                             <div className="sections">
                                 <h1>Trail Analysis</h1>
                                 <div className="analysis_container">
-                                    <Dashboard trailData={trailData} />
+                                    <Dashboard trailData={lidarData ? lidarData : trailData} />
                                 </div>
                             </div>
                         </div>

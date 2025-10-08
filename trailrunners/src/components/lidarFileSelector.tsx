@@ -32,10 +32,26 @@ export default function LidarFileSelector({firstUse = false, setTrailData, selec
             }}
             firstUse={firstUse}
             config={{
-                acceptedFileTypes: ".laz",
+                acceptedFileTypes: ".laz,.las",
                 uploadEndpoint: "/api/uploadLidar",
                 fetchEndpoint: "/api/lidarFiles",
-                selectItemText: "Upload Lidar Data",
+                uploadMessages: {
+                    pending: "Uploading LIDAR file...",
+                    success: "LIDAR file uploaded.",
+                    error: "Failed to upload LIDAR file",
+                },
+                fetchMessages: {
+                    pending: "Fetching LIDAR files...",
+                    success: "LIDAR files successfully fetched",
+                    error: "Failed to retrieve LIDAR files",
+                },
+                selectionMessages: {
+                    pending: "Processing LIDAR data...",
+                    success: "LIDAR data processed.",
+                    error: "Failed to process LIDAR data",
+                },
+                firstUseUploadText: "Upload LIDAR",
+                selectItemText: "Select LIDAR",
             }}
             formDataHelper={addGpxToFormData}
         />

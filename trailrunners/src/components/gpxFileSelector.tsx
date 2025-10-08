@@ -18,10 +18,7 @@ export default function GPXFileSelector({firstUse = false, setTrailData, selecte
 
             }}
             selected={selected}
-            onSelectionChange={(name) => {
-                console.log("Selected trail:", name);
-                setSelected(name);
-            }}
+            onSelectionChange={setSelected}
             firstUse={firstUse}
             config={{
                 acceptedFileTypes: ".gpx",

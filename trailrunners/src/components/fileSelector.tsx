@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState, Dispatch } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import { Upload } from "lucide-react";
 
@@ -31,10 +31,17 @@ interface FileSelectorProps {
     onDataLoaded: (data: unknown) => void;
     selected: string;
     onSelectionChange: (name: string) => void;
-    firstUse?: boolean;
     config: FileSelectorConfig;
+    firstUse?: boolean;
     className?: string;
     defaultItems?: string[];
+    setFileItem?: Dispatch<SetStateAction<FileItem | null>>;
+}
+
+export interface FileItem {
+    fileType: string;
+    fileName?: string
+    file?: File;
 }
 
 const defaultConfig: Partial<FileSelectorConfig> = {
@@ -65,6 +72,7 @@ export default function FileSelector({
     config,
     className = "",
     defaultItems = [],
+    setFileItem,
 }: FileSelectorProps) {
     const mergedConfig = { ...defaultConfig, ...config };
     const [items, setItems] = useState<Array<string>>(defaultItems);
@@ -133,6 +141,7 @@ export default function FileSelector({
 
         onSelectionChange(file.name);
         setToggle(false);
+        setFileItem && setFileItem({fileType: config.acceptedFileTypes, fileName: file.name, file: file});
 
         try {
             if (pending) {
@@ -174,6 +183,7 @@ export default function FileSelector({
             }
 
             setPending(true);
+            setFileItem && setFileItem({fileType: config.acceptedFileTypes, fileName: item});
 
             const formData = new FormData();
             formData.append("fileName", item);

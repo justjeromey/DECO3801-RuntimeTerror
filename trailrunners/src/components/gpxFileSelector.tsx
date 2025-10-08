@@ -7,15 +7,15 @@ interface GPXFileSelectorProps {
     setTrailData: (data: unknown) => void;
     selected: string;
     setSelected: (name: string) => void;
+    setFileItem?: (data: unknown) => void;
 }
 
 
-export default function GPXFileSelector({firstUse = false, setTrailData, selected, setSelected}: GPXFileSelectorProps) {
+export default function GPXFileSelector({firstUse = false, setTrailData, selected, setSelected, setFileItem}: GPXFileSelectorProps) {
     return (
         <FileSelector
             onDataLoaded={(files) => {
                 setTrailData(files);
-
             }}
             selected={selected}
             onSelectionChange={setSelected}
@@ -25,6 +25,7 @@ export default function GPXFileSelector({firstUse = false, setTrailData, selecte
                 uploadEndpoint: "/api/parser",
                 fetchEndpoint: "/api/fileReader",
             }}
+            setFileItem={setFileItem}
         />
     );
 }

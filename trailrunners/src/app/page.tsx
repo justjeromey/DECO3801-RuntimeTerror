@@ -1,8 +1,9 @@
 "use client";
 
+import { useRef, useState } from "react";
 import GPXFileSelector from "@/components/gpxFileSelector";
 import LidarFileSelector from "@/components/lidarFileSelector";
-import { useRef, useState } from "react";
+import type { FileItem } from "@/components/fileSelector";
 import dynamic from "next/dynamic";
 import Dashboard from "@/components/dashboard";
 import Header from "../components/header";
@@ -21,6 +22,7 @@ export default function Home() {
     const [selectedTrail, setSelectedTrail] = useState(""); 
     const [selectedLidar, setSelectedLidar] = useState("");
     const [lidarData, setLidarData] = useState();
+    const [gpxFileItem, setGpxFileItem] = useState<FileItem | null>(null);
     const mapRef = useRef(null);
 
     return (
@@ -42,6 +44,7 @@ export default function Home() {
                             selected={selectedTrail}
                             setSelected={setSelectedTrail}
                             firstUse={true}
+                            setFileItem={setGpxFileItem}
                         />
                     </div>
                 ) : (
@@ -56,6 +59,7 @@ export default function Home() {
                                     selected={selectedLidar}
                                     setSelected={setSelectedLidar}
                                     firstUse={false}
+                                    gpxFileItem={gpxFileItem}
                                 />
 
                                 <GPXFileSelector

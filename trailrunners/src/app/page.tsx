@@ -26,9 +26,11 @@ export default function Home() {
     const mapRef = useRef(null);
 
     useEffect(() => {
-        setLidarData(null);
+        setLidarData(undefined);
         setSelectedLidar("");
     }, [selectedTrail]);
+
+    const displayData = lidarData || trailData;
 
     return (
         <div className="flex flex-col justify-between min-h-screen">
@@ -80,18 +82,18 @@ export default function Home() {
                             <div className="nested_components flex flex-col md:flex-row gap-6">
                                 <div className="sections flex-1">
                                     <h1>Trail Elevation Visualiser</h1>
-                                    <ChartViewer trailData={lidarData ? lidarData : trailData} setPointIndex={setPointIndex}/>
+                                    {displayData && <ChartViewer trailData={displayData} setPointIndex={setPointIndex}/>}
                                 </div>
                                 <div className="sections flex-1">
                                     <h1>Trail Overview</h1>
-                                    <MapViewer trailData={lidarData ? lidarData : trailData} pointIndex={pointIndex} ref={mapRef} />
+                                    {displayData && <MapViewer trailData={displayData} pointIndex={pointIndex} ref={mapRef} />}
                                 </div>
                             </div>
 
                             <div className="sections">
                                 <h1>Trail Analysis</h1>
                                 <div className="analysis_container">
-                                    <Dashboard trailData={lidarData ? lidarData : trailData} />
+                                    {displayData && mapRef.current && <Dashboard trailData={displayData}/>}
                                 </div>
                             </div>
                         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import GPXFileSelector from "@/components/gpxFileSelector";
+import LidarFileSelector from "@/components/lidarFileSelector";
 import { useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Dashboard from "@/components/dashboard";
@@ -18,6 +19,8 @@ export default function Home() {
     const [trailData, setTrailData] = useState();
     const [pointIndex, setPointIndex] = useState(0);
     const [selectedTrail, setSelectedTrail] = useState(""); 
+    const [selectedLidar, setSelectedLidar] = useState("");
+    const [lidarData, setLidarData] = useState();
     const mapRef = useRef(null);
 
     return (
@@ -47,12 +50,21 @@ export default function Home() {
                             
                             <h1 className="trailSummary">TRAIL SUMMARY</h1>
 
-                            <GPXFileSelector
-                                setTrailData={setTrailData}
-                                selected={selectedTrail}
-                                setSelected={setSelectedTrail}
-                                firstUse={false}
-                            />
+                            <div className="flex flex-row items-center gap-4">
+                                <LidarFileSelector
+                                    setTrailData={setLidarData}
+                                    selected={selectedLidar}
+                                    setSelected={setSelectedLidar}
+                                    firstUse={false}
+                                />
+
+                                <GPXFileSelector
+                                    setTrailData={setTrailData}
+                                    selected={selectedTrail}
+                                    setSelected={setSelectedTrail}
+                                    firstUse={false}
+                                />
+                            </div>
                         </div>
 
                         <div className="components flex flex-col gap-6">

@@ -15,6 +15,7 @@ export default function GPXFileSelector({firstUse = false, setTrailData, selecte
     return (
         <FileSelector
             onDataLoaded={(files) => {
+                console.log("Trail data loaded:", files);
                 setTrailData(files);
             }}
             selected={selected}

@@ -24,7 +24,6 @@ export default function LidarFileSelector({firstUse = false, setTrailData, selec
         <FileSelector
             onDataLoaded={(files) => {
                 setTrailData(files);
-
             }}
             selected={selected}
             onSelectionChange={(name) => {
@@ -34,7 +33,7 @@ export default function LidarFileSelector({firstUse = false, setTrailData, selec
             firstUse={firstUse}
             config={{
                 acceptedFileTypes: ".laz",
-                uploadEndpoint: "/api/parser",
+                uploadEndpoint: "/api/uploadLidar",
                 fetchEndpoint: "/api/lidarFiles",
                 selectItemText: "Upload Lidar Data",
             }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import GPXFileSelector from "@/components/gpxFileSelector";
 import LidarFileSelector from "@/components/lidarFileSelector";
 import type { FileItem } from "@/components/fileSelector";
@@ -24,6 +24,11 @@ export default function Home() {
     const [lidarData, setLidarData] = useState();
     const [gpxFileItem, setGpxFileItem] = useState<FileItem | null>(null);
     const mapRef = useRef(null);
+
+    useEffect(() => {
+        setLidarData(null);
+        setSelectedLidar("");
+    }, [selectedTrail]);
 
     return (
         <div className="flex flex-col justify-between min-h-screen">

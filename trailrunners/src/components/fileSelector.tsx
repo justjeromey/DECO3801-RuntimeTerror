@@ -23,6 +23,8 @@ interface FileSelectorConfig {
         success: string;
         error: string;
     };
+    firstUseUploadItemText?: string;
+    selectItemText?: string;
 }
 
 interface FileSelectorProps {
@@ -51,6 +53,8 @@ const defaultConfig: Partial<FileSelectorConfig> = {
         success: "Selection processed.",
         error: "Failed to process selection",
     },
+    firstUseUploadItemText: "Upload file",
+    selectItemText: "Select item",
 };
 
 export default function FileSelector({
@@ -207,7 +211,7 @@ export default function FileSelector({
                 onClick={() => setToggle(!toggled)}
             >
                 {firstUse && <Upload className="w-6 h-6" />}
-                {selected || (firstUse ? "Upload File" : "Select Item")}
+                {selected || (firstUse ? config.firstUseUploadItemText : config.selectItemText)}
             </button>
 
             <div

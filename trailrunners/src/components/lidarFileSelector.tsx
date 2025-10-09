@@ -10,7 +10,6 @@ interface LidarFileSelectorProps {
     gpxFileItem?: FileItem | null;
 }
 
-
 export default function LidarFileSelector({firstUse = false, setTrailData, selected, setSelected, gpxFileItem}: LidarFileSelectorProps) {
     const addGpxToFormData = (formData: FormData) => {
         if (gpxFileItem?.file) {

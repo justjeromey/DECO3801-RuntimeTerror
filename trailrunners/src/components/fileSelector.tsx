@@ -3,6 +3,7 @@
 import { SetStateAction, useEffect, useRef, useState, Dispatch } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import { Upload } from "lucide-react";
+import Image from "next/image";
 
 interface FileSelectorConfig {
     acceptedFileTypes: string;
@@ -114,7 +115,10 @@ export default function FileSelector({
     // Toggles the dropdown menu
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
-            if (dropdown.current && !dropdown.current.contains(event.target as Node)) {
+            if (
+                dropdown.current &&
+                !dropdown.current.contains(event.target as Node)
+            ) {
                 setToggle(false);
             }
         }
@@ -231,7 +235,23 @@ export default function FileSelector({
                 onClick={() => setToggle(!toggled)}
             >
                 {firstUse && <Upload className="w-6 h-6" />}
-                {selected || (firstUse ? mergedConfig.firstUseUploadText : mergedConfig.selectItemText)}
+
+                <div className="flex">
+                    <p>
+                        {selected || (firstUse ? mergedConfig.firstUseUploadText : mergedConfig.selectItemText)}
+                    </p>
+                    {firstUse ? (
+                        ""
+                    ) : (
+                        <Image
+                            src="/DropDownMenu.svg"
+                            alt="Drop down icon"
+                            width={24}
+                            height={24}
+                            className={`inline-block ml-3 mt-0.5 ${toggled ? "rotate-180" : ""} transition`}
+                        />
+                    )}
+                </div>
             </button>
 
             <div
@@ -246,7 +266,7 @@ export default function FileSelector({
                     className="hidden"
                     onChange={handleUpload}
                 />
-                <label className="file_select_button cursor-pointer italic text-center" htmlFor="file-upload-label">
+                <label className="file_select_button cursor-pointer italic text-center animate-pulse" htmlFor="file-upload-label">
                     Upload {config.acceptedFileTypes} file
                 </label>
 

@@ -58,7 +58,7 @@ const Dashboard: React.FC<DashboardProps> = ({ trailData }) => {
     const centerLong = longitudes?.length ? longitudes.reduce((a, b) => a + b, 0) / longitudes.length : 0;
 
     return (
-        <span className="inline-grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
+        <span className="inline-grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
             <StatCard label="Altitude Change" value={altitudeChange} unit="m" color="blue" />
             <StatCard label="Altitude Min" value={altitudeMin} unit="m" color="blue" />
             <StatCard label="Altitude Max" value={altitudeMax} unit="m" color="blue" />

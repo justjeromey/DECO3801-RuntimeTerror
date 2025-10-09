@@ -14,7 +14,8 @@ const Header: React.FC<HeaderProps> = ({ activePath }) => {
     ];
 
     return (
-        <header className="header sticky top-0 z-50 flex flex-row justify-between items-center px-10 py-4 bg-white shadow-md">
+        <header className="header">
+        <a href="/">
         <Image
             src="/logo.svg"
             width={290}
@@ -23,8 +24,9 @@ const Header: React.FC<HeaderProps> = ({ activePath }) => {
             style={{ display: "block", width: 290, height: 70 }}
             priority
         />
+        </a>
 
-        <div className="nav_links flex flex-row gap-10 text-lg font-medium uppercase">
+        <div className="nav_links flex flex-row items-center gap-2 font-medium uppercase">
             {navItems.map((item) => (
             <a
                 key={item.href}
@@ -32,7 +34,7 @@ const Header: React.FC<HeaderProps> = ({ activePath }) => {
                 className={`headerLink ${
                 activePath === item.href
                     ? "activeLink text-green-600 font-bold"
-                    : "text-gray-600 hover:text-green-500 transition-colors"
+                    : "text-gray-600 hover:text-green-500 transition-all"
                 }`}
             >
                 {item.label}

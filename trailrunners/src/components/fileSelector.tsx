@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
-import { Upload } from "lucide-react"; 
+import { Upload } from "lucide-react";
+import Image from "next/image";
 
 interface FileSelectorProps {
     setTrailData: (data: unknown) => void;
@@ -11,7 +12,12 @@ interface FileSelectorProps {
     firstUse: boolean;
 }
 
-export default function FileSelector({ setTrailData, selected, setSelected, firstUse }: FileSelectorProps) {
+export default function FileSelector({
+    setTrailData,
+    selected,
+    setSelected,
+    firstUse,
+}: FileSelectorProps) {
     const acceptedFileTypes = ".gpx";
     const [trails, setTrails] = useState<Array<string>>([]);
     const [toggled, setToggle] = useState<boolean>(false);
@@ -24,7 +30,7 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
         async function fetchTrails() {
             try {
                 // Attempt to fetch default trails
-                const promise = fetch("/api/fileReader").then(async res => {
+                const promise = fetch("/api/fileReader").then(async (res) => {
                     if (!res.ok) {
                         throw new Error("Fetch failed");
                     }
@@ -40,7 +46,6 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
                 if (files) {
                     setTrails(files);
                 }
-            
             } catch (error) {
                 console.error(error);
                 return;
@@ -53,7 +58,10 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
     // Toggles the dropdown menu
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
-            if (dropdown.current && !dropdown.current.contains(event.target as Node)) {
+            if (
+                dropdown.current &&
+                !dropdown.current.contains(event.target as Node)
+            ) {
                 setToggle(false);
             }
         }
@@ -72,7 +80,7 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
     // Loads the selected file and sends file to parser
     const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files[0];
-        
+
         if (!file) {
             return;
         }
@@ -81,7 +89,7 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
         formData.append("file", file);
 
         setSelected(file.name);
-        setToggle(false); 
+        setToggle(false);
 
         // Send request to parser
         try {
@@ -90,14 +98,17 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
             }
 
             setPending(true);
-            
-            const promise = fetch("/api/parser", { method: "POST", body: formData }).then(async res => {
-                if (!res.ok) { 
+
+            const promise = fetch("/api/parser", {
+                method: "POST",
+                body: formData,
+            }).then(async (res) => {
+                if (!res.ok) {
                     throw new Error("Upload failed");
                 }
                 return res.json();
             });
-            
+
             const result = await toast.promise(promise, {
                 pending: "Uploading file...",
                 success: "File uploaded.",
@@ -107,7 +118,6 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
             if (result) {
                 setTrailData(result);
             }
-
         } catch (error) {
             console.error(`File upload failed ${error}`);
         } finally {
@@ -127,16 +137,20 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
             }
 
             setPending(true);
-            
+
             // Fetch selected trail
             const promise = fetch("/api/parser", {
                 method: "POST",
-                body: (() => { const f = new FormData(); f.append("fileName", trail); return f; })(),
-            }).then(async res => {
+                body: (() => {
+                    const f = new FormData();
+                    f.append("fileName", trail);
+                    return f;
+                })(),
+            }).then(async (res) => {
                 if (!res.ok) throw new Error("Parsing failed");
                 return res.json();
             });
-            
+
             // Toast promise for user feedback
             const result = await toast.promise(promise, {
                 pending: "Parsing selected trail...",
@@ -155,7 +169,10 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
     };
 
     return (
-        <div ref={dropdown} className={`relative z-10 ${firstUse ? "mt-4" : ""}`}>
+        <div
+            ref={dropdown}
+            className={`relative z-10 ${firstUse ? "mt-4" : ""}`}
+        >
             {/* Toggle button */}
             <button
                 type="button"
@@ -163,7 +180,23 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
                 onClick={() => setToggle(!toggled)}
             >
                 {firstUse && <Upload className="w-6 h-6" />}
-                {selected || (firstUse ? "Upload Trail" : "Select Trail")}
+                <div className="flex">
+                    <p>
+                        {selected ||
+                            (firstUse ? "Upload Trail" : "Select Trail")}
+                    </p>
+                    {firstUse ? (
+                        ""
+                    ) : (
+                        <Image
+                            src="/DropDownMenu.svg"
+                            alt="Drop down icon"
+                            width={24}
+                            height={24}
+                            className={`inline-block ml-3 mt-0.5 ${toggled ? "rotate-180" : ""} transition`}
+                        />
+                    )}
+                </div>
             </button>
 
             <div
@@ -179,7 +212,7 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
                     onChange={handleUpload}
                 />
                 <label
-                    className="file_select_button cursor-pointer italic text-center"
+                    className="file_select_button cursor-pointer italic text-center animate-pulse"
                     htmlFor="file-upload-label"
                 >
                     Upload .gpx file
@@ -187,7 +220,12 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
 
                 {/* Existing trails */}
                 {trails.map((trail, idx) => (
-                    <button key={idx} type="button" className="file_select_button" onClick={() => handleSelection(trail)}>
+                    <button
+                        key={idx}
+                        type="button"
+                        className="file_select_button"
+                        onClick={() => handleSelection(trail)}
+                    >
                         {trail}
                     </button>
                 ))}
@@ -206,7 +244,7 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
                 theme="dark"
                 transition={Bounce}
                 toastClassName="burnt_toast"
-                style= {{ 
+                style={{
                     position: "fixed",
                     top: "15vh",
                     left: "50%",

@@ -420,6 +420,13 @@ export default function ChartViewer({
                     setPointIndex(pointIndex);
                 }
             },
+            transitions: {
+                zoom: {
+                    animation: {
+                        duration: 0,
+                    },
+                },
+            },
             responsive: true,
             interactions: {
                 mode: "nearest",

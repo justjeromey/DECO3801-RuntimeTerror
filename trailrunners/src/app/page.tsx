@@ -58,8 +58,7 @@ export default function Home() {
           </div>
         ) : (
           <div className="w-full flex flex-col gap-6 mt-6">
-            <div className="w-full flex items-center justify-between">
-              <h1 className="trailSummary">TRAIL SUMMARY</h1>
+            <div className="w-full flex items-center justify-end">
 
               <div className="flex flex-row items-center gap-4">
                 <LidarFileSelector

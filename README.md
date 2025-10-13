@@ -5,29 +5,29 @@ Runtime Terror Team Repository for DECO3801 Team
 This project is for Runtime Timmer's DECO3801 Project. Trailrunners is a web application to detect "rolling hills" in 
 trail running tracks.
 
-## Installation
+# Installation
 
-### Prerequisites
+## Prerequisites
 Ensure you have the following installed on your laptop:
-**1. Python (and PIP).**
-**2. Node.js (and NPM). NPM is preferred, but other JavaScript package managers like yarn are also suitable.**
-**3. (Optional and Recommended) NPM's "Concurrently"**
-**3. (Optional and Recommended) Bash"**
+1. **Python (and PIP).**
+2. **Node.js (and NPM). NPM is preferred, but other JavaScript package managers like yarn are also suitable.**
+3. **(Optional and Recommended) NPM's "Concurrently"**
+4. **(Optional and Recommended) Bash**
 
 
-### Manual Installation
+## Manual Installation
 
-#### Front-End
+### Front-End
 To install the TrailRunners Next.js front-end follow the following procedures:
 
-**1. Go into the trailrunners directory and install all of the packages.**
+1. **Go into the trailrunners directory and install all of the packages.**
 
 ```bash 
 cd trailrunners
 npm install
 ```
 
-#### Back-End
+### Back-End
 To install the TrailRunners Python FastAPI back-end scripts follow the following procedures:
 
 1. **Create the Python Environment (In Root Directory)**  
@@ -45,7 +45,7 @@ To install the TrailRunners Python FastAPI back-end scripts follow the following
     pip install -r requirements.txt
     ```
 
-### Automatic Installation
+## Automatic Installation
 For future updating of commands you may use the following command to update all dependencies in both the back-end and front-end contexts. 
 This can also be used for first-time installation, however, this method using concurrently to install for first-time use can potentially 
 be volatile and may not fully install the application correctly.
@@ -54,7 +54,7 @@ be volatile and may not fully install the application correctly.
 npm run install-all
 ```
 
-## Updating Requirements
+# Updating Requirements
 
 When updating any requirements for the front-end, like adding new packages, ensure these commands are being executed within the trailrunners directory.
 
@@ -79,9 +79,9 @@ pip freeze > requirements.txt
 
 To ensure any requirements stored in a virtual environment are carried over to the actual requirements file.
 
-## Start-up
+# Start-up
 
-### Automatic
+## Automatic
 To start-up the application (back-end and front-end simultaneously) you can use our custom concurrently command within the "trailrunners" directory:
 
 ```bash
@@ -92,7 +92,7 @@ This command should run both the back-end and front-end environments at the same
 
 Alternatively, you can use the "start.sh" script to run both back-end and front-end environments simultaneously on Linux environments.
 
-### Manual
+## Manual
 Otherwise, if there are any issues with the automatic start-up command, you will need to have two separate to terminals open to run both the back-end server and front-end server.
 
 1. **To run the front-end environment (In the trailrunners directory)**  
@@ -107,7 +107,7 @@ Otherwise, if there are any issues with the automatic start-up command, you will
     uvicorn main:app --reload
     ```
 
-## Usage
+# Usage
 
 To use the application, ensure you have .gpx files to submit which contains your trail data for analysis. The web application has its own 
 tutorials to assist you in the collection of your GPX data. For additional refinement of your data, it is also recommended to have LiDAR
@@ -115,7 +115,7 @@ files (.laz) of the location in which your GPX data is within.
 
 For use, ensure you are at the "Trail Summary" Page to submit your trail running track for analysis. And enjoy!
 
-## Thanks and Acknowledgements
+# Thanks and Acknowledgements
 Thank you, dear user, for using and supporting this application.
 
 We would like to acknowledge the DECO3801 staff, along with our tutor Shubh Gupta and our mentor Raimundo Sanchez, for assisting us in the development of TrailRunners.

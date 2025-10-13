@@ -58,7 +58,7 @@ body {
 }
 
 .button_1 {
-    @apply mt-3 cursor-pointer max-w-[10rem] bg-accent-2 border border-secondary p-1 px-3 rounded-lg hover:brightness-110 active:brightness-90;
+    @apply mt-3 cursor-pointer bg-primary border border-secondary p-1 px-3 rounded-lg hover:brightness-110 active:brightness-90;
 }
 
 .trailSummary {
@@ -67,7 +67,7 @@ body {
 }
 
 .analysis_container {
-    @apply w-full h-full rounded-lg p-5 bg-primary border border-secondary;
+    @apply w-full h-full rounded-lg p-5 bg-primary border border-secondary flex flex-col lg:flex-row gap-4;
 }
 
 .map_container {

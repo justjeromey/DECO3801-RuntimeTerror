@@ -618,7 +618,7 @@ export default function ChartViewer({
                 type="button"
                 id="reset_zoom"
                 onClick={handleZoomReset}
-                className="button_1"
+                className="button_1 max-w-50"
             >
                 Reset Zoom
             </button>

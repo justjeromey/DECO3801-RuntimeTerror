@@ -45,10 +45,14 @@ const SetMapCenter: React.FC<SetMapCenterProps> = ({ center, initial }) => {
     useEffect(() => {
         if (!map || !center) return;
 
-        if (!initial) {
-            map.setView(center, 15);
-        } else {
-            map.setView(center);
+        try {
+            if (!initial) {
+                map.setView(center, 15);
+            } else {
+                map.setView(center);
+            }
+        } catch (e) {
+            console.log("Map not ready", e);
         }
     }, [center, initial, map]);
 

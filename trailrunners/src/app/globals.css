@@ -18,7 +18,7 @@
     --color-foreground: var(--foreground);
     --color-primary: #1b1918; /* Main color */
     --color-secondary: #23211E; /* Border color */
-    --color-accent-1: #69a742;
+    --color-accent-1: #19ad39;
     --color-accent-2: #22201F;
     --color-accent-3: #2a3024;
     --font-poppins: "Poppins", sans-serif;
@@ -58,7 +58,7 @@ body {
 }
 
 .button_1 {
-    @apply mt-3 cursor-pointer max-w-[10rem] bg-accent-2 border border-secondary p-1 px-3 rounded-lg hover:brightness-110 active:brightness-90;
+    @apply mt-3 cursor-pointer bg-primary border border-secondary p-1 px-3 rounded-lg hover:brightness-110 active:brightness-90;
 }
 
 .trailSummary {
@@ -67,7 +67,7 @@ body {
 }
 
 .analysis_container {
-    @apply w-full h-full rounded-lg p-5 bg-primary border border-secondary;
+    @apply w-full h-full rounded-lg p-5 bg-primary border border-secondary flex flex-col lg:flex-row gap-4;
 }
 
 .map_container {
@@ -76,22 +76,20 @@ body {
 }
 
 .header {
-    @apply w-full;
-    background-color:#2a3024;
+    @apply max-w-full rounded-2xl sticky m-3 border border-gray-400/5 backdrop-blur-lg top-3 z-50 flex flex-row justify-between items-center px-10 py-4 shadow-md bg-[#2a3024]/80;
 }
 
 .headerLink {
-    @apply text-gray-400 text-lg font-medium uppercase transition-colors transition-transform duration-300 hover:text-white hover:scale-105 cursor-pointer;
+    @apply text-gray-400 py-2 px-4 text-base font-medium uppercase transition-colors transition-transform duration-300 
+    hover:text-white hover:scale-105 cursor-pointer;
 }
 
 .headerLink.activeLink {
-    @apply text-white;
-    border-bottom: 2px solid #69a742;
-    padding-bottom: 4px;
+    @apply inset-shadow-xs inset-shadow-white/4 text-white transition-all border border-secondary ease-initial rounded-full bg-background;
 }
 
 .fileSelector {
-    @apply hidden md:inline w-full border border-secondary px-6 py-2 bg-primary cursor-pointer;
+    @apply hidden md:inline w-full border border-secondary pl-4 pr-2 py-2 bg-primary cursor-pointer;
 }
 
 .fileSelector_icon {

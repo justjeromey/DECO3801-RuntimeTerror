@@ -171,11 +171,20 @@ export default function ChartViewer({
         // Create datasets for each difficulty group
         Object.entries(segmentGroups).forEach(([difficultyLevel, segments]) => {
             const difficulty = segments[0].difficulty;
+
             const segmentData = distances.map((distance, index) => {
                 // Check if this point belongs to any segment in this difficulty group
-                const belongsToGroup = segments.some(segment => 
-                    index >= segment.startIndex && index <= segment.endIndex
+                const belongsToGroup = segments.some(segment => {
+                    if (index >= segment.startIndex - 1 && index <= segment.endIndex) {
+                        return true;
+                    }
+
+                    if (index >= segment.startIndex && index <= segment.endIndex) {
+                        return true;
+                    }
+                } 
                 );
+
                 return belongsToGroup ? elevations[index] : null;
             });
 
@@ -269,7 +278,6 @@ export default function ChartViewer({
     const calculateGradientSegments = useCallback((trailData: Trail) => {
         // Always use efficient calculation for many segments
         if (FRONTEND_SEGMENT_COUNT > MAX_DATASETS || FORCE_FRONTEND_SEGMENTS) {
-            console.log('hitting this')
             const allSegments = calculateAllSegments(trailData);
             
             // Store segments for tooltip use
@@ -412,6 +420,13 @@ export default function ChartViewer({
                     setPointIndex(pointIndex);
                 }
             },
+            transitions: {
+                zoom: {
+                    animation: {
+                        duration: 0,
+                    },
+                },
+            },
             responsive: true,
             interactions: {
                 mode: "nearest",
@@ -472,6 +487,11 @@ export default function ChartViewer({
                             return ""; // Hide label
                         },
                     },
+                    position: "nearest",
+                    caretPadding: 30,
+                    caretSize: 0,
+                    yAlign: "center",
+                    xAlign: "right",
                 },
                 zoom: {
                     pan: {
@@ -598,7 +618,7 @@ export default function ChartViewer({
                 type="button"
                 id="reset_zoom"
                 onClick={handleZoomReset}
-                className="button_1"
+                className="button_1 max-w-50"
             >
                 Reset Zoom
             </button>

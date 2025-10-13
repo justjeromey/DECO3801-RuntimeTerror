@@ -43,10 +43,16 @@ const markerOptions = { color: "#e2ecf2", opacity: 1, fillColor: "#3888fb", fill
 const SetMapCenter: React.FC<SetMapCenterProps> = ({ center, initial }) => {
     const map = useMap();
     useEffect(() => {
-        if (!initial) {
-            map.setView(center, 15);
-        } else {
-            map.setView(center);
+        if (!map || !center) return;
+
+        try {
+            if (!initial) {
+                map.setView(center, 15);
+            } else {
+                map.setView(center);
+            }
+        } catch (e) {
+            console.log("Map not ready", e);
         }
     }, [center, initial, map]);
 

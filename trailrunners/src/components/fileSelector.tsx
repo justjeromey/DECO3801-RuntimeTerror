@@ -1,59 +1,124 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { SetStateAction, useEffect, useRef, useState, Dispatch } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
-import { Upload } from "lucide-react"; 
+import { Upload } from "lucide-react";
+import Image from "next/image";
 
-interface FileSelectorProps {
-    setTrailData: (data: unknown) => void;
-    selected: string;
-    setSelected: (name: string) => void;
-    firstUse: boolean;
+interface FileSelectorConfig {
+    acceptedFileTypes: string;
+    uploadEndpoint: string;
+    fetchEndpoint?: string;
+    uploadMessages?: {
+        pending: string;
+        success: string;
+        error: string;
+    };
+    fetchMessages?: {
+        pending: string;
+        success: string;
+        error: string;
+    };
+    selectionMessages?: {
+        pending: string;
+        success: string;
+        error: string;
+    };
+    firstUseUploadText?: string;
+    selectItemText?: string;
 }
 
-export default function FileSelector({ setTrailData, selected, setSelected, firstUse }: FileSelectorProps) {
-    const acceptedFileTypes = ".gpx";
-    const [trails, setTrails] = useState<Array<string>>([]);
+interface FileSelectorProps {
+    onDataLoaded: (data: unknown) => void;
+    selected: string;
+    onSelectionChange: (name: string) => void;
+    config: FileSelectorConfig;
+    firstUse?: boolean;
+    className?: string;
+    defaultItems?: string[];
+    setFileItem?: Dispatch<SetStateAction<FileItem | null>>;
+    formDataHelper?: (formData: FormData) => void;
+}
+
+export interface FileItem {
+    fileType: string;
+    fileName?: string
+    file?: File;
+}
+
+const defaultConfig: Partial<FileSelectorConfig> = {
+    uploadMessages: {
+        pending: "Uploading file...",
+        success: "File uploaded.",
+        error: "Failed to upload selected file",
+    },
+    fetchMessages: {
+        pending: "Fetching items...",
+        success: "Items successfully fetched",
+        error: "Failed to retrieve items",
+    },
+    selectionMessages: {
+        pending: "Processing selection...",
+        success: "Selection processed.",
+        error: "Failed to process selection",
+    },
+    firstUseUploadText: "Upload file",
+    selectItemText: "Select item",
+};
+
+export default function FileSelector({
+    onDataLoaded,
+    selected,
+    onSelectionChange,
+    firstUse = false,
+    config,
+    className = "",
+    defaultItems = [],
+    setFileItem,
+    formDataHelper,
+}: FileSelectorProps) {
+    const mergedConfig = { ...defaultConfig, ...config };
+    const [items, setItems] = useState<Array<string>>(defaultItems);
     const [toggled, setToggle] = useState<boolean>(false);
     const [pending, setPending] = useState<boolean>(false);
     const dropdown = useRef<HTMLDivElement>(null);
 
-    // Fetch default trails on component load
+    // Fetch default items on component load
     useEffect(() => {
-        // Grab default trails on load
-        async function fetchTrails() {
+        if (!config.fetchEndpoint) {
+            return;
+        }
+
+        async function fetchItems() {
             try {
-                // Attempt to fetch default trails
-                const promise = fetch("/api/fileReader").then(async res => {
+                const promise = fetch(config.fetchEndpoint!).then(async (res) => {
                     if (!res.ok) {
                         throw new Error("Fetch failed");
                     }
                     return res.json();
                 });
 
-                const files = await toast.promise(promise, {
-                    pending: "Fetching trails...",
-                    success: "Trails successfully fetched",
-                    error: "Failed to retrieve default trails",
-                });
+                const files = await toast.promise(promise, mergedConfig.fetchMessages!);
 
                 if (files) {
-                    setTrails(files);
+                    setItems(files);
                 }
-            
             } catch (error) {
                 console.error(error);
                 return;
             }
         }
 
-        fetchTrails();
-    }, []);
+        fetchItems();
+    }, [config.fetchEndpoint]);
 
     // Toggles the dropdown menu
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
-            if (dropdown.current && !dropdown.current.contains(event.target as Node)) {
+            if (
+                dropdown.current &&
+                !dropdown.current.contains(event.target as Node)
+            ) {
                 setToggle(false);
             }
         }
@@ -69,10 +134,10 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
         };
     }, [toggled]);
 
-    // Loads the selected file and sends file to parser
+    // Loads the selected file and sends file to endpoint
     const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files[0];
-        
+        const file = event.target.files?.[0];
+
         if (!file) {
             return;
         }
@@ -80,34 +145,36 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
         const formData = new FormData();
         formData.append("file", file);
 
-        setSelected(file.name);
-        setToggle(false); 
+        if (formDataHelper) {
+            formDataHelper(formData);
+        }
 
-        // Send request to parser
+        onSelectionChange(file.name);
+        setToggle(false);
+        setFileItem && setFileItem({fileType: config.acceptedFileTypes, fileName: file.name, file: file});
+
         try {
             if (pending) {
                 return;
             }
 
             setPending(true);
-            
-            const promise = fetch("/api/parser", { method: "POST", body: formData }).then(async res => {
-                if (!res.ok) { 
+
+            const promise = fetch(config.uploadEndpoint, {
+                method: "POST",
+                body: formData,
+            }).then(async (res) => {
+                if (!res.ok) {
                     throw new Error("Upload failed");
                 }
                 return res.json();
             });
-            
-            const result = await toast.promise(promise, {
-                pending: "Uploading file...",
-                success: "File uploaded.",
-                error: "Failed to upload selected file",
-            });
+
+            const result = await toast.promise(promise, mergedConfig.uploadMessages!);
 
             if (result) {
-                setTrailData(result);
+                onDataLoaded(result);
             }
-
         } catch (error) {
             console.error(`File upload failed ${error}`);
         } finally {
@@ -115,55 +182,76 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
         }
     };
 
-    // Handles trail selection, sends request to parser
-    const handleSelection = async (trail: string) => {
-        setSelected(trail);
+    // Handles item selection, sends request to endpoint
+    const handleSelection = async (item: string) => {
+        onSelectionChange(item);
         setToggle(false);
 
-        // Send request to parser
         try {
             if (pending) {
                 return;
             }
 
             setPending(true);
-            
-            // Fetch selected trail
-            const promise = fetch("/api/parser", {
+            setFileItem && setFileItem({fileType: config.acceptedFileTypes, fileName: item});
+
+            const formData = new FormData();
+            formData.append("fileName", item);
+
+            if (formDataHelper) {
+                formDataHelper(formData);
+            }
+
+            const promise = fetch(config.uploadEndpoint, {
                 method: "POST",
-                body: (() => { const f = new FormData(); f.append("fileName", trail); return f; })(),
-            }).then(async res => {
-                if (!res.ok) throw new Error("Parsing failed");
+                body: formData,
+            }).then(async (res) => {
+                if (!res.ok) throw new Error("Processing failed");
                 return res.json();
             });
-            
-            // Toast promise for user feedback
-            const result = await toast.promise(promise, {
-                pending: "Parsing selected trail...",
-                success: "Trail parsed.",
-                error: "Failed to parse selected trail",
-            });
+
+            const result = await toast.promise(promise, mergedConfig.selectionMessages!);
 
             if (result) {
-                setTrailData(result);
+                onDataLoaded(result);
             }
         } catch (error) {
-            console.error(`Selected file parsing failed ${error}`);
+            console.error(`Selected item processing failed ${error}`);
         } finally {
             setPending(false);
         }
     };
 
     return (
-        <div ref={dropdown} className={`relative z-10 ${firstUse ? "mt-4" : ""}`}>
+        <div ref={dropdown} className={`relative z-10 ${firstUse ? "mt-4" : ""} ${className}`}>
             {/* Toggle button */}
             <button
                 type="button"
-                className={`${firstUse ? "flex items-center justify-center bg-green-400 hover:bg-green-500 text-white font-bold py-4 px-6 rounded-lg gap-2 text-lg cursor-pointer" : `fileSelector ${toggled ? "rounded-t-lg" : "rounded-lg"} hover:brightness-125`}`}
+                className={`${
+                    firstUse
+                        ? "flex items-center justify-center bg-green-400 hover:bg-green-500 text-white font-bold py-4 px-6 rounded-lg gap-2 text-lg cursor-pointer"
+                        : `fileSelector ${toggled ? "rounded-t-lg" : "rounded-lg"} hover:brightness-125`
+                }`}
                 onClick={() => setToggle(!toggled)}
             >
                 {firstUse && <Upload className="w-6 h-6" />}
-                {selected || (firstUse ? "Upload Trail" : "Select Trail")}
+
+                <div className="flex">
+                    <p>
+                        {selected || (firstUse ? mergedConfig.firstUseUploadText : mergedConfig.selectItemText)}
+                    </p>
+                    {firstUse ? (
+                        ""
+                    ) : (
+                        <Image
+                            src="/DropDownMenu.svg"
+                            alt="Drop down icon"
+                            width={24}
+                            height={24}
+                            className={`inline-block ml-3 mt-0.5 ${toggled ? "rotate-180" : ""} transition`}
+                        />
+                    )}
+                </div>
             </button>
 
             <div
@@ -174,21 +262,18 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
                 <input
                     type="file"
                     id="file-upload-label"
-                    accept={acceptedFileTypes}
+                    accept={config.acceptedFileTypes}
                     className="hidden"
                     onChange={handleUpload}
                 />
-                <label
-                    className="file_select_button cursor-pointer italic text-center"
-                    htmlFor="file-upload-label"
-                >
-                    Upload .gpx file
+                <label className="file_select_button cursor-pointer italic text-center animate-pulse" htmlFor="file-upload-label">
+                    Upload {config.acceptedFileTypes} file
                 </label>
 
-                {/* Existing trails */}
-                {trails.map((trail, idx) => (
-                    <button key={idx} type="button" className="file_select_button" onClick={() => handleSelection(trail)}>
-                        {trail}
+                {/* Existing items */}
+                {items.map((item, idx) => (
+                    <button key={idx} type="button" className="file_select_button" onClick={() => handleSelection(item)}>
+                        {item}
                     </button>
                 ))}
             </div>
@@ -206,7 +291,7 @@ export default function FileSelector({ setTrailData, selected, setSelected, firs
                 theme="dark"
                 transition={Bounce}
                 toastClassName="burnt_toast"
-                style= {{ 
+                style={{
                     position: "fixed",
                     top: "15vh",
                     left: "50%",

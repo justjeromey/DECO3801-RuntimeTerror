@@ -1,30 +1,37 @@
 "use client";
 
-import FileSelector from "@/components/fileSelector";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import GPXFileSelector from "@/components/gpxFileSelector";
+import LidarFileSelector from "@/components/lidarFileSelector";
+import type { FileItem } from "@/components/fileSelector";
 import dynamic from "next/dynamic";
 import Dashboard from "@/components/dashboard";
 import Header from "../components/header";
-
-// interface PointData {
-//     longitude: number;
-//     latitude: number;
-// };
-
+import ControlPanel from "@/components/controlPanel";
 
 const MapViewer = dynamic(() => import("@/components/map"), {
     ssr: false,
 });
 
-const ChartViewer = dynamic(() => import('@/components/chart'), {
-  ssr: false,
+const ChartViewer = dynamic(() => import("@/components/chart"), {
+    ssr: false,
 });
 
 export default function Home() {
     const [trailData, setTrailData] = useState();
     const [pointIndex, setPointIndex] = useState(0);
-    const [selectedTrail, setSelectedTrail] = useState(""); 
+    const [selectedTrail, setSelectedTrail] = useState("");
+    const [selectedLidar, setSelectedLidar] = useState("");
+    const [lidarData, setLidarData] = useState();
+    const [gpxFileItem, setGpxFileItem] = useState<FileItem | null>(null);
     const mapRef = useRef(null);
+
+    useEffect(() => {
+        setLidarData(undefined);
+        setSelectedLidar("");
+    }, [selectedTrail]);
+
+    const displayData = lidarData || trailData;
 
     return (
         <div className="flex flex-col justify-between min-h-screen">
@@ -34,49 +41,78 @@ export default function Home() {
                 {!trailData ? (
                     <div className="flex flex-col items-center justify-center h-full text-center gap-6 mt-10">
                         <h1 className="text-3xl font-bold">
-                            Welcome to <span className="text-green-400 italic">TrailRunners</span>
+                            Welcome to{" "}
+                            <span className="text-green-400 italic">
+                                TrailRunners
+                            </span>
                         </h1>
                         <p className="text-lg max-w-md">
-                            To get started, upload a trail <strong>.gpx</strong> file for trail analysis and summary.
+                            To get started, upload a trail <strong>.gpx</strong>{" "}
+                            file for trail analysis and summary.
                         </p>
 
-                        <FileSelector
+                        <GPXFileSelector
                             setTrailData={setTrailData}
                             selected={selectedTrail}
                             setSelected={setSelectedTrail}
                             firstUse={true}
+                            setFileItem={setGpxFileItem}
                         />
                     </div>
                 ) : (
                     <div className="w-full flex flex-col gap-6 mt-6">
-                        <div className="w-full flex items-center justify-between">
-                            
-                            <h1 className="trailSummary">TRAIL SUMMARY</h1>
+                        <div className="w-full flex items-center justify-end">
+                            <div className="flex flex-row items-center gap-4">
+                                <LidarFileSelector
+                                    setTrailData={setLidarData}
+                                    selected={selectedLidar}
+                                    setSelected={setSelectedLidar}
+                                    firstUse={false}
+                                    gpxFileItem={gpxFileItem}
+                                />
 
-                            <FileSelector
-                                setTrailData={setTrailData}
-                                selected={selectedTrail}
-                                setSelected={setSelectedTrail}
-                                firstUse={false}
-                            />
+                                <GPXFileSelector
+                                    setTrailData={setTrailData}
+                                    selected={selectedTrail}
+                                    setSelected={setSelectedTrail}
+                                    firstUse={false}
+                                />
+                            </div>
                         </div>
 
                         <div className="components flex flex-col gap-6">
                             <div className="nested_components flex flex-col md:flex-row gap-6">
                                 <div className="sections flex-1">
                                     <h1>Trail Elevation Visualiser</h1>
-                                    <ChartViewer trailData={trailData} setPointIndex={setPointIndex}/>
+                                    {displayData && (
+                                        <ChartViewer
+                                            trailData={displayData}
+                                            setPointIndex={setPointIndex}
+                                        />
+                                    )}
                                 </div>
                                 <div className="sections flex-1">
                                     <h1>Trail Overview</h1>
-                                    <MapViewer trailData={trailData} pointIndex={pointIndex} ref={mapRef} />
+                                    {displayData && (
+                                        <MapViewer
+                                            key={selectedLidar || selectedTrail}
+                                            trailData={displayData}
+                                            pointIndex={pointIndex}
+                                            ref={mapRef}
+                                        />
+                                    )}
                                 </div>
                             </div>
 
                             <div className="sections">
                                 <h1>Trail Analysis</h1>
                                 <div className="analysis_container">
-                                    <Dashboard trailData={trailData} />
+                                    {displayData && (
+                                        <Dashboard trailData={displayData} />
+                                    )}
+                                    {displayData && (
+                                        <ControlPanel trailData={displayData} />
+                                    )}
                                 </div>
                             </div>
                         </div>

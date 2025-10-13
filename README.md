@@ -11,7 +11,9 @@ trail running tracks.
 Ensure you have the following installed on your laptop:
 **1. Python (and PIP).**
 **2. Node.js (and NPM). NPM is preferred, but other JavaScript package managers like yarn are also suitable.**
-**3. NPM's "Concurrently"**
+**3. (Optional and Recommended) NPM's "Concurrently"**
+**3. (Optional and Recommended) Bash"**
+
 
 ### Manual Installation
 
@@ -87,6 +89,8 @@ npm run all
 ```
 
 This command should run both the back-end and front-end environments at the same time in one terminal locally. This web application will then be available on [http://localhost:3000] for use, or as otherwise suggested by the console when the front-end is started up. The back-end server will also be running on [http://127.0.0.1:8000].
+
+Alternatively, you can use the "start.sh" script to run both back-end and front-end environments simultaneously on Linux environments.
 
 ### Manual
 Otherwise, if there are any issues with the automatic start-up command, you will need to have two separate to terminals open to run both the back-end server and front-end server.

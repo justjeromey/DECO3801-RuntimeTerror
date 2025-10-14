@@ -184,13 +184,38 @@ export default function Info() {
                                         </Link>                                        
                                     </div>
                                 </div>
-                               
 
                                 {/* Step 3 */}
                                 <div className="flex flex-col gap-6"> 
                                     <div className="flex items-center gap-6">
                                         <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-400 text-black font-bold text-xl shrink-0">
                                         3
+                                        </div>
+                                        <h3 className="text-xl uppercase font-bold">Upload your .LAZ File for Refinement</h3>
+                                    </div>
+
+                                    <div className="px-18">
+                                        <p>
+                                            If you have a .LAZ file containing LiDAR data for your trail area, you can upload it to enhance
+                                            the elevation profile accuracy. The tool will integrate the LiDAR data with your GPX file to 
+                                            provide a more detailed analysis of elevation changes along your route.
+                                        </p>
+
+                                        <br />
+
+                                        <p>
+                                            This data can be found through online data LiDAR repositories like QSpatial. Be sure you select
+                                            a LiDAR file which is contains the area in which your GPX was recorded.
+                                        </p>                                 
+                                    </div>
+                                </div>
+                               
+
+                                {/* Step 4 */}
+                                <div className="flex flex-col gap-6"> 
+                                    <div className="flex items-center gap-6">
+                                        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-400 text-black font-bold text-xl shrink-0">
+                                        4
                                         </div>
                                         <h3 className="text-xl uppercase font-bold">Explore the Elevation Profile</h3>
                                     </div>

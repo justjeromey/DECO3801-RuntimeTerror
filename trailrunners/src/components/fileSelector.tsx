@@ -297,6 +297,7 @@ export default function FileSelector({
                     left: "50%",
                     transform: "translateX(-50%)",
                     minWidth: "250px",
+                    zIndex: 10000,
                 }}
             />
         </div>

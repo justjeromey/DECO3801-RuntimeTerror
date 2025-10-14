@@ -188,8 +188,11 @@ export default function Generate() {
                 </section>
 
                 {/* GPX Tracker (Apple) */}
+                
+            
                 <section className="w-full bg-green-600 py-20 text-white">
-                    <div className="max-w-3xl px-20">
+                    <div className="w-full px-20">
+                        
                         <div className="flex flex-row items-center gap-3">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -208,14 +211,54 @@ export default function Generate() {
                             <h3 className="text-3xl font-bold text-white">Open GPX Tracker (Apple)</h3>
                         </div>
 
-                        <ol className="list-decimal list-inside space-y-3 text-lg mt-6">
-                            <li>Open the app</li>
-                            <li>Click Start</li>
-                            <li>Run a trail</li>
-                            <li>When complete, click Save</li>
-                            <li>Open your GPX files in the top left</li>
-                            <li>Select a GPX trail and click Share</li>
-                            <li>Choose a mode to download your GPX file</li>
+                        <ol className="list-decimal text-lg text-gray-300 grid grid-cols-1 sm:grid-cols-2 gap-8 mt-6">
+                            <li>
+                                Open the app, click "Start Tracking" and run your trail.             
+
+                                <Image
+                                src="/OGPX1.gif"
+                                width={250}
+                                height={250}
+                                alt="Open GPX Open"
+                                className="gifStyle max-w-full h-auto"
+                                />
+                            </li>
+
+                            <li>
+                                When complete, click "Save" and give your .GPX file a name.
+
+                                <Image
+                                src="/OGPX2.gif"
+                                width={250}
+                                height={250}
+                                alt="Open GPX Start"
+                                className="gifStyle max-w-full h-auto"
+                                />
+                            </li>
+
+                            <li>
+                                Open your GPX files in the top left and select a file and click "Share".
+
+                                <Image
+                                src="/OGPX3.gif"
+                                width={250}
+                                height={250}
+                                alt="Open GPX Open Files"
+                                className="gifStyle max-w-full h-auto"
+                                />
+                            </li>
+
+                            <li>
+                                Choose a mode to download your GPX file.
+
+                                <Image
+                                src="/OGPX4.gif"
+                                width={250}
+                                height={250}
+                                alt="Open GPX Download and Share File"
+                                className="gifStyle max-w-full h-auto"
+                                />
+                            </li>
                         </ol>
                     </div>
                 </section>

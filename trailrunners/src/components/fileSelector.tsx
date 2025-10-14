@@ -293,7 +293,7 @@ export default function FileSelector({
                 toastClassName="burnt_toast"
                 style={{
                     position: "fixed",
-                    top: "15vh",
+                    top: "18vh",
                     left: "50%",
                     transform: "translateX(-50%)",
                     minWidth: "250px",

@@ -76,7 +76,7 @@ body {
 }
 
 .header {
-    @apply max-w-full rounded-2xl sticky m-3 border border-gray-400/5 backdrop-blur-lg top-3 z-10 flex flex-row justify-between items-center px-10 py-4 shadow-md bg-[#2a3024]/80;
+    @apply max-w-full rounded-2xl sticky m-3 border border-gray-400/5 backdrop-blur-lg top-3 z-30 flex flex-row justify-between items-center px-10 py-4 shadow-md bg-[#2a3024]/80;
 }
 
 .headerLink {
@@ -89,7 +89,7 @@ body {
 }
 
 .fileSelector {
-    @apply hidden md:inline w-full border border-secondary pl-4 pr-2 py-2 bg-primary cursor-pointer;
+    @apply hidden md:inline w-full border border-secondary pl-4 pr-2 py-2 bg-primary cursor-pointer z-1000;
 }
 
 .fileSelector_icon {

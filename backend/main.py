@@ -5,7 +5,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from parseGpx import parse_gpx, convert_gpx_data_to_json, handle_gpx_stats
 from parseLidar import parse_lidar
 from gnss_to_gpx import convert_to_gpx
+from typing import List
+from pydantic import BaseModel
 import tempfile
+
+class TrailData(BaseModel):
+    elevations: List[float]
+    latitudes: List[float]
+    longitudes: List[float]
+    threshold: int
+    segments: int
 
 app = FastAPI()
 
@@ -57,6 +66,13 @@ async def convert_file(file: UploadFile = File(...)):
         filename="converted_output.gpx",
         media_type="application/gpx+xml"
     )
+
+@app.post("/update")
+async def update_params(data: TrailData):
+    # TODO: Re-run that returns updated TrailData
+    # Look at TrailData class, that's the input object
+    print(data)
+    pass
 
 app.add_middleware(
     CORSMiddleware,

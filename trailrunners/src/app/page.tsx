@@ -111,7 +111,7 @@ export default function Home() {
                                         <Dashboard trailData={displayData} />
                                     )}
                                     {displayData && (
-                                        <ControlPanel trailData={displayData} />
+                                        <ControlPanel trailData={displayData} setTrail={setTrailData}/>
                                     )}
                                 </div>
                             </div>

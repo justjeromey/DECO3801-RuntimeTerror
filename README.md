@@ -1,6 +1,8 @@
 # DECO3801-RuntimeTerror
 Runtime Terror Team Repository for DECO3801 Team
 
+https://github.com/justjeromey/DECO3801-RuntimeTerror
+
 # About
 This project is for Runtime Timmer's DECO3801 Project. Trailrunners is a web application to detect "rolling hills" in 
 trail running tracks.

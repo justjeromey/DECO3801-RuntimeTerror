@@ -45,6 +45,8 @@ interface Trail {
     segment_x_positions?: Array<number>;
     turning_x: Array<number>;
     turning_y: Array<number>;
+    rolling_x: Array<number>;
+    rolling_y: Array<number>;
 }
 
 interface ChartData {
@@ -375,20 +377,20 @@ export default function ChartViewer({
     };
 
     // Create a new line with y points only for the turning points
-    const getTurningPoints = (trailData: Trail) => {
+    const getRollingHills = (trailData: Trail) => {
         const distances = trailData.cumulative_distances_m;
         const elevations = trailData.elevations;
-        const turning_x = trailData.turning_x;
-        let turning_x_m = [];
+        const rolling_x= trailData.rolling_x;
+        let rolling_x_m = [];
 
         // Fix: Convert turning points from km to m
-        for (const point of turning_x) {
-            turning_x_m.push(point * 1000);
+        for (const point of rolling_x) {
+            rolling_x_m.push(point * 1000);
         }
 
         const segmentData = distances.map((distance, index) => {
             // Check if this point matches a given turning point
-            const _index = turning_x_m.indexOf(distance);
+            const _index = rolling_x_m.indexOf(distance);
             return _index != -1 ? elevations[index] : null;
         });
 
@@ -409,7 +411,7 @@ export default function ChartViewer({
         if (trailData) {
             try {
                 const gradientSegments = calculateGradientSegments(trailData);
-                const turningPoints = getTurningPoints(trailData);
+                const rollingHills = getRollingHills(trailData);
 
                 // Parse new trail data
                 setChartData({
@@ -417,7 +419,7 @@ export default function ChartViewer({
                     labels: trailData.cumulative_distances_m,
                     datasets: [
                         ...gradientSegments,
-                        turningPoints,
+                        rollingHills,
                         {
                             label: "Elevation Profile",
                             // Y axis data

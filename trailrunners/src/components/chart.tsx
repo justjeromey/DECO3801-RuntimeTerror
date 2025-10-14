@@ -43,6 +43,8 @@ interface Trail {
         grade: number;
     }>;
     segment_x_positions?: Array<number>;
+    turning_x: Array<number>;
+    turning_y: Array<number>;
 }
 
 interface ChartData {
@@ -372,11 +374,42 @@ export default function ChartViewer({
         return null;
     };
 
+    // Create a new line with y points only for the turning points
+    const getTurningPoints = (trailData: Trail) => {
+        const distances = trailData.cumulative_distances_m;
+        const elevations = trailData.elevations;
+        const turning_x = trailData.turning_x;
+        let turning_x_m = [];
+
+        // Fix: Convert turning points from km to m
+        for (const point of turning_x) {
+            turning_x_m.push(point * 1000);
+        }
+
+        const segmentData = distances.map((distance, index) => {
+            // Check if this point matches a given turning point
+            const _index = turning_x_m.indexOf(distance);
+            return _index != -1 ? elevations[index] : null;
+        });
+
+        return {
+            label: "Rolling Hills",
+            data: segmentData,
+            pointBackgroundColor: "#f72e27",
+            pointRadius: 1.5,
+            pointHoverRadius: 6,
+            pointHitRadius: 50,
+            fill: false,
+            order: 1,
+        }
+    };
+
     // Check if trail data has changed
     useEffect(() => {
         if (trailData) {
             try {
                 const gradientSegments = calculateGradientSegments(trailData);
+                const turningPoints = getTurningPoints(trailData);
 
                 // Parse new trail data
                 setChartData({
@@ -384,6 +417,7 @@ export default function ChartViewer({
                     labels: trailData.cumulative_distances_m,
                     datasets: [
                         ...gradientSegments,
+                        turningPoints,
                         {
                             label: "Elevation Profile",
                             // Y axis data

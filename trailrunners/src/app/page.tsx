@@ -25,13 +25,16 @@ export default function Home() {
     const [lidarData, setLidarData] = useState();
     const [gpxFileItem, setGpxFileItem] = useState<FileItem | null>(null);
     const mapRef = useRef(null);
+    const [displayData, setDisplayData] = useState();
 
     useEffect(() => {
         setLidarData(undefined);
         setSelectedLidar("");
     }, [selectedTrail]);
 
-    const displayData = lidarData || trailData;
+    useEffect(() => {
+        setDisplayData(lidarData || trailData);
+    }, [trailData, lidarData])
 
     return (
         <div className="flex flex-col justify-between min-h-screen">
@@ -111,7 +114,7 @@ export default function Home() {
                                         <Dashboard trailData={displayData} />
                                     )}
                                     {displayData && (
-                                        <ControlPanel trailData={displayData} setTrail={setTrailData}/>
+                                        <ControlPanel trailData={displayData} setTrailData={setDisplayData}/>
                                     )}
                                 </div>
                             </div>

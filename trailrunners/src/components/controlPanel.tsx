@@ -33,12 +33,14 @@ interface DashboardProps {
 }
 
 const MAX_THRESHOLD = 100;
-const MAX_SPLITS = 100;
+const DEFAULT_THESHOLD = 10;
+const DEFAULT_SEGMENTS = 5;
+const MAX_SEGMENTS = 100;
 const API_URL = process.env.NEXT_PUBLIC_FASTAPI_BASE_URL;
 
 export default function ControlPanel({ trailData, setTrailData }: DashboardProps) {
-    const [thresh, setThresh] = useState<number|null>(null);
-    const [segs, setSegments] = useState<number|null>(null);
+    const [thresh, setThresh] = useState<number>(DEFAULT_THESHOLD);
+    const [segs, setSegments] = useState<number>(DEFAULT_SEGMENTS);
     const [pending, setPending] = useState<boolean>(false);
 
     const handleParameters = async (formData: FormData) => {
@@ -51,12 +53,11 @@ export default function ControlPanel({ trailData, setTrailData }: DashboardProps
             setThresh(threshold);
         }
 
-        if (segments && segments >= 1 && segments <= MAX_SPLITS) {
+        if (segments && segments >= 1 && segments <= MAX_SEGMENTS) {
             setSegments(segments);
         }
 
         // Call api with gpx data + new params
-        console.log(`${API_URL}/update`)
         try {
             if (pending) return;
             setPending(true)
@@ -68,6 +69,7 @@ export default function ControlPanel({ trailData, setTrailData }: DashboardProps
                     elevations: trailData.elevations,
                     latitudes: trailData.latitudes,
                     longitudes: trailData.longitudes,
+                    cumulative_distances_m: trailData.cumulative_distances_m,
 
                     // Fill in value with previous one if not provided
                     threshold: threshold ? threshold : thresh,
@@ -80,6 +82,7 @@ export default function ControlPanel({ trailData, setTrailData }: DashboardProps
 
             if (data) {
                 console.log(data)
+                setTrailData(data)
             }
         } catch (e) {
             console.error("Update failed...", e);

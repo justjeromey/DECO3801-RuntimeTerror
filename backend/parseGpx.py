@@ -240,10 +240,7 @@ def calculateTrailStats(distances: List[float], elevations: List[float]) -> dict
         "grade" : avgGrade
     }
 
-def handle_gpx_stats(gpx_data: GPXData):
-    num_splits = 5 # This should be done dynamically based on trail length
-    threshold = 10
-
+def handle_gpx_stats(gpx_data: GPXData, threshold = 10, num_splits = 5):
     stats = calculateTrailStats(gpx_data.cumulative_distances_m, gpx_data.elevations)
     turning_x, turning_y = calculateTurningPoints(gpx_data.cumulative_distances_m, gpx_data.elevations)
     rolling_x, rolling_y = calculateRollingHills(turning_x, turning_y, threshold)

@@ -43,6 +43,10 @@ interface Trail {
         grade: number;
     }>;
     segment_x_positions?: Array<number>;
+    turning_x: Array<number>;
+    turning_y: Array<number>;
+    rolling_x: Array<number>;
+    rolling_y: Array<number>;
 }
 
 interface ChartData {
@@ -372,11 +376,42 @@ export default function ChartViewer({
         return null;
     };
 
+    // Create a new line with y points only for the turning points
+    const getRollingHills = (trailData: Trail) => {
+        const distances = trailData.cumulative_distances_m;
+        const elevations = trailData.elevations;
+        const rolling_x= trailData.rolling_x;
+        let rolling_x_m = [];
+
+        // Fix: Convert turning points from km to m
+        for (const point of rolling_x) {
+            rolling_x_m.push(point * 1000);
+        }
+
+        const segmentData = distances.map((distance, index) => {
+            // Check if this point matches a given turning point
+            const _index = rolling_x_m.indexOf(distance);
+            return _index != -1 ? elevations[index] : null;
+        });
+
+        return {
+            label: "Rolling Hills",
+            data: segmentData,
+            pointBackgroundColor: "#f72e27",
+            pointRadius: 1.5,
+            pointHoverRadius: 6,
+            pointHitRadius: 50,
+            fill: false,
+            order: 1,
+        }
+    };
+
     // Check if trail data has changed
     useEffect(() => {
         if (trailData) {
             try {
                 const gradientSegments = calculateGradientSegments(trailData);
+                const rollingHills = getRollingHills(trailData);
 
                 // Parse new trail data
                 setChartData({
@@ -384,6 +419,7 @@ export default function ChartViewer({
                     labels: trailData.cumulative_distances_m,
                     datasets: [
                         ...gradientSegments,
+                        rollingHills,
                         {
                             label: "Elevation Profile",
                             // Y axis data

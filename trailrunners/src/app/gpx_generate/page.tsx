@@ -263,6 +263,31 @@ export default function Generate() {
                     </div>
                 </section>
 
+                <section className="w-full bg-colour-primary py-20">
+                    <div className="flex flex-col items-center max-w-4xl mx-auto px-6 text-center text-white">
+                        <h2 className="text-4xl font-bold mb-6 text-green-400">
+                            Advanced Collection Methods
+                        </h2>
+
+                        <div>
+                            For more advanced GPX data collection, use dedicated GPS devices like the Garmin GPSMAP 67i. 
+                            
+                            <br/> <br/>
+
+                            These devices offer higher precision data and more consistent data for trail running. 
+                            After running a trail, these devices allow for the easy exportation of GPX files which can be directly uploaded to TrailRunners.
+
+                            <br/> <br/>
+
+                            In addition, LiDAR datasets from organisations like QSpatial, allow for more refined analysis of trails. You can use these LiDAR datasets
+                            in conjunction with your GPX files on TrailRunners, by finding LiDAR datasets that contain the location where your GPX data was collected
+                            from.
+                        </div>
+                    </div>
+                </section>
+
+                
+
                 <footer className="p-2 py-3 flex flex-wrap items-center justify-center">
                     <p>Made with ❤️ by Runtime Terrors</p>
                 </footer>

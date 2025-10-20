@@ -49,9 +49,9 @@ const Header: React.FC<HeaderProps> = ({ activePath }) => {
             {/* Hamburger menu */}
             <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-gray-400 hover:text-white cursor-pointer transition-colors">
                 {menuOpen ? (
-                <XMarkIcon className="h-7 w-7" />
+                    <XMarkIcon className="h-7 w-7" />
                 ) : (
-                <Bars3Icon className="h-7 w-7" />
+                    <Bars3Icon className="h-7 w-7" />
                 )}
             </button>
 

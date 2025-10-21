@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
     Chart as ChartJS,
@@ -84,7 +85,7 @@ export default function ChartViewer({
     const chartRef = useRef(null);
 
     // Configuration for number of segments - change this to adjust segment count
-    const FORCE_FRONTEND_SEGMENTS = true; // Set to true to use frontend calculation with custom segment count
+    const FORCE_FRONTEND_SEGMENTS = false; // Prefer backend segmentation; set true to force frontend calculation
     const FRONTEND_SEGMENT_COUNT = 20; // Number of segments when using frontend calculation (20 is optimal for performance)
     const MAX_DATASETS = 10; // Limit the number of visual datasets for performance
 
@@ -280,81 +281,99 @@ export default function ChartViewer({
 
     // Function to create gradient segments using backend data
     const calculateGradientSegments = useCallback((trailData: Trail) => {
-        // Always use efficient calculation for many segments
-        if (FRONTEND_SEGMENT_COUNT > MAX_DATASETS || FORCE_FRONTEND_SEGMENTS) {
-            const allSegments = calculateAllSegments(trailData);
-            
-            // Store segments for tooltip use
-            (window as any).currentSegments = allSegments;
-            
-            return createVisualSegments(allSegments, trailData);
-        }
+        // 1) Prefer backend-provided segments unless explicitly forcing frontend
+        if (!FORCE_FRONTEND_SEGMENTS && trailData.segment_stats && trailData.segment_x_positions) {
+            const segments = [] as any[];
+            const distances = trailData.cumulative_distances_m;
+            const elevations = trailData.elevations;
 
-        // Use original method for small number of segments
-        if (!trailData.segment_stats || !trailData.segment_x_positions) {
-            console.warn('Backend segment data not available, using fallback calculation');
-            return calculateFallbackSegments(trailData);
-        }
+            const tooltipSegments: Array<{ startDistance: number; endDistance: number; gradient: number; elevationGain: number; }> = [];
 
-        const segments = [];
-        const distances = trailData.cumulative_distances_m;
-        const elevations = trailData.elevations;
+            for (let i = 0; i < trailData.segment_stats.length; i++) {
+                const stat = trailData.segment_stats[i];
+                const difficulty = getGradientDifficulty(stat.grade);
 
-        for (let i = 0; i < trailData.segment_stats.length; i++) {
-            const stat = trailData.segment_stats[i];
-            const difficulty = getGradientDifficulty(stat.grade);
-            
-            // Find start and end positions for this segment
-            const startDistance = i === 0 ? 0 : trailData.segment_x_positions[i - 1] * 1000;
-            const endDistance = trailData.segment_x_positions[i] * 1000;
-            
-            // Find corresponding indices in the main data with improved logic
-            let startIndex = 0;
-            let endIndex = distances.length - 1; // Default to last index for final segment
-            
-            // Find the first point at or after startDistance
-            for (let j = 0; j < distances.length; j++) {
-                if (distances[j] >= startDistance) {
-                    startIndex = j;
-                    break;
-                }
-            }
-            
-            // Find the last point at or before endDistance (except for last segment)
-            if (i < trailData.segment_stats.length - 1) {
-                for (let j = distances.length - 1; j >= 0; j--) {
-                    if (distances[j] <= endDistance) {
-                        endIndex = j;
+                // Find start and end positions for this segment (segment_x_positions are in km)
+                const startDistance = i === 0 ? 0 : trailData.segment_x_positions[i - 1] * 1000;
+                const endDistance = trailData.segment_x_positions[i] * 1000;
+
+                // Map distances to indices
+                let startIndex = 0;
+                let endIndex = distances.length - 1; // Default to last index for final segment
+
+                // First point at or after startDistance
+                for (let j = 0; j < distances.length; j++) {
+                    if (distances[j] >= startDistance) {
+                        startIndex = j;
                         break;
                     }
                 }
-            }
-            
-            // Create data points for this segment
-            const segmentData = distances.map((distance, index) => {
-                if (index >= startIndex && index <= endIndex) {
-                    return elevations[index];
-                }
-                return null;
-            });
 
-            segments.push({
-                label: `${difficulty.level} (${(stat.grade * 100).toFixed(1)}%)`,
-                data: segmentData,
-                backgroundColor: difficulty.color,
-                borderColor: difficulty.color.replace('0.3', '0.8'),
-                borderWidth: 0,
-                pointRadius: 0,
-                fill: 'origin',
-                order: 2,
-                gradient: stat.grade,
-                startDistance: startDistance,
-                endDistance: endDistance,
-                elevationGain: stat.gain
-            });
+                // Last point at or before endDistance (except for last segment)
+                if (i < trailData.segment_stats.length - 1) {
+                    for (let j = distances.length - 1; j >= 0; j--) {
+                        if (distances[j] <= endDistance) {
+                            endIndex = j;
+                            break;
+                        }
+                    }
+                }
+
+                // Create data points for this segment
+                const segmentData = distances.map((distance, index) => {
+                    if (index >= startIndex && index <= endIndex) {
+                        return elevations[index];
+                    }
+                    return null;
+                });
+
+                segments.push({
+                    label: `${difficulty.level} (${(stat.grade * 100).toFixed(1)}%)`,
+                    data: segmentData,
+                    backgroundColor: difficulty.color,
+                    borderColor: difficulty.color.replace('0.3', '0.8'),
+                    borderWidth: 0,
+                    pointRadius: 0,
+                    fill: 'origin',
+                    order: 2,
+                    gradient: stat.grade,
+                    startDistance: startDistance,
+                    endDistance: endDistance,
+                    elevationGain: stat.gain,
+                });
+
+                tooltipSegments.push({
+                    startDistance,
+                    endDistance,
+                    gradient: stat.grade,
+                    elevationGain: stat.gain,
+                });
+            }
+
+            // Provide tooltip data
+            (window as any).currentSegments = tooltipSegments;
+            return segments;
         }
 
-        return segments;
+        // 2) Otherwise, use efficient frontend calculation (aggregated shading), or fallback
+        if (FRONTEND_SEGMENT_COUNT > MAX_DATASETS || FORCE_FRONTEND_SEGMENTS) {
+            const allSegments = calculateAllSegments(trailData);
+            // Store segments for tooltip use
+            (window as any).currentSegments = allSegments;
+            return createVisualSegments(allSegments, trailData);
+        }
+
+        // 3) Fallback simple per-chunk segmentation
+        console.warn('Backend segment data not available, using fallback calculation');
+        const fallback = calculateFallbackSegments(trailData);
+        // Approximate tooltip segments from fallback metadata if present
+        (window as any).currentSegments = fallback.map((s: any) => ({
+            startDistance: s.startDistance,
+            endDistance: s.endDistance,
+            gradient: s.gradient ?? 0,
+            elevationGain: s.elevationGain ?? 0,
+        }));
+        return fallback;
     }, [FRONTEND_SEGMENT_COUNT, MAX_DATASETS, FORCE_FRONTEND_SEGMENTS, calculateAllSegments, createVisualSegments, calculateFallbackSegments, getGradientDifficulty]);
 
     // Efficient function to get current segment info for tooltip
@@ -523,11 +542,11 @@ export default function ChartViewer({
                             return ""; // Hide label
                         },
                     },
-                    position: "nearest",
+                    position: "nearest" as const,
                     caretPadding: 30,
                     caretSize: 0,
-                    yAlign: "center",
-                    xAlign: "right",
+                    yAlign: "center" as const,
+                    xAlign: "right" as const,
                 },
                 zoom: {
                     pan: {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 interface TrailData {
     altitudeChange: number;
@@ -21,32 +22,71 @@ interface TrailData {
     turning_y: number[];
 }
 
+interface Parameters {
+    threshold: number;
+    segments: number;
+}
+
 interface DashboardProps {
     trailData?: TrailData;
+    setTrailData?: React.Dispatch<React.SetStateAction<TrailData>>;
 }
 
 const MAX_THRESHOLD = 100;
-const MAX_SPLITS = 100;
+const DEFAULT_THESHOLD = 10;
+const DEFAULT_SEGMENTS = 5;
+const MAX_SEGMENTS = 100;
+const API_URL = process.env.NEXT_PUBLIC_FASTAPI_BASE_URL;
 
-export default function ControlPanel({ trailData }: DashboardProps) {
-    const [thresh, setThresh] = useState<number|null>(null)
-    const [splits, setSplits] = useState<number|null>(null)
+export default function ControlPanel({ trailData, setTrailData }: DashboardProps) {
+    const [thresh, setThresh] = useState<number>(DEFAULT_THESHOLD);
+    const [segs, setSegments] = useState<number>(DEFAULT_SEGMENTS);
+    const [pending, setPending] = useState<boolean>(false);
 
-    const handleParameters = (formData: FormData) => {
-        if (!formData) return;
+    const handleParameters = async (formData: FormData) => {
+        if (formData.get("threshold") == "" && formData.get("splits") == "") return;
 
         const threshold = Number(formData.get("threshold"));
-        const splits = Number(formData.get("splits"));
+        const segments = Number(formData.get("splits"));
 
         if (threshold && threshold >= 1 && threshold <= MAX_THRESHOLD) {
             setThresh(threshold);
         }
 
-        if (splits && splits >= 1 && splits <= MAX_SPLITS) {
-            setSplits(splits);
+        if (segments && segments >= 1 && segments <= MAX_SEGMENTS) {
+            setSegments(segments);
         }
 
-        console.log(formData);
+        // Call api with gpx data + new params
+        try {
+            if (pending) return;
+            setPending(true)
+
+            const promise = await fetch(`${API_URL}/update`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    elevations: trailData.elevations,
+                    latitudes: trailData.latitudes,
+                    longitudes: trailData.longitudes,
+                    cumulative_distances_m: trailData.cumulative_distances_m,
+
+                    // Fill in value with previous one if not provided
+                    threshold: threshold ? threshold : thresh,
+                    segments: segments ? segments : segs,
+                }),
+            })
+
+            const data = await promise.json();
+            setPending(false)
+
+            if (data) {
+                console.log(data)
+                setTrailData(data)
+            }
+        } catch (e) {
+            console.error("Update failed...", e);
+        }
     };
 
     return (
@@ -79,7 +119,7 @@ export default function ControlPanel({ trailData }: DashboardProps) {
                             name="splits"
                             min="1"
                             max="200"
-                            placeholder={splits ? splits.toString() : "5"}
+                            placeholder={segs ? segs.toString() : "5"}
                         />
                     </div>
                     <button type="submit" className="button_1 px-4 py-2 w-full">Update Parameters</button>

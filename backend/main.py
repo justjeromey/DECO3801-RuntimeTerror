@@ -1,11 +1,21 @@
+from typing import List, Optional
 from fastapi import FastAPI, File, UploadFile
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from parseGpx import parse_gpx, convert_gpx_data_to_json, handle_gpx_stats
+from parseGpx import GPXData, parse_gpx, convert_gpx_data_to_json, handle_gpx_stats
 from parseLidar import parse_lidar
 from gnss_to_gpx import convert_to_gpx
+from pydantic import BaseModel
 import tempfile
+
+class TrailData(BaseModel):
+    elevations: List[Optional[float]]
+    latitudes: List[float]
+    longitudes: List[float]
+    cumulative_distances_m: List[float]
+    threshold: int
+    segments: int
 
 app = FastAPI()
 
@@ -57,6 +67,18 @@ async def convert_file(file: UploadFile = File(...)):
         filename="converted_output.gpx",
         media_type="application/gpx+xml"
     )
+
+@app.post("/update")
+async def update_params(data: TrailData):
+    gpx_data = GPXData(
+            longitudes = data.longitudes,
+            latitudes = data.latitudes,
+            elevations = data.elevations,
+            cumulative_distances_m = data.cumulative_distances_m)
+    output = handle_gpx_stats(gpx_data, data.threshold, data.segments)
+    json = convert_gpx_data_to_json(output)
+
+    return JSONResponse(status_code=200, content=json)
 
 app.add_middleware(
     CORSMiddleware,

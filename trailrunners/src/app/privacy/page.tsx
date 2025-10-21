@@ -44,7 +44,7 @@ export default function Privacy() {
                         <h3 className="text-2xl font-semibold mt-6">4. User Accounts:</h3>
                         <p>
                             We will not ask users to create accounts or provide login information. All features of TrailRunners are accessible without
-                            the need for user accounts. If any "TrailRunners" website asks for account creations or details, please report it to us immediately - 
+                            the need for user accounts. If any &quot;TrailRunners&quot; website asks for account creations or details, please report it to us immediately - 
                             we will never ask for this information.
                         </p>
 

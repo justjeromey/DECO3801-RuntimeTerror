@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
             }
         }
     }
-
+ 
     // make the request to the FastAPI server
     const fastApiRes = await fetch(API_URL, {
       method: "POST",

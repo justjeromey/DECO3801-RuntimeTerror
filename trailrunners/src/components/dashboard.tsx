@@ -24,7 +24,7 @@ interface DashboardProps {
 }
 
 const StatCard = ({ label, value, unit = '', color = 'blue' }: { label: string; value: number | string; unit?: string; color?: string }) => (
-    <span className="bg-white rounded-xl shadow-lg p-4 inline-block hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+    <span className="bg-background rounded-xl shadow-lg p-4 inline-block hover:shadow-xl transition-shadow duration-300 border border-secondary">
         <span className="text-gray-500 text-sm font-medium block mb-1 uppercase tracking-wider">{label}</span>
         <span className={`text-2xl font-bold block text-${color}-600`}>
             {typeof value === 'number' ? value.toFixed(1) : value}
@@ -58,7 +58,7 @@ const Dashboard: React.FC<DashboardProps> = ({ trailData }) => {
     const centerLong = longitudes?.length ? longitudes.reduce((a, b) => a + b, 0) / longitudes.length : 0;
 
     return (
-        <span className="inline-grid grid-cols-2 md:grid-cols-4 gap-4 p-4">
+        <span className="inline-grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard label="Altitude Change" value={altitudeChange} unit="m" color="blue" />
             <StatCard label="Altitude Min" value={altitudeMin} unit="m" color="blue" />
             <StatCard label="Altitude Max" value={altitudeMax} unit="m" color="blue" />

@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo } from "react";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useEffect, } from "react";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
-import { Polyline, Circle, Marker, CircleMarker } from "react-leaflet";
+import { Polyline, CircleMarker } from "react-leaflet";
 import { useState } from "react";
 import { useMap } from "react-leaflet/hooks";
 
@@ -42,12 +43,18 @@ const markerOptions = { color: "#e2ecf2", opacity: 1, fillColor: "#3888fb", fill
 const SetMapCenter: React.FC<SetMapCenterProps> = ({ center, initial }) => {
     const map = useMap();
     useEffect(() => {
-        if (!initial) {
-            map.setView(center, 15);
-        } else {
-            map.setView(center);
+        if (!map || !center) return;
+
+        try {
+            if (!initial) {
+                map.setView(center, 15);
+            } else {
+                map.setView(center);
+            }
+        } catch (e) {
+            console.log("Map not ready", e);
         }
-    }, [center, initial]);
+    }, [center, initial, map]);
 
     return null;
 };
@@ -99,7 +106,15 @@ export default function MapViewer({ trailData, pointIndex, ref }) {
         } catch (error) {
             console.log(error);
         }
-    }, [pointIndex]);
+    }, [pointIndex, trailData]);
+
+    const MapResizeFix = () => {
+        const map = useMap();
+        useEffect(() => {
+            map.invalidateSize();
+        }, [map]);
+        return null;
+    };
 
     // Simply return the TSX directly - no render() needed
     return (
@@ -115,6 +130,8 @@ export default function MapViewer({ trailData, pointIndex, ref }) {
                 className="rounded-md"
             >
                 <SetMapCenter center={center} initial={initial} />
+                <MapResizeFix /> 
+
                 <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

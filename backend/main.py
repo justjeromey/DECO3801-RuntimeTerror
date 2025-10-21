@@ -1,8 +1,11 @@
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
-from parseGpx import parse_gpx, convert_gpx_data_to_json
+from parseGpx import parse_gpx, convert_gpx_data_to_json, handle_gpx_stats
+from parseLidar import parse_lidar
+from gnss_to_gpx import convert_to_gpx
+import tempfile
 
 app = FastAPI()
 
@@ -14,9 +17,46 @@ async def upload_gpx(file: UploadFile = File(...)):
 
     # Process the GPX file
     gpx_data = parse_gpx(file.file)
+    handle_gpx_stats(gpx_data)
     json = convert_gpx_data_to_json(gpx_data)
 
     return JSONResponse(status_code=200, content=json)
+
+@app.post("/process-lidar")
+async def process_lidar(lidar_file: UploadFile = File(...), gpx_file: UploadFile = File(...)):
+    if not lidar_file.filename.endswith(".laz"):
+        return JSONResponse(status_code=400, content={"message": "Invalid LiDAR file type. Please upload a .laz file."})
+    
+    if not gpx_file.filename.endswith(".gpx"):
+        return JSONResponse(status_code=400, content={"message": "Invalid GPX file type. Please upload a .gpx file."})
+    
+    # Load the lidar data
+    gpx_data = parse_lidar(lidar_file.file, gpx_file.file)
+    handle_gpx_stats(gpx_data)
+    json = convert_gpx_data_to_json(gpx_data)
+    
+    return JSONResponse(status_code=200, content=json)
+
+@app.post("/convert")
+async def convert_file(file: UploadFile = File(...)):
+    # Save uploaded file temporarily
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".txt") as tmp:
+        contents = await file.read()
+        tmp.write(contents)
+        tmp_path = tmp.name
+
+    # Output file
+    output_file = tmp_path.replace(".txt", ".gpx")
+
+    # Run your converter
+    convert_to_gpx(tmp_path, output_file)
+
+    # Return file to frontend
+    return FileResponse(
+        path=output_file,
+        filename="converted_output.gpx",
+        media_type="application/gpx+xml"
+    )
 
 app.add_middleware(
     CORSMiddleware,

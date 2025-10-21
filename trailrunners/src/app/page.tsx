@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import Dashboard from "@/components/dashboard";
 import Header from "../components/header";
 import ControlPanel from "@/components/controlPanel";
+import Footer from "@/components/footer";
 
 const MapViewer = dynamic(() => import("@/components/map"), {
     ssr: false,
@@ -25,13 +26,16 @@ export default function Home() {
     const [lidarData, setLidarData] = useState();
     const [gpxFileItem, setGpxFileItem] = useState<FileItem | null>(null);
     const mapRef = useRef(null);
+    const [displayData, setDisplayData] = useState();
 
     useEffect(() => {
         setLidarData(undefined);
         setSelectedLidar("");
     }, [selectedTrail]);
 
-    const displayData = lidarData || trailData;
+    useEffect(() => {
+        setDisplayData(lidarData || trailData);
+    }, [trailData, lidarData])
 
     return (
         <div className="flex flex-col justify-between min-h-screen">
@@ -111,7 +115,7 @@ export default function Home() {
                                         <Dashboard trailData={displayData} />
                                     )}
                                     {displayData && (
-                                        <ControlPanel trailData={displayData} />
+                                        <ControlPanel trailData={displayData} setTrailData={setDisplayData}/>
                                     )}
                                 </div>
                             </div>
@@ -120,9 +124,7 @@ export default function Home() {
                 )}
             </main>
 
-            <footer className="p-2 py-3 flex flex-wrap items-center justify-center">
-                <p>Made with ❤️ by Runtime Terrors</p>
-            </footer>
+            <Footer />
         </div>
     );
 }

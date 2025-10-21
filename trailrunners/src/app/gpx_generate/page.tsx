@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Header from "../../components/header";
 import GNSSButton from "../../components/gnssButton";
+import Footer from "../../components/footer";
 
 export default function Generate() {
   return (
@@ -286,11 +287,7 @@ export default function Generate() {
                     </div>
                 </section>
 
-                
-
-                <footer className="p-2 py-3 flex flex-wrap items-center justify-center">
-                    <p>Made with ❤️ by Runtime Terrors</p>
-                </footer>
+                <Footer />
             </main>
         </div>
     );

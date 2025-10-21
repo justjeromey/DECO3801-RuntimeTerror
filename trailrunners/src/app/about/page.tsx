@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ChevronRightIcon, ChevronLeftIcon} from "@heroicons/react/24/outline";
 import { useEffect, useState, useCallback } from "react";
 import Header from "../../components/header";
+import Footer from "../../components/footer";
 
 export default function Info() {
     const features = [
@@ -51,77 +52,76 @@ export default function Info() {
                     </div>
                 </section>
   
-                <section className="flex flex-row">
+                <section className="flex flex-wrap justify-center items-stretch">
 
                     {/* Key Features of TrailRunners */}
-                    <div className="w-2/5 bg-green-400 text-black py-15 px-10 flex flex-col gap-5 justify-center items-center relative">
+                    <div className="flex-1 min-w-[320px] md:max-w-[40%] bg-green-400 text-black py-15 px-10 flex flex-col gap-5 justify-center items-center">
                         <h3 className="text-2xl font-bold mb-4 text-center">Key Features</h3>
 
                         <div className="flex gap-5 items-center justify-center w-full">
-                            <button onClick={prevFeature} className="p-2 mr-4 rounded-full bg-black/10 hover:bg-black/20 transition-colors">
-                                <ChevronLeftIcon className="w-6 h-6 text-black" />
-                            </button>
+                        <button onClick={prevFeature} className="p-2 mr-4 rounded-full bg-black/10 hover:bg-black/20 transition-colors">
+                            <ChevronLeftIcon className="w-6 h-6 text-black" />
+                        </button>
 
-                            <div className="text-center">
-                                <div className="text-5xl mb-4">{features[currentFeature].icon}</div>
-                                <h4 className="font-semibold text-l mb-2">{features[currentFeature].title}</h4>
-                                <p className="px-4">{features[currentFeature].text}</p>
-                            </div>
+                        <div className="text-center">
+                            <div className="text-5xl mb-4">{features[currentFeature].icon}</div>
+                            <h4 className="font-semibold text-l mb-2">{features[currentFeature].title}</h4>
+                            <p className="px-4">{features[currentFeature].text}</p>
+                        </div>
 
-                            <button onClick={nextFeature} className="p-2 ml-4 rounded-full bg-black/10 hover:bg-black/20 transition-colors">
-                                <ChevronRightIcon className="w-6 h-6 text-black" />
-                            </button>
+                        <button onClick={nextFeature} className="p-2 ml-4 rounded-full bg-black/10 hover:bg-black/20 transition-colors">
+                            <ChevronRightIcon className="w-6 h-6 text-black" />
+                        </button>
                         </div>
 
                         <div className="flex mt-4 space-x-2">
-                            {features.map((_, index) => (
-                                <div
-                                    key={index}
-                                    className={`h-2 w-2 rounded-full ${index === currentFeature ? 'bg-black' : 'bg-black/30'}`}
-                                ></div>
-                            ))}
+                        {features.map((_, index) => (
+                            <div
+                            key={index}
+                            className={`h-2 w-2 rounded-full ${index === currentFeature ? 'bg-black' : 'bg-black/30'}`}
+                            ></div>
+                        ))}
                         </div>
                     </div>
-                    
+
                     {/* Tips for TrailRunners */}
-                    <div className="w-4/5 bg-white p-15 text-black flex flex-col">
+                    <div className="flex-1 min-w-[320px] md:max-w-[60%] bg-white p-15 text-black flex flex-col">
                         <h3 className="text-2xl font-bold mb-4 text-black text-center">
-                            Tips for Best Results
+                        Tips for Best Results
                         </h3>
 
                         <div className="flex flex-col md:flex-row gap-6 flex-1">
-                            <div className="flex-1 rounded-lg shadow-md p-6 bg-gray-100 text-center flex flex-col justify-center">
-                                <h4 className="font-bold mb-2">📁 File Format</h4>
-                                <p>Upload GPX files for best compatibility</p>
-                            </div>
+                        <div className="flex-1 rounded-lg shadow-md p-6 bg-gray-100 text-center flex flex-col justify-center">
+                            <h4 className="font-bold mb-2">📁 File Format</h4>
+                            <p>Upload GPX files for best compatibility</p>
+                        </div>
 
-                            <div className="flex-1 rounded-lg shadow-md p-6 bg-gray-100 text-center flex flex-col justify-center">
-                                <h4 className="font-bold mb-2">🎯 Accuracy</h4>
-                                <p>Ensure your GPS data is clean and continuous</p>
-                            </div>
+                        <div className="flex-1 rounded-lg shadow-md p-6 bg-gray-100 text-center flex flex-col justify-center">
+                            <h4 className="font-bold mb-2">🎯 Accuracy</h4>
+                            <p>Ensure your GPS data is clean and continuous</p>
+                        </div>
 
-                            <div className="flex-1 rounded-lg shadow-md p-6 bg-gray-100 text-center flex flex-col justify-center">
-                                <h4 className="font-bold mb-2">📱 Device</h4>
-                                <p>Works best on desktop for detailed analysis</p>
-                            </div>
+                        <div className="flex-1 rounded-lg shadow-md p-6 bg-gray-100 text-center flex flex-col justify-center">
+                            <h4 className="font-bold mb-2">📱 Device</h4>
+                            <p>Works best on desktop for detailed analysis</p>
+                        </div>
                         </div>
                     </div>
-
                 </section>
 
                 {/* How to Use TrailRunners */}
-                <section className="w-full bg-colour-primary py-20 px-20">
-                    <div className="p-6 text-left text-white">
+                <section className="w-full bg-colour-primary py-20">
+                    <div className="p-6 text-center text-white">
                         <h2 className="text-4xl font-bold mb-6">
                             How to Use <span className="italic text-green-400">TrailRunners</span>
                         </h2>
                         
-                        <div className="p-6 text-left text-white max-w-3xl">
+                        <div className="p-6 text-center text-white w-full text-center justify-center w-full">
 
-                            <div className="space-y-8">
+                            <div className="space-y-8 gap-20 flex flex-col">
                                 {/* Step 1 */}
                                 <div className="flex flex-col gap-6"> 
-                                    <div className="flex items-center gap-6">
+                                    <div className="flex items-center gap-6 justify-center flex-col">
                                         <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-400 text-black font-bold text-xl shrink-0">
                                         1
                                         </div>
@@ -154,7 +154,7 @@ export default function Info() {
 
                                 {/* Step 2 */}
                                 <div className="flex flex-col gap-6"> 
-                                    <div className="flex items-center gap-6">
+                                    <div className="flex items-center gap-6 justify-center flex-col">
                                         <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-400 text-black font-bold text-xl shrink-0">
                                         2
                                         </div>
@@ -187,7 +187,7 @@ export default function Info() {
 
                                 {/* Step 3 */}
                                 <div className="flex flex-col gap-6"> 
-                                    <div className="flex items-center gap-6">
+                                    <div className="flex items-center gap-6 justify-center flex-col">
                                         <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-400 text-black font-bold text-xl shrink-0">
                                         3
                                         </div>
@@ -210,10 +210,9 @@ export default function Info() {
                                     </div>
                                 </div>
                                
-
                                 {/* Step 4 */}
                                 <div className="flex flex-col gap-6"> 
-                                    <div className="flex items-center gap-6">
+                                    <div className="flex items-center gap-6 justify-center flex-col">
                                         <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-400 text-black font-bold text-xl shrink-0">
                                         4
                                         </div>
@@ -238,9 +237,7 @@ export default function Info() {
                     </div>
                 </section>
 
-                <footer className="p-2 py-3 flex flex-wrap items-center justify-center">
-                    <p>Made with ❤️ by Runtime Terrors</p>
-                </footer>
+                <Footer />
             </main>
         </div>
     );

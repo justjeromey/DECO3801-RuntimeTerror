@@ -8,6 +8,7 @@ import dynamic from "next/dynamic";
 import Dashboard from "@/components/dashboard";
 import Header from "../components/header";
 import ControlPanel from "@/components/controlPanel";
+import Footer from "@/components/footer";
 
 const MapViewer = dynamic(() => import("@/components/map"), {
     ssr: false,
@@ -120,9 +121,7 @@ export default function Home() {
                 )}
             </main>
 
-            <footer className="p-2 py-3 flex flex-wrap items-center justify-center">
-                <p>Made with ❤️ by Runtime Terrors</p>
-            </footer>
+            <Footer />
         </div>
     );
 }

@@ -4,30 +4,8 @@ from typing import List, Optional
 from parseGpx import parse_gpx, GPXData
 from scipy.spatial import KDTree
 from pyproj import Transformer
-from lidar_util import get_real_path, get_route_bounds
+from lidar_util import get_real_path, fit_lidar_to_route
 
-def fit_lidar_to_route(las, gpx_data: GPXData, margin: float = 0.001, las_crs_epsg: int = 28356):
-    """
-    Filter the LAS points to only those within the bounding box of the GPX route plus a margin.
-    """
-    min_lat, max_lat, min_lon, max_lon = get_route_bounds(gpx_data)
-    min_lat -= margin
-    max_lat += margin
-    min_lon -= margin
-    max_lon += margin
-
-    # Transform GPX WGS84 coordinates to LAS CRS
-    transformer = Transformer.from_crs("EPSG:4326", f"EPSG:{las_crs_epsg}", always_xy=True)
-
-    # Transform the bounding box corners
-    (min_x, min_y) = transformer.transform(min_lon, min_lat)
-    (max_x, max_y) = transformer.transform(max_lon, max_lat)
-
-    # Create a mask for points within the bounding box
-    mask = (las.x >= min_x) & (las.x <= max_x) & (las.y >= min_y) & (las.y <= max_y)
-
-    # Apply the mask to filter points
-    las.points = las.points[mask]
 
 def link_points_to_route(las, gpx_data: GPXData, distance_thresh: float) -> List[Optional[float]]:
     """

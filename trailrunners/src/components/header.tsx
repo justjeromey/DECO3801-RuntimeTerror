@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"; 
 
 interface HeaderProps {
@@ -18,7 +19,7 @@ const Header: React.FC<HeaderProps> = ({ activePath }) => {
 
     return (
         <header className="header">
-            <a href="/" className="flex items-center">
+            <Link href="/" className="flex items-center">
                 <Image
                     src="/logo.svg"
                     width={290}
@@ -27,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({ activePath }) => {
                     className="block"
                     priority
                 />
-            </a>
+            </Link>
 
             {/* Desktop nav */}
             <nav className="hidden md:flex flex-row items-center gap-4 font-medium uppercase">

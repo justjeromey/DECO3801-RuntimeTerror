@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -592,7 +594,7 @@ export default function ChartViewer({
         <div className="chart_container">
             {chartData !== null ? (
                 <>
-                    <Line data={chartData} options={options} ref={chartRef} />
+                    <Line data={chartData} options={options as any} ref={chartRef} />
                     {trailData && 
                         ((trailData.segment_stats && trailData.segment_stats.length > 0) || 
                          (trailData.elevations && trailData.elevations.length > 0)) && (

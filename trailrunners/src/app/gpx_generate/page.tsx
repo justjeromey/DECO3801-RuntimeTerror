@@ -214,7 +214,7 @@ export default function Generate() {
 
                         <ol className="list-decimal text-lg text-gray-300 grid grid-cols-1 sm:grid-cols-2 gap-8 mt-6">
                             <li>
-                                Open the app, click "Start Tracking" and run your trail.             
+                                Open the app, click &quot;Start Tracking&quot; and run your trail.             
 
                                 <Image
                                 src="/OGPX1.gif"
@@ -226,7 +226,7 @@ export default function Generate() {
                             </li>
 
                             <li>
-                                When complete, click "Save" and give your .GPX file a name.
+                                When complete, click &quot;Save&quot; and give your .GPX file a name.
 
                                 <Image
                                 src="/OGPX2.gif"
@@ -238,7 +238,7 @@ export default function Generate() {
                             </li>
 
                             <li>
-                                Open your GPX files in the top left and select a file and click "Share".
+                                Open your GPX files in the top left and select a file and click &quot;Share&quot;.
 
                                 <Image
                                 src="/OGPX3.gif"

@@ -21,6 +21,7 @@ export default function LidarFileSelector({firstUse = false, setTrailData, selec
 
     return (
         <FileSelector
+            key="lidar"
             onDataLoaded={(files) => {
                 setTrailData(files);
             }}

@@ -68,6 +68,7 @@ export default function Home() {
                         <div className="w-full flex items-center justify-end">
                             <div className="flex flex-row items-center gap-4">
                                 <LidarFileSelector
+                                    key="lidar"
                                     setTrailData={setLidarData}
                                     selected={selectedLidar}
                                     setSelected={setSelectedLidar}
@@ -76,6 +77,7 @@ export default function Home() {
                                 />
 
                                 <GPXFileSelector
+                                    key="gpx"
                                     setTrailData={setTrailData}
                                     selected={selectedTrail}
                                     setSelected={setSelectedTrail}

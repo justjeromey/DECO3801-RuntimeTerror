@@ -10,7 +10,7 @@ export default function Info() {
     const features = [
         { id: 1, title: 'Interactive Elevation Profile', icon: '⛰️', text: 'Visualize your trail’s elevation changes in a detailed, interactive graph.' },
         { id: 2, title: 'Dynamic Map Integration', icon: '🗺️', text: 'View your route on an integrated map that highlights rolling hills on your trail.' },
-        { id: 3, title: 'Trail Analysis', icon: '📈', text: 'Get detailed data on your trail, including elevation, distance and segment information.' },
+        { id: 3, title: 'Trail Analysis', icon: '📈', text: 'Get detailed data on your trail, including elevation, distance and segment information.' }
     ];
 
      const [currentFeature, setCurrentFeature] = useState(0);

@@ -7,7 +7,9 @@ from pyproj import Transformer
 from lidar_util import get_real_path, fit_lidar_to_route
 
 
-def link_points_to_route(las, gpx_data: GPXData, distance_thresh: float) -> List[Optional[float]]:
+def link_points_to_route(
+    las, gpx_data: GPXData, distance_thresh: float
+) -> List[Optional[float]]:
     """
     Link each GPX point to the nearest LIDAR point and return a list of elevations.
     If no LIDAR points are available, return a list of None.
@@ -38,7 +40,9 @@ def link_points_to_route(las, gpx_data: GPXData, distance_thresh: float) -> List
     return elevations
 
 
-def prune_trees(elevations: List[Optional[float]], max_gap: int = 5, gap_increase: float = 0.3) -> List[Optional[float]]:
+def prune_trees(
+    elevations: List[Optional[float]], max_gap: float = 5.0, gap_increase: float = 0.3
+) -> List[Optional[float]]:
     """
     Prune spikes in elevation data likely caused by trees and interpolate missing values.
     Also handles the case where trees might be at the end of the route.
@@ -48,7 +52,7 @@ def prune_trees(elevations: List[Optional[float]], max_gap: int = 5, gap_increas
 
     pruned = list(elevations)
     n = len(pruned)
-    
+
     # First pass: detect and handle tree spikes (including at the end)
     i = 0
     while i < n - 1:
@@ -70,7 +74,9 @@ def prune_trees(elevations: List[Optional[float]], max_gap: int = 5, gap_increas
         if next_val - current_val > max_gap:
             end_of_spike = j + 1
             gap = max_gap
-            while end_of_spike < n and (pruned[end_of_spike] is None or pruned[end_of_spike] - current_val > gap):
+            while end_of_spike < n and (
+                pruned[end_of_spike] is None or pruned[end_of_spike] - current_val > gap
+            ):
                 gap += gap_increase
                 end_of_spike += 1
 
@@ -79,7 +85,9 @@ def prune_trees(elevations: List[Optional[float]], max_gap: int = 5, gap_increas
                 end_val = pruned[end_of_spike]
                 num_points = end_of_spike - i
                 for k in range(i + 1, end_of_spike):
-                    pruned[k] = current_val + (end_val - current_val) * (k - i) / num_points
+                    pruned[k] = (
+                        current_val + (end_val - current_val) * (k - i) / num_points
+                    )
                 i = end_of_spike
             else:
                 # Spike extends to the end - likely trees at the end
@@ -91,6 +99,7 @@ def prune_trees(elevations: List[Optional[float]], max_gap: int = 5, gap_increas
             i = j
 
     return pruned
+
 
 def fill_missing_values(elevations: List[Optional[float]]) -> List[Optional[float]]:
     for i in range(len(elevations)):
@@ -125,7 +134,10 @@ def fill_missing_values(elevations: List[Optional[float]]) -> List[Optional[floa
 
     return elevations
 
-def parse_lidar(laz_file, gpx_file, distance_thresh: float = 1.5, max_tree_gap: float = 1.5) -> GPXData:
+
+def parse_lidar(
+    laz_file, gpx_file, distance_thresh: float = 1.5, max_tree_gap: float = 1.5
+) -> GPXData:
     gpx_data = parse_gpx(gpx_file)
 
     las = laspy.read(laz_file)
@@ -140,6 +152,7 @@ def parse_lidar(laz_file, gpx_file, distance_thresh: float = 1.5, max_tree_gap: 
     gpx_data.elevations = elevations
     return gpx_data
 
+
 if __name__ == "__main__":
     laz_path = "data/lidar/honeyeater_mini.laz"
     laz_path = get_real_path(laz_path)
@@ -153,6 +166,7 @@ if __name__ == "__main__":
 
     # plot the elevations against distance
     import matplotlib.pyplot as plt
+
     plt.plot(result.cumulative_distances_m, result.elevations)
     plt.xlabel("Distance (m)")
     plt.ylabel("Elevation (m)")

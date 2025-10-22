@@ -64,9 +64,9 @@ export default function Home() {
                         />
                     </div>
                 ) : (
-                    <div className="w-full flex flex-col gap-6 mt-6">
-                        <div className="w-full flex items-center justify-end">
-                            <div className="flex flex-row items-center gap-4">
+                    <div className="w-full flex flex-col gap-6 min-h-screen">
+                        <div className="w-full flex items-center justify-end min-h-16">
+                            <div className="flex flex-row items-center gap-4 min-h-16">
                                 <LidarFileSelector
                                     key="lidar"
                                     setTrailData={setLidarData}

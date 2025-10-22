@@ -31,7 +31,7 @@ const Header: React.FC<HeaderProps> = ({ activePath }) => {
             </Link>
 
             {/* Desktop nav */}
-            <nav className="hidden md:flex flex-row items-center gap-4 font-medium uppercase">
+            <nav className="hidden lg:flex flex-row items-center gap-4 font-medium uppercase">
                 {navItems.map((item) => (
                 <a
                     key={item.href}
@@ -48,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({ activePath }) => {
             </nav>
 
             {/* Hamburger menu */}
-            <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden text-gray-400 hover:text-white cursor-pointer transition-colors">
+            <button onClick={() => setMenuOpen(!menuOpen)} className="lg:hidden text-gray-400 hover:text-white cursor-pointer transition-colors">
                 {menuOpen ? (
                     <XMarkIcon className="h-7 w-7" />
                 ) : (
@@ -59,7 +59,7 @@ const Header: React.FC<HeaderProps> = ({ activePath }) => {
             {menuOpen && (
                 <div
                     className="absolute left-0 top-[calc(100%+0.5rem)] w-full bg-[#2a3024]/95 backdrop-blur-lg 
-                            shadow-md flex flex-col py-3 md:hidden border border-gray-400/5 rounded-lg z-50 opacity-100"
+                            shadow-md flex flex-col py-3 lg:hidden border border-gray-400/5 rounded-lg z-50 opacity-100"
                 >
                     {navItems.map((item) => (
                     <a

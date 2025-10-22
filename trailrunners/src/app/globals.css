@@ -89,11 +89,11 @@ body {
 }
 
 .fileSelector {
-    @apply hidden md:inline w-full border border-secondary pl-4 pr-2 py-2 bg-primary cursor-pointer z-1000;
+    @apply inline w-full border border-secondary pl-4 pr-2 py-2 bg-primary cursor-pointer z-1000;
 }
 
 .fileSelector_icon {
-    @apply md:hidden inline;
+    @apply inline;
 }
 
 .file_select_button {

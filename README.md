@@ -130,6 +130,12 @@ cd backend
 pip3 install -r requirements.txt
 ```
 
+### Reloading
+
+```bash
+webprojctl enable nodejs
+```
+
 # Usage
 
 To use the application, ensure you have .gpx files to submit which contains your trail data for analysis. The web application has its own 

@@ -9,9 +9,8 @@ import Footer from "../../components/footer";
 export default function Info() {
     const features = [
         { id: 1, title: 'Interactive Elevation Profile', icon: '⛰️', text: 'Visualize your trail’s elevation changes in a detailed, interactive graph.' },
-        { id: 2, title: 'Real-time Distance Tracking', icon: '⏱️', text: 'Monitor your progress and remaining distance as you move along the route.' },
-        { id: 3, title: 'Dynamic Map Integration', icon: '🗺️', text: 'View your route on an integrated map that highlights key points and terrain.' },
-        { id: 4, title: 'Elevation Gain/Loss Analysis', icon: '📈', text: 'Get detailed data on your total elevation gain and loss for better training.' },
+        { id: 2, title: 'Dynamic Map Integration', icon: '🗺️', text: 'View your route on an integrated map that highlights rolling hills on your trail.' },
+        { id: 3, title: 'Trail Analysis', icon: '📈', text: 'Get detailed data on your trail, including elevation, distance and segment information.' },
     ];
 
      const [currentFeature, setCurrentFeature] = useState(0);

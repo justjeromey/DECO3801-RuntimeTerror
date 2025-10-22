@@ -239,7 +239,7 @@ export default function FileSelector({
             >
                 {firstUse && <Upload className="w-6 h-6" />}
 
-                <div className="flex">
+                <div className="flex justify-between">
                     <p>
                         {selected || (firstUse ? mergedConfig.firstUseUploadText : mergedConfig.selectItemText)}
                     </p>
@@ -264,12 +264,12 @@ export default function FileSelector({
                 {/* Upload option */}
                 <input
                     type="file"
-                    id="file-upload-label"
+                    id={config.acceptedFileTypes}
                     accept={config.acceptedFileTypes}
                     className="hidden"
                     onChange={handleUpload}
                 />
-                <label className="file_select_button cursor-pointer italic text-center animate-pulse" htmlFor="file-upload-label">
+                <label className="file_select_button cursor-pointer italic text-center animate-pulse" htmlFor={config.acceptedFileTypes}>
                     Upload {config.acceptedFileTypes} file
                 </label>
 

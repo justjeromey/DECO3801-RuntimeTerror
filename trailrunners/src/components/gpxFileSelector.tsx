@@ -14,6 +14,7 @@ interface GPXFileSelectorProps {
 export default function GPXFileSelector({firstUse = false, setTrailData, selected, setSelected, setFileItem}: GPXFileSelectorProps) {
     return (
         <FileSelector
+            key="gpx"
             onDataLoaded={(files) => {
                 setTrailData(files);
             }}

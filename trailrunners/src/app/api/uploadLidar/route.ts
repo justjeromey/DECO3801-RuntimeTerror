@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-const API_URL = "http://127.0.0.1:8000/process-lidar";
+const API_URL = process.env.NEXT_PUBLIC_FASTAPI_BASE_URL;
 
 export async function POST(request: NextRequest) {
   try {
@@ -51,9 +51,9 @@ export async function POST(request: NextRequest) {
             }
         }
     }
-
+ 
     // make the request to the FastAPI server
-    const fastApiRes = await fetch(API_URL, {
+    const fastApiRes = await fetch(`${API_URL}/process-lidar`, {
       method: "POST",
       body: formDataToSend,
     });

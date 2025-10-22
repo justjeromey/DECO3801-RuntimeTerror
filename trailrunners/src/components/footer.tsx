@@ -3,9 +3,8 @@ import Link from "next/link";
 const Footer = () => {
 
     return (
-        <footer className="p-2 py-3 flex flex-wrap items-center justify-center gap-5">
+        <footer className="p-2 py-3 flex flex-col items-center justify-center gap-5">
             <p>Made with ❤️ by Runtime Terrors</p>
-
             <Link 
                 href="/privacy" 
                 className="underline"

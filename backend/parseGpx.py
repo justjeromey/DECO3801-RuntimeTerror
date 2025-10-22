@@ -127,8 +127,12 @@ def calculateDynamic(turning_x: List[float], turning_y: List[float], threshold: 
             continue
         # If section is short then it is rolling hill
         elif hypotenuse < threshold:
-            rolling_x.extend([turning_x[x],turning_x[x+1]])
-            rolling_y.extend([turning_y[x], turning_y[x+1]])
+            if len(rolling_x) == 0:
+                rolling_x.extend([turning_x[x],turning_x[x+1]])
+                rolling_y.extend([turning_y[x], turning_y[x+1]])
+            elif rolling_x[-1] != turning_x[x]:
+                rolling_x.extend([turning_x[x],turning_x[x+1]])
+                rolling_y.extend([turning_y[x], turning_y[x+1]])
     return rolling_x, rolling_y
 
 def calculateSegmentStats(x_list: list[int], y_list: list[int], start: int, end: int, threshold):
@@ -240,13 +244,10 @@ def calculateTrailStats(distances: List[float], elevations: List[float]) -> dict
         "grade" : avgGrade
     }
 
-def handle_gpx_stats(gpx_data: GPXData):
-    num_splits = 5 # This should be done dynamically based on trail length
-    threshold = 10
-
+def handle_gpx_stats(gpx_data: GPXData, threshold = 10, num_splits = 5):
     stats = calculateTrailStats(gpx_data.cumulative_distances_m, gpx_data.elevations)
     turning_x, turning_y = calculateTurningPoints(gpx_data.cumulative_distances_m, gpx_data.elevations)
-    rolling_x, rolling_y = calculateRollingHills(turning_x, turning_y, threshold)
+    rolling_x, rolling_y = calculateDynamic(turning_x, turning_y, threshold, 0.5, 0.04)
     segment_stats, segment_x_positions = calculateSegments(turning_x, turning_y, num_splits, (gpx_data.cumulative_distances_m[-1] / num_splits), threshold)
     
     # assign stats to gpx_data
@@ -359,9 +360,10 @@ def save_json(data: GPXData, file_path: str):
 
 # with open(gpx_path, 'r') as gpx_file:
 #     gpx_result: GPXData = parse_gpx(gpx_file)
-#     print(gpx_result.turning_x)
-#     print(gpx_result.turning_y)
-#     print(gpx_result.rolling_y)
-#     for i in range (5):
-#         print(gpx_result.segment_stats[i]["gain"])
-#         print(gpx_result.segment_x_positions[i])
+#     gpx_result = handle_gpx_stats(gpx_result)
+#     partialCount = 0
+#     for i in gpx_result.rolling_x:
+#         if i < 0.2:
+#             print(i)
+#             partialCount += 1
+#     print(partialCount)

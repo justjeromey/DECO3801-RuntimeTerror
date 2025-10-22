@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
 
-const API_URL = "http://127.0.0.1:8000/format-gpx";
+const API_URL = process.env.NEXT_PUBLIC_FASTAPI_BASE_URL;
 
 export async function POST(request: NextRequest) {
     try {
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
             _formData.append("file", file);
 
             // Pass file object to parser api
-            const fastApiRes = await fetch(API_URL, {
+            const fastApiRes = await fetch(`${API_URL}/format-gpx`, {
                 method: "POST",
                 body: _formData,
             });
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
         }
 
         // If it's a file object, pass the file object to parser api
-        const fastApiRes = await fetch(API_URL, {
+        const fastApiRes = await fetch(`${API_URL}/format-gpx`, {
             method: "POST",
             body: formData,
         });

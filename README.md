@@ -16,7 +16,6 @@ Ensure you have the following installed on your laptop:
 3. **(Optional and Recommended) NPM's "Concurrently"**
 4. **(Optional and Recommended) Bash**
 
-
 ## Manual Installation
 
 ### Front-End
@@ -108,6 +107,28 @@ Otherwise, if there are any issues with the automatic start-up command, you will
     cd backend
     uvicorn main:app --reload
     ```
+
+## Zones Setup
+Ensure that the main repository is set up for the "nodejs" directory. Ensure you have npm (+ concurrently installed inside of the trail runners directory) and Python
+/ Pip installed.
+
+### Front-end
+In "trailrunners"
+
+```bash
+npm install
+npm run build
+```
+
+### Back-end
+In root (nodejs)
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+cd backend
+pip3 install -r requirements.txt
+```
 
 # Usage
 

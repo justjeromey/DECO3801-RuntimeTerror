@@ -1,10 +1,11 @@
 import os
 import numpy as np
-from typing import Tuple, List, Optional
+from typing import Tuple
 import laspy
 from scipy.spatial import KDTree
 from pyproj import Transformer
 from parseGpx import GPXData, parse_gpx
+from pyproj import CRS
 
 
 def load_lidar_points(laz_rel_path: str):
@@ -65,12 +66,14 @@ def save_gpx_data_to_laz(gpx_data, output_path: str):
 
     elevations = np.array([e if e is not None else -9999 for e in gpx_data.elevations])
 
-    # Setup LAS header (XYZ only, version 1.2)
-    header = laspy.LasHeader(point_format=0, version="1.2")
-
-    # Set scaling/offsets for storage precision
-    header.scales = [0.01, 0.01, 0.01]  # centimeter precision
-    header.offsets = [np.min(eastings), np.min(northings), np.min(elevations)]
+    # Setup LAS header (XYZ only, version 1.4)
+    header = laspy.LasHeader(point_format=0, version="1.4")
+    header.x_scale = 0.01
+    header.y_scale = 0.01
+    header.z_scale = 0.01
+    header.x_offset = np.min(eastings)
+    header.y_offset = np.min(northings)
+    header.z_offset = np.min(elevations)
 
     # Create LAS object
     las = laspy.LasData(header)
@@ -79,7 +82,7 @@ def save_gpx_data_to_laz(gpx_data, output_path: str):
     las.z = elevations
 
     # Add CRS metadata (so GIS knows it’s EPSG:28356)
-    header.parse_crs("EPSG:28356")
+    header.crs = CRS.from_epsg(28356)
 
     # Write file
     las.write(output_path)
@@ -137,7 +140,8 @@ def create_mini_lidar_file(
     gpx_tree = KDTree(gpx_coords)
 
     # vectorized query: query all LiDAR points at once (MUCH faster!)
-    lidar_coords = np.vstack((las.x, las.y)).T
+    x, y = np.asarray(las.x), np.asarray(las.y)
+    lidar_coords = np.vstack((x, y)).T
     distances, _ = gpx_tree.query(lidar_coords)
 
     # create boolean mask for points within the distance threshold
@@ -146,17 +150,21 @@ def create_mini_lidar_file(
     print(f"Number of points within {distance}m of route: {np.sum(mask)}")
 
     # apply mask to filter points (vectorized operation)
-    filtered_x = las.x[mask]
-    filtered_y = las.y[mask]
-    filtered_z = las.z[mask]
+    filtered_x = np.asarray(las.x)[mask]
+    filtered_y = np.asarray(las.y)[mask]
+    filtered_z = np.asarray(las.z)[mask]
 
     # create new LAS file with filtered points
     output_path = get_real_path(output_laz_path)
 
     # setup LAS header
     header = laspy.LasHeader(point_format=0, version="1.2")
-    header.scales = [0.01, 0.01, 0.01]  # centimeter precision
-    header.offsets = [np.min(filtered_x), np.min(filtered_y), np.min(filtered_z)]
+    header.x_scale = 0.01
+    header.y_scale = 0.01
+    header.z_scale = 0.01
+    header.x_offset = np.min(filtered_x)
+    header.y_offset = np.min(filtered_y)
+    header.z_offset = np.min(filtered_z)
 
     # create LAS object
     filtered_las = laspy.LasData(header)
@@ -165,7 +173,7 @@ def create_mini_lidar_file(
     filtered_las.z = filtered_z
 
     # add CRS metadata
-    header.parse_crs("EPSG:28356")
+    header.crs = CRS.from_epsg(28356)
 
     # write the filtered LAS file
     filtered_las.write(output_path)

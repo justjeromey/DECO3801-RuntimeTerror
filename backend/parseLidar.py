@@ -3,6 +3,7 @@ import laspy
 from typing import List, Optional
 from parseGpx import parse_gpx, GPXData
 from scipy.spatial import KDTree
+from scipy.ndimage import uniform_filter1d
 from pyproj import Transformer
 from lidar_util import get_real_path, fit_lidar_to_route
 
@@ -40,99 +41,78 @@ def link_points_to_route(
     return elevations
 
 
-def prune_trees(
-    elevations: List[Optional[float]], max_gap: float = 5.0, gap_increase: float = 0.3
-) -> List[Optional[float]]:
+def fuse_elevation_models(
+    lidar_elevations: List[float | None],
+    gpx_elevations: List[float | None],
+    max_gap: float = 3.0,
+    weight_lidar: float = 0.7,
+    smoothing_window: int = 5,
+) -> None | List[float]:
     """
-    Prune spikes in elevation data likely caused by trees and interpolate missing values.
-    Also handles the case where trees might be at the end of the route.
+    Prune LIDAR elevations that are likely to be from trees.
+    If a gap larger than max_gap is detected between consecutive known elevations,
+    the elevations in that gap are set to None.
     """
-    if not elevations:
-        return []
 
-    pruned = list(elevations)
-    n = len(pruned)
+    if len(lidar_elevations) != len(gpx_elevations):
+        raise ValueError("Arrays must be the same length.")
 
-    # First pass: detect and handle tree spikes (including at the end)
-    i = 0
-    while i < n - 1:
-        if pruned[i] is None:
-            i += 1
+    fused = []
+    for lidar, gpx in zip(lidar_elevations, gpx_elevations):
+        # Skip None values
+        if lidar is None or gpx is None:
+            fused.append(gpx if gpx is not None else lidar)
             continue
 
-        j = i + 1
-        while j < n and pruned[j] is None:
-            j += 1
+        # Prune spikes above GPX
+        if lidar - gpx > max_gap:
+            lidar = gpx
 
-        if j == n:
-            break
+        # Weighted fusion
+        fused_val = weight_lidar * lidar + (1 - weight_lidar) * gpx
+        fused.append(fused_val)
 
-        current_val = pruned[i]
-        next_val = pruned[j]
+    # Smooth the array using a simple moving average
+    fused_array = np.array(fused, dtype=float)
+    smoothed = uniform_filter1d(fused_array, size=smoothing_window, mode="nearest")
 
-        # Detect a spike: a sharp increase in elevation
-        if next_val - current_val > max_gap:
-            end_of_spike = j + 1
-            gap = max_gap
-            while end_of_spike < n and (
-                pruned[end_of_spike] is None or pruned[end_of_spike] - current_val > gap
-            ):
-                gap += gap_increase
-                end_of_spike += 1
+    return smoothed.tolist()
 
-            if end_of_spike < n:
-                # Normal spike with an endpoint - interpolate
-                end_val = pruned[end_of_spike]
-                num_points = end_of_spike - i
-                for k in range(i + 1, end_of_spike):
-                    pruned[k] = (
-                        current_val + (end_val - current_val) * (k - i) / num_points
-                    )
-                i = end_of_spike
-            else:
-                # Spike extends to the end - likely trees at the end
-                # Interpolate backwards from the last known good point
-                for k in range(j, n):
-                    pruned[k] = current_val
-                break
+
+def fill_missing_values(elevations: List[Optional[float]]) -> List[float | None]:
+    n = len(elevations)
+    result = elevations.copy()
+
+    # Forward pass: fill with last known value
+    last_val = None
+    for i in range(n):
+        if result[i] is not None:
+            last_val = result[i]
         else:
-            i = j
+            result[i] = last_val
 
-    return pruned
+    # Backward pass: fill remaining None with next known value
+    next_val = None
+    for i in range(n - 1, -1, -1):
+        if result[i] is not None:
+            next_val = result[i]
+        elif next_val is not None:
+            # Linear interpolation
+            # Find the start of the missing segment
+            j = i
+            while j >= 0 and elevations[j] is None:
+                j -= 1
+            start_val = result[j] if j >= 0 else next_val
+            end_val = next_val
+            segment_len = i - j
+            for k in range(j + 1, i + 1):
+                ratio = (k - j) / segment_len
+                if (start_val is not None) and (end_val is not None):
+                    result[k] = start_val + (end_val - start_val) * ratio
+                else:
+                    result[k] = start_val if start_val is not None else end_val
 
-
-def fill_missing_values(elevations: List[Optional[float]]) -> List[Optional[float]]:
-    for i in range(len(elevations)):
-        if elevations[i] is None:
-            # Find the nearest non-None values before and after
-            before_val = None
-            before_idx = i - 1
-            while before_idx >= 0 and elevations[before_idx] is None:
-                before_idx -= 1
-            if before_idx >= 0:
-                before_val = elevations[before_idx]
-
-            after_val = None
-            after_idx = i + 1
-            while after_idx < len(elevations) and elevations[after_idx] is None:
-                after_idx += 1
-            if after_idx < len(elevations):
-                after_val = elevations[after_idx]
-
-            # Interpolate based on available values
-            if before_val is not None and after_val is not None:
-                # Linear interpolation between before and after
-                distance_ratio = (i - before_idx) / (after_idx - before_idx)
-                elevations[i] = before_val + (after_val - before_val) * distance_ratio
-            elif before_val is not None:
-                # Use the last known value (forward fill)
-                elevations[i] = before_val
-            elif after_val is not None:
-                # Use the next known value (backward fill)
-                elevations[i] = after_val
-            # If both are None, leave as None (shouldn't happen in normal cases)
-
-    return elevations
+    return result
 
 
 def parse_lidar(
@@ -143,13 +123,16 @@ def parse_lidar(
     las = laspy.read(laz_file)
     fit_lidar_to_route(las, gpx_data, margin=0.001, las_crs_epsg=28356)
 
-    elevations = link_points_to_route(las, gpx_data, distance_thresh=distance_thresh)
-    elevations = prune_trees(elevations, max_gap=max_tree_gap)
+    lidar_elevations = link_points_to_route(
+        las, gpx_data, distance_thresh=distance_thresh
+    )
 
-    elevations = fill_missing_values(elevations)
+    fusion = fuse_elevation_models(
+        lidar_elevations, gpx_data.elevations, max_gap=max_tree_gap
+    )
+    if fusion is not None:
+        gpx_data.elevations = [float(e) for e in fusion]
 
-    # replace gpx_data.elevations with elevations
-    gpx_data.elevations = elevations
     return gpx_data
 
 
@@ -161,13 +144,14 @@ if __name__ == "__main__":
         result = parse_lidar(laz_path, gpx_file, max_tree_gap=1.5)
 
     # save to file
-    from lidar_util import save_gpx_data_to_laz
+    # from lidar_util import save_gpx_data_to_laz
     # save_gpx_data_to_laz(result, "data/lidar/honeyeater_mini.laz")
 
     # plot the elevations against distance
     import matplotlib.pyplot as plt
 
-    plt.plot(result.cumulative_distances_m, result.elevations)
+    fixed_eles = [e if e is not None else 0 for e in result.elevations]
+    plt.plot(result.cumulative_distances_m, fixed_eles)
     plt.xlabel("Distance (m)")
     plt.ylabel("Elevation (m)")
     plt.title("Elevation Profile")

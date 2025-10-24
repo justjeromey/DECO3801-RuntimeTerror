@@ -141,6 +141,7 @@ export default function Generate() {
                                 height={250}
                                 alt="GNSS Turn On Action"
                                 className="gifStyle max-w-full h-auto"
+                                unoptimized
                             />
                             </li>
 

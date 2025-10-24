@@ -64,7 +64,8 @@ export default function ControlPanel({ trailData, setTrailData }: DashboardProps
             if (pending) return;
             setPending(true)
 
-            const promise = await fetch(`${API_URL}/update`, {
+            // Fetches via exposed enpoint
+            const promise = await fetch(`/api/update`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

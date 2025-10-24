@@ -1,7 +1,8 @@
 # DECO3801-RuntimeTerror
 Runtime Terror Team Repository for DECO3801 Team
 
-https://github.com/justjeromey/DECO3801-RuntimeTerror
+Repository: https://github.com/justjeromey/DECO3801-RuntimeTerror
+
 Live: https://runtimeterror.uqcloud.net/
 
 # About

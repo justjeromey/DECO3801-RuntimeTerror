@@ -80,21 +80,6 @@ export default function ControlPanel({ trailData, setTrailData }: DashboardProps
                 }),
             })
 
-            // const promise = await fetch(`${API_URL}/update`, {
-            //     method: "POST",
-            //     headers: { "Content-Type": "application/json" },
-            //     body: JSON.stringify({
-            //         elevations: trailData.elevations,
-            //         latitudes: trailData.latitudes,
-            //         longitudes: trailData.longitudes,
-            //         cumulative_distances_m: trailData.cumulative_distances_m,
-
-            //         // Fill in value with previous one if not provided
-            //         threshold: threshold ? threshold : thresh,
-            //         segments: segments ? segments : segs,
-            //     }),
-            // })
-
             const data = await promise.json();
             setPending(false)
 
